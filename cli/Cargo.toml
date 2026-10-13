@@ -1,0 +1,10 @@
+[package]
+name = "dotted-cli"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+keyring = { version = "3.6", default-features = false, features = ["apple-native"] }
+rpassword = "7.5"
+serde_json = { version = "1", features = ["preserve_order"] }
+ureq = { version = "3.4", default-features = false, features = ["rustls"] }

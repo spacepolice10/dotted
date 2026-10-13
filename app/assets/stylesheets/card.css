@@ -1,0 +1,128 @@
+@layer base {
+  .card-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-v);
+  }
+
+  article,
+  .card {
+    --surface-colour: var(--color-1);
+    --surface-border: var(--border-subtle);
+    --surface-shadow: var(--shadow-subtle);
+
+    width: 100%;
+    border: var(--surface-border);
+    border-radius: var(--radius-base);
+    background: var(--surface-colour);
+    box-shadow: var(--surface-shadow);
+
+    &[data-elevation="1"] {
+      --surface-colour: var(--color-1);
+      --surface-border: var(--border-subtle);
+    }
+
+    &[data-elevation="2"] {
+      --surface-colour: var(--color-2);
+      --surface-border: var(--border-subtle);
+      --surface-shadow: var(--shadow-strong);
+    }
+
+    /* Opt in only when the whole card has an interactive target. */
+    &[data-pressable] {
+      cursor: pointer;
+      transition: box-shadow 0.25s ease;
+
+      &:focus-within {
+        box-shadow: var(--shadow-strong);
+      }
+
+      &:active {
+        box-shadow: var(--surface-shadow);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        transition: none;
+      }
+    }
+
+    &>header {
+      width: 100%;
+      border-block-end: var(--surface-border);
+      padding-inline: var(--space-h);
+      padding-block: var(--space-v);
+
+      &>strong {
+        font-family: var(--font-family-sans);
+        font-weight: var(--font-weight-medium);
+      }
+    }
+
+    &>main {
+      flex: 1 1 0;
+      width: 100%;
+      padding-block: var(--space-v-2);
+      padding-inline: var(--space-h);
+    }
+
+    &>div {
+      flex: 1 1 0;
+      width: 100%;
+      padding-block: var(--space-v);
+      padding-inline: var(--space-h);
+    }
+
+    &>footer {
+      display: flex;
+      justify-content: flex-start;
+      padding: var(--space-v) var(--space-h);
+    }
+
+    & code {
+      overflow-wrap: anywhere;
+    }
+  }
+}
+
+@layer components {
+  .card--warning {
+    --surface-colour: var(--model-color-4-bg);
+    --surface-border: 1px solid color-mix(in oklch, var(--model-color-4) 55%, var(--color-invert-3));
+    --surface-shadow: 0 0 0 1px color-mix(in oklch, var(--model-color-4) 18%, transparent), var(--shadow-medium);
+
+    border-radius: var(--radius-strong);
+  }
+
+  .card--warning > header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-h-half);
+  }
+
+  .card--warning > header > span {
+    display: inline-grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-full);
+    background: var(--color-1);
+  }
+
+  .card--warning > header > strong {
+    font-weight: var(--font-weight-strong);
+  }
+
+  .card--warning > main {
+    display: grid;
+    gap: var(--space-v);
+  }
+
+  .card--warning code {
+    display: block;
+    padding: var(--space-v) var(--space-h-half);
+    border: var(--border-subtle);
+    border-radius: var(--radius-subtle);
+    background: var(--color-1);
+    user-select: all;
+  }
+}

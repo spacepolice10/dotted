@@ -1,0 +1,171 @@
+.lexxy-content>p {
+  overflow-wrap: anywhere !important;
+}
+
+
+@layer components {
+  .bullet--published-link {
+    width: 100%;
+    padding: var(--space-v-half) var(--space-h-half);
+    border: 1px solid var(--color-invert-4);
+    border-radius: var(--radius-base);
+    background: var(--color-2);
+    color: var(--color-invert-4);
+    font: inherit;
+  }
+
+  .bullet--pending {
+    opacity: var(--opacity-half);
+    pointer-events: none;
+  }
+
+  .bullet--pending-failed {
+    opacity: var(--opacity-full);
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  .bullet--pending-status {
+    color: var(--color-negative);
+  }
+
+  /* Focal bullet in the `bullets#show` context window. The accent bar and tint
+     mark it outright; the surrounding window recedes so the eye lands on it
+     first without needing a heavy border. */
+  .bullet--current {
+    position: relative;
+
+    .bullet--body {
+      background: var(--color-accent-1-subtle);
+    }
+  }
+
+  .bullet--current::before {
+    content: "";
+    position: absolute;
+    inset-block: var(--space-v-half);
+    inset-inline-start: 0;
+    width: 4px;
+    border-radius: var(--radius-base);
+    background: var(--color-accent-1);
+  }
+
+  .bullet {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    gap: var(--space-v-half);
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    padding-inline: var(--space-h-half);
+    color: var(--color-invert-1);
+
+    @media (hover: hover) {
+      &:hover .bullet--body {
+        background: var(--color-2);
+        border-color: var(--color-2);
+        box-shadow: var(--shadow-subtle);
+      }
+    }
+  }
+
+  .bullet--marker {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: var(--space-h);
+    height: var(--space-h);
+    cursor: pointer;
+  }
+
+  .bullet--marker-icon {
+    scale: 0.8;
+    border-radius: var(--radius-full);
+    background: var(--background-canvas-colour);
+    color: light-dark(oklch(0.57 0.04 241), oklch(0.72 0.045 241));
+
+    .icon {
+      color: inherit;
+    }
+  }
+
+  .bullet--body {
+    --lexxy-color-ink: var(--color-invert-1);
+
+    min-width: 5rem;
+    max-width: 100%;
+    width: fit-content;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--space-v-half);
+    border: 1px solid var(--color-1);
+    border-radius: var(--radius-base);
+    padding: var(--space-v) var(--space-h);
+    background: var(--color-1);
+    box-shadow: var(--shadow-subtle);
+    color: var(--color-invert-1);
+    line-height: 1.5;
+
+    & a {
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .bullet--select-checkbox {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  [data-mode="select"] .bullet--select-checkbox {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .bullet:has(> input:focus-visible) .bullet--body {
+    outline: 1px solid color-mix(in oklch,
+        var(--color-accent-1) 80%,
+        transparent);
+  }
+
+  .bullet[data-bullet-done="true"] {
+    opacity: 0.85;
+
+    .bullet--body {
+      text-decoration: line-through;
+      color: var(--color-invert-3);
+    }
+  }
+
+  @keyframes bullet-select-bounce {
+    0% {
+      transform: translateY(0);
+    }
+
+    40% {
+      transform: translateY(-2px);
+    }
+
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  .bullet:has(input:checked) {
+    .bullet--body {
+      border-color: var(--model-color-2);
+      box-shadow: 0 0 0 1px var(--model-color-2), var(--shadow-subtle);
+      background: var(--model-color-2-bg);
+      color: var(--color-invert-1);
+      animation: bullet-select-bounce 0.18s ease-out;
+    }
+  }
+}

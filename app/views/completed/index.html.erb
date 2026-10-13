@@ -1,0 +1,14 @@
+<% content_for(:title) { "Completed" } %>
+
+<%= render "shared/back_tabbar" %>
+
+<main class="timeline--window" data-size="sm">
+    <%= turbo_frame_tag "completed_timeline",
+      class: "utilities--contents",
+      src: bullets_path(completed: true) do %>
+      <div class="timeline--load-more-trigger" aria-busy="true">
+        <%= icon("spinner", class: "icon icon--spin") %>
+        <span class="utilities--sr-only">Loading completed</span>
+      </div>
+    <% end %>
+</main>

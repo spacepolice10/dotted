@@ -1,0 +1,12 @@
+<fieldset>
+  <legend class="utilities--sr-only">Colour</legend>
+  <div role="radiogroup" aria-label="Colour picker">
+    <% Colourable::COLOUR_MAPPINGS.each_key do |name| %>
+      <label style="color: <%= colour(name) %>;">
+        <%= form.radio_button :colour, name, class: "utilities--sr-only" %>
+        <div style="background: <%= colour_bg(name) %>; width: 100%; height: 100%;" aria-hidden="true"></div>
+        <span class="utilities--sr-only"><%= name.capitalize %></span>
+      </label>
+    <% end %>
+  </div>
+</fieldset>

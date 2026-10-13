@@ -1,0 +1,15 @@
+<% content_for(:title, "Edit collection") %>
+
+<%= render "shared/back_tabbar",
+      url: collection_path(@collection),
+      aria_label: "Back to collection" %>
+
+<main data-size="sm">
+  <h1>Collection</h1>
+
+  <div>
+    <div id="<%= dom_id(@collection) %>" class="utilities--contents">
+      <%= render "form", collection: @collection %>
+    </div>
+  </div>
+</main>

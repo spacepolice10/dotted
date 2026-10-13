@@ -1,0 +1,43 @@
+<% content_for(:title, "Account") %>
+
+<%= render "shared/tabbar" %>
+
+<main id="user" data-size="sm">
+  <section>
+    <header>
+        <h1>Account</h1>
+        <p><%= current_user.email_address %></p>
+    </header>
+
+    <article>
+      <ul data-layout="column" data-divider="single">
+        <li>
+          <%= link_to access_codes_path, data: { turbo_frame: "_top" } do %>
+            <%= icon("code") %>
+
+            <p>Access codes</p>
+          <% end %>
+        </li>
+
+        <li>
+          <%= link_to webhooks_path, data: { turbo_frame: "_top" } do %>
+            <%= icon("webhook") %>
+
+            <p>Webhooks</p>
+          <% end %>
+        </li>
+      </ul>
+    </article>
+
+    <div></div>
+  </section>
+
+  <footer class="utilities--mx-auto">
+    <%= button_to authentication_path,
+        method: :delete,
+        data: { intent: "secondary", size: "sm" },
+        form: { data: { turbo_confirm: "Sign out of Dotted?" }, class: 'utilities--contents' } do %>
+      <%= icon("sign-out") %> Sign out
+    <% end %>
+  </footer>
+</main>

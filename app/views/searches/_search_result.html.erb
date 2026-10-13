@@ -1,0 +1,21 @@
+<%# locals: (entry:, query:) %>
+<%= link_to polymorphic_path(entry),
+      class: "combobox--item",
+      tabindex: "-1",
+      data: {
+        combobox_target: "item",
+        controller: "recent-search",
+        action: "click->recent-search#record",
+        recent_search_searchable_type_value: entry.class.name,
+        recent_search_searchable_id_value: entry.id.to_s,
+        recent_search_url_value: search_selection_path
+      } do %>
+  <span class="search--result-icon">
+    <% result_icon = entry.is_a?(Bullet) ? bullet_marker_colour(entry) : ("color: #{entry.colour_variable};" if entry.respond_to?(:colour_variable)) %>
+    <%= icon(entry.search_result_icon, style: result_icon) %>
+  </span>
+  <span class="search--result-content">
+    <span class="search--result-type"><%= entry.search_result_type %></span>
+    <span class="search--result-body"><%= highlight_search_result(entry.search_result_body, query) %></span>
+  </span>
+<% end %>

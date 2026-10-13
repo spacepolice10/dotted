@@ -1,0 +1,13 @@
+<% content_for(:title) { @bullet.name } %>
+
+<main data-size="md" class="utilities--mx-auto">
+  <%= render "bullets/bullet", bullet: @bullet %>
+</main>
+
+<br>
+
+<footer>
+  <%= link_to root_path, class: "utilities--mx-auto", data: { intent: "primary", radius: "base", size: "sm" } do %>
+    <%= icon("plus") %> create your .dotted
+  <% end %>
+</footer>

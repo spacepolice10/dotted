@@ -1,0 +1,176 @@
+<div
+  class="bullet-menu"
+  data-bullet-menu-target="menu"
+  data-action="keydown.esc@document->bullet-menu#escape"
+  tabindex="0"
+  hidden
+>
+  <details class="bullet-menu--card" data-bullet-menu-target="card">
+  <summary>
+    <span>Bulk edit</span>
+    <span data-bullet-menu-target="amount">0 selected</span>
+  </summary>
+
+  <div class="bullet-menu--actions">
+    <%= form_with url: completion_path, method: :post,
+          class: "utilities--contents",
+          data: { turbo_stream: true, bullet_menu_target: "complete" },
+          html: { hidden: true } do %>
+      <%= hidden_field_tag :bullet_ids, "", data: { bullet_menu_target: "idList" } %>
+
+      <%= button_tag type: :submit,
+            class: "hotkey-hint hotkey-hint--always bullet-menu--action-button",
+            data: {
+              intent: "secondary",
+              radius: "base",
+              size: "sm",
+              controller: "hotkey",
+              hotkey: "C",
+              action: "keydown.c@document->hotkey#click"
+            },
+            aria: { keyshortcuts: "C" } do %>
+        <%= icon("check", style: "color: var(--color-accent-1)") %> Complete
+      <% end %>
+    <% end %>
+
+    <%= form_with url: completion_path, method: :delete,
+          class: "utilities--contents",
+          data: { turbo_stream: true, bullet_menu_target: "uncomplete" },
+          html: { hidden: true } do %>
+      <%= hidden_field_tag :bullet_ids, "", data: { bullet_menu_target: "idList" } %>
+
+      <%= button_tag type: :submit,
+            class: "hotkey-hint hotkey-hint--always bullet-menu--action-button",
+            data: {
+              intent: "secondary",
+              radius: "base",
+              size: "sm",
+              controller: "hotkey",
+              hotkey: "U",
+              action: "keydown.u@document->hotkey#click"
+            },
+            aria: { keyshortcuts: "U" } do %>
+        <%= icon("square") %> Uncomplete
+      <% end %>
+    <% end %>
+
+    <%= form_with url: publish_path, method: :post,
+          class: "utilities--contents",
+          data: { turbo_stream: true, bullet_menu_target: "publish" },
+          html: { hidden: true } do %>
+      <%= hidden_field_tag :bullet_ids, "", data: { bullet_menu_target: "idList" } %>
+
+      <%= button_tag type: :submit,
+            class: "hotkey-hint hotkey-hint--always bullet-menu--action-button",
+            data: {
+              intent: "secondary",
+              radius: "base",
+              size: "sm",
+              controller: "hotkey",
+              hotkey: "Shift+P",
+              action: "keydown.shift+p@document->hotkey#click"
+            },
+            aria: { keyshortcuts: "Shift+P" } do %>
+        <%= icon("link", style: "color: var(--color-accent-2)") %> Publish
+      <% end %>
+    <% end %>
+
+    <%= form_with url: publish_path, method: :delete,
+          class: "utilities--contents",
+          data: { turbo_stream: true, bullet_menu_target: "unpublish" },
+          html: { hidden: true } do %>
+      <%= hidden_field_tag :bullet_ids, "", data: { bullet_menu_target: "idList" } %>
+
+      <%= button_tag type: :submit,
+            class: "hotkey-hint hotkey-hint--always bullet-menu--action-button",
+            data: {
+              intent: "secondary",
+              radius: "base",
+              size: "sm",
+              controller: "hotkey",
+              hotkey: "Shift+P",
+              action: "keydown.shift+p@document->hotkey#click"
+            },
+            aria: { keyshortcuts: "Shift+P" } do %>
+        <%= icon("link", style: "color: var(--color-accent-2)") %> Unpublish
+      <% end %>
+    <% end %>
+
+    <button
+      type="button"
+      class="bullet-menu--action-button"
+      data-bullet-menu-target="copyLink"
+      data-action="bullet-menu#copyLink"
+      data-intent="secondary"
+      data-radius="base"
+      data-size="sm"
+      hidden
+    >
+      <%= icon("link", style: "color: var(--color-accent-2)") %> Copy publish link
+    </button>
+
+    <button
+      type="button"
+      class="hotkey-hint hotkey-hint--always bullet-menu--action-button"
+      data-controller="hotkey"
+      data-intent="secondary"
+      data-radius="base"
+      data-size="sm"
+      data-hotkey="L"
+      data-action="bullet-menu#openPicker keydown.l@document->hotkey#click"
+      data-bullet-menu-dialog-param="postpone_dialog"
+      data-bullet-menu-url-param="<%= new_postpone_path %>"
+      aria-keyshortcuts="L"
+    >
+      <%= icon("arrow-forward-up", style: "color: var(--model-color-3)") %> Later
+    </button>
+
+    <button
+      type="button"
+      class="hotkey-hint hotkey-hint--always bullet-menu--action-button"
+      data-controller="hotkey"
+      data-intent="secondary"
+      data-radius="base"
+      data-size="sm"
+      data-hotkey="S"
+      data-action="bullet-menu#openPicker keydown.s@document->hotkey#click"
+      data-bullet-menu-dialog-param="collects_dialog"
+      data-bullet-menu-url-param="<%= new_collect_path %>"
+      aria-keyshortcuts="S"
+    >
+      <%= icon("hash", style: "color: var(--model-color-5)") %> Tag
+    </button>
+  </div>
+
+  <br>
+    <button
+      type="button"
+      class="utilities--mx-auto"
+      data-intent="primary"
+      data-radius="base"
+      data-size="sm"
+      data-action="bullet-menu#clear"
+      aria-label="Clear selection"
+    >
+      <p>Clear selection</p>
+    </button>
+  </details>
+</div>
+
+<%= render "bullets/bullet_picker_dialog",
+      name: "Later",
+      dialog_id: "postpone_dialog",
+      frame_id: "postpone_picker",
+      size: "sm",
+      frame_data: {
+        controller: "grid-navigation",
+        grid_navigation_columns_value: 1,
+        action: "keydown->grid-navigation#navigate"
+      } %>
+
+<%= render "bullets/bullet_picker_dialog",
+      name: "Save",
+      dialog_id: "collects_dialog",
+      frame_id: "collects_picker",
+      size: "lg",
+      close_on_submit: false %>

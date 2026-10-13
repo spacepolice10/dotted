@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -euo pipefail
+
+storage_path="${STORAGE_PATH:-/rails/storage}"
+snapshot_path="$storage_path/backups/once"
+
+for database_name in production.sqlite3 production_cache.sqlite3 production_queue.sqlite3 production_cable.sqlite3; do
+  database="$storage_path/$database_name"
+  snapshot="$snapshot_path/$database_name"
+
+  if [ -f "$snapshot" ]; then
+    cp "$snapshot" "$database.restore"
+    mv "$database.restore" "$database"
+    rm -f "$database-wal" "$database-shm"
+  fi
+done
+
+rm -rf "$snapshot_path"

@@ -1,0 +1,21 @@
+<% if @failed_bullet&.errors&.any? %>
+  <%= turbo_stream.update "toasts" do %>
+    <%= render "shared/toasts", type: "errmsg", messages: @failed_bullet.errors.full_messages %>
+  <% end %>
+<% else %>
+  <%= turbo_stream.update "toasts" do %>
+    <% message = @bullets.size == 1 ? "Bullet collected into #{@collection.name}" : "#{@bullets.size} bullets collected into #{@collection.name}" %>
+    <%= render "shared/toasts", type: "notify", messages: [message] %>
+  <% end %>
+  <%= turbo_stream.replace dom_id(@collection, :collect_row) do %>
+    <%= render "bullets/collects/collection",
+          collection: @collection,
+          bullet_ids: @bullet_ids,
+          collected_ids: @collected_collection_ids %>
+  <% end %>
+  <% @bullets.each do |bullet| %>
+    <%= turbo_stream.replace_all bullet do %>
+      <%= render "bullets/bullet", bullet: bullet %>
+    <% end %>
+  <% end %>
+<% end %>

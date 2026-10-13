@@ -1,0 +1,80 @@
+<% content_for(:title, "Search") %>
+
+<%= render "shared/tabbar" %>
+
+<main id="search" data-size="sm">
+  <section>
+    <header>
+      <h1>Index</h1>
+    </header>
+    <article id="search_navigation" class="search--navigation">
+      <ul data-layout="column" data-divider="single">
+        <li>
+          <%= link_to attachments_path, data: { turbo_frame: "_top" } do %>
+            <%= icon("paperclip") %>
+            <p>Attachments</p>
+            <% if @attachments_count.positive? %>
+              <small class="pill"><%= @attachments_count %></small>
+            <% end %>
+          <% end %>
+        </li>
+
+        <li>
+          <%= link_to completed_index_path, data: { turbo_frame: "_top" } do %>
+            <%= icon("check") %>
+            <p>Completed</p>
+            <% if @completed_count.positive? %>
+              <small class="pill"><%= @completed_count %></small>
+            <% end %>
+          <% end %>
+        </li>
+
+        <li>
+          <%= link_to collections_path, data: { turbo_frame: "_top" } do %>
+            <%= icon("folder") %>
+            <p>Collections</p>
+            <% if @collections_count.positive? %>
+              <small class="pill"><%= @collections_count %></small>
+            <% end %>
+          <% end %>
+        </li>
+
+        <li>
+          <%= link_to bullets_path(from: Date.current + 1), data: { turbo_frame: "_top" } do %>
+            <%= icon("calendar") %>
+            <p>Upcoming</p>
+            <% if @upcoming_count.positive? %>
+              <small class="pill"><%= @upcoming_count %></small>
+            <% end %>
+          <% end %>
+        </li>
+      </ul>
+    </article>
+
+    <ul id="search_collections" data-layout="grid"></ul>
+  </section>
+
+  <footer class="utilities--mx-auto">
+
+    <button
+      type="button"
+      data-intent="secondary"
+      data-size="sm"
+      class="hotkey-hint utilities--mx-auto"
+      commandfor="search_picker_dialog"
+      command="show-modal"
+      aria-label="Search"
+      data-controller="hotkey"
+      data-hotkey="S"
+      data-action="keydown.shift+s@document->hotkey#click"
+    >
+      <%= icon("search") %>
+      <span>Search…</span>
+    </button>
+  </footer>
+
+
+  <small class="utilities--mx-auto utilities--desktop-only">
+    Press <kbd>Cmd/Ctrl</kbd> + <kbd>K</kbd> to search from any screen
+  </small>
+</main>

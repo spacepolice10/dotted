@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Dotted">
+  <style>
+    .ring { fill: #e8f8ef; stroke: #5fd49a; }
+    .dot { fill: #5fd49a; }
+    @media (prefers-color-scheme: dark) {
+      .ring { fill: #243f35; stroke: #8aedb5; }
+      .dot { fill: #8aedb5; }
+    }
+  </style>
+
+  <circle class="ring" cx="16" cy="16" r="11" stroke-width="2.25" />
+  <circle class="dot" cx="16" cy="16" r="4" />
+</svg>

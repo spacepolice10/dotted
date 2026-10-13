@@ -1,0 +1,67 @@
+<% content_for(:title) { "Dotted — Welcome" } %>
+
+<main data-size="sm">
+  <section>
+    <header>
+      <h1 class="branding-heading">dotted</h1>
+    </header>
+
+    <article id="sign_in_form" data-elevation="1">
+      <header>
+        <h2>Sign in</h2>
+      </header>
+
+      <main>
+        <%= form_with url: authentication_path, data: { controller: "valid-email" }, class: "utilities--mx-auto" do |form| %>
+          <% if @user&.errors&.any? %>
+            <div class="form--errors" role="alert">
+              <ul>
+                <% @user.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <label>
+            <small>Enter your e-mail address &amp; we will send you a one-time code to sign in or create an account.</small>
+
+            <%= form.email_field :email_address,
+        required: true,
+        autofocus: true,
+        autocomplete: "username",
+        placeholder: "you@example.com",
+        aria: { label: "Email address" },
+        value: params[:email_address],
+        data: {
+          valid_email_target: "input",
+          action: "input->valid-email#validate blur->valid-email#validate"
+        } %>
+
+            <% if @user&.errors&.any? %>
+              <small class="form--errors"><%= @user.errors.full_messages.to_sentence %></small>
+            <% end %>
+          </label>
+
+          <%= form.button type: "submit", data: { intent: "primary", radius: "full", size: "lg" } do %>
+            Continue
+          <% end %>
+        <% end %>
+      </main>
+    </article>
+
+    <br>
+
+    <footer class="utilities--mx-auto">
+      <nav aria-label="About">
+        <%= link_to features_path, class: "pill" do %>
+          <%= icon "lightbulb" %> Features
+        <% end %>
+
+        <%= link_to support_path, class: "pill" do %>
+          <%= icon "mail" %> Support
+        <% end %>
+      </nav>
+    </footer>
+  </section>
+</main>

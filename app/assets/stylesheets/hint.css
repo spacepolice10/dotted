@@ -1,0 +1,54 @@
+@layer components {
+  /*
+   * Hint popovers (popover="hint" + interestfor invokers).
+   * Trigger carries anchor-name; panel carries matching position-anchor (inline).
+   */
+ 
+  [interestfor] {
+    interest-delay: 0.2s;
+  }
+
+  [popover="hint"] {
+    box-sizing: border-box;
+    position: fixed;
+    inset: unset;
+    margin: 0;
+    padding: var(--space-v-half) var(--space-h-half);
+    width: max-content;
+    max-width: min(
+      calc(var(--space-h-2) * 9),
+      calc(100vw - (2 * var(--space-h)))
+    );
+    background: var(--color-invert-1);
+    color: var(--color-1);
+    /* 1px hairline — no stroke-width token in the design system */
+    border: 1px solid var(--color-invert-2);
+    border-radius: var(--radius-base);
+    box-shadow: var(--shadow-base);
+    font-weight: 400;
+    pointer-events: none;
+    position-area: block-start center;
+    margin-block-end: var(--space-v-half);
+    position-try-fallbacks:
+      flip-block,
+      flip-inline,
+      flip-block flip-inline;
+    opacity: 0;
+    transform: translateY(var(--space-v-half));
+    transition:
+      opacity 80ms ease,
+      transform 80ms ease,
+      display 80ms allow-discrete,
+      overlay 80ms allow-discrete;
+  }
+
+  .hint[popover="hint"]:popover-open {
+    opacity: 1;
+    transform: translateY(0);
+
+    @starting-style {
+      opacity: 0;
+      transform: translateY(var(--space-v-half));
+    }
+  }
+}

@@ -1,0 +1,82 @@
+<%# locals: (bullet:, preset:, autofocus: false, collection: nil, pops_on: Date.current, composer_id: nil) %>
+
+<div
+id="bullet_composer"
+  class="composer"
+  data-controller="composer composer-attachment"
+>
+  <%= form_with model: bullet,
+        multipart: true,
+        class: "utilities--contents",
+        data: {
+          composer_target: "form",
+          action: "submit->composer#submit"
+        } do |fr| %>
+    <% if collection %>
+      <%= fr.hidden_field :collection_id, value: collection.id %>
+    <% end %>
+    <%= fr.hidden_field :pops_on, value: pops_on %>
+    <%= file_field_tag "bullet[file]",
+          id: "bullet_composer_attachment_file",
+          hidden: true,
+          direct_upload: true,
+          data: { composer_attachment_target: "file", action: "change->composer-attachment#attach" } %>
+
+    <span class="utilities--contents">
+      <button
+        type="button"
+        data-action="composer-attachment#choose"
+        class="composer--control composer--attach"
+        aria-label="Attach file"
+      >
+        <%= icon("paperclip") %>
+      </button>
+
+      <%= fr.rich_text_area :body,
+            preset: preset,
+            autofocus: autofocus,
+            placeholder: "What's on your mind?",
+            class: "hotkey-hint lexxy-editor--empty",
+            data: {
+              controller: "hotkey",
+              action: "keydown.shift+f@document->hotkey#focus keydown.enter@document->composer#submitByKeyboard:capture",
+              composer_target: "editor",
+              hotkey: "F",
+            } %>
+    </span>
+
+    <%= fr.button class: "composer--control composer--submit-button", aria: { label: "Save bullet" }, data: { action: "pointerdown->composer#submit" } do %>
+      <%= icon("arrow-up") %>
+    <% end %>
+  <% end %>
+
+  <template data-composer-target="pendingTextTemplate">
+    <turbo-frame id="bullet_client_CLIENT_ID" class="bullet bullet--pending" data-bullet-done="false">
+      <span class="bullet--marker" aria-hidden="true">
+        <%= icon("circle", class: "bullet--marker-icon") %>
+      </span>
+      <div class="bullet--content">
+        <div class="bullet--body">
+          <div class="bullet--note utilities--line-clamp-3" data-pending-body></div>
+        </div>
+      </div>
+    </turbo-frame>
+  </template>
+
+  <template data-composer-attachment-target="pendingFileTemplate">
+    <turbo-frame id="bullet_client_CLIENT_ID" class="bullet bullet--pending" data-bullet-done="false">
+      <span class="bullet--marker" aria-hidden="true">
+        <%= icon("circle", class: "bullet--marker-icon") %>
+      </span>
+      <div class="bullet--content">
+        <div class="bullet--body">
+          <span class="attachment--file">
+            <%= icon("paperclip") %>
+            <span class="attachment--file-name utilities--line-clamp-1" data-pending-filename></span>
+          </span>
+          <img data-pending-image hidden alt="" class="attachment--preview">
+        </div>
+      </div>
+    </turbo-frame>
+  </template>
+</div>

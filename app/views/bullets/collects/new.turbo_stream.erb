@@ -1,0 +1,7 @@
+<%= turbo_stream.replace "collects-collections-list" do %>
+  <%= render "bullets/collects/collections_list",
+        bullet_ids: params[:bullet_ids].to_s,
+        return_to: @return_to,
+        collections: @collections,
+        collected_ids: @collected_collection_ids %>
+<% end %>

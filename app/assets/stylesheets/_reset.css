@@ -1,0 +1,126 @@
+/* Modern CSS Reset — 2026
+ *
+ * Synthesized from:
+ *   Josh W. Comeau  — joshwcomeau.com/css/custom-css-reset
+ *   Andy Bell       — piccalil.li/blog/a-more-modern-css-reset
+ *   David Bushell   — dbushell.com/2025/09/12/css-reset
+ *
+ * In @layer reset so components always win.
+ */
+
+
+
+@layer reset {
+
+  /* Box model */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box; /* include padding/border in element size */
+  }
+
+  /* Strip margins & padding — we control spacing in components */
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Root defaults */
+  html {
+    color-scheme: light dark;                  /* opt in to OS-level dark mode */
+    hanging-punctuation: first allow-end last; /* typographic punctuation hanging */
+    interpolate-size: allow-keywords;          /* enables transitions to/from intrinsic sizes (e.g. height: auto) */
+    scrollbar-gutter: stable;                  /* prevent layout shift when scrollbar appears */
+    text-size-adjust: none;                    /* disable browser auto font scaling */
+    -webkit-text-size-adjust: none;            /* same for Safari/WebKit */
+    -webkit-tap-highlight-color: transparent;  /* remove tap flash on mobile */
+    -webkit-font-smoothing: antialiased;       /* subpixel → grayscale antialiasing on macOS/iOS */
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto; /* disable smooth scrolling for motion-sensitive users */
+    }
+  }
+
+  /* Body */
+  body {
+    min-block-size: 100svb; /* fill at least the small viewport block axis (avoids mobile chrome gap) */
+  }
+
+  /* Typography, links, and font-family live in base.css (@layer base) */
+
+  /* Media */
+  img, picture, video, canvas, svg {
+    display: block;          /* remove inline baseline gap below media elements */
+    max-inline-size: 100%;   /* prevent overflow past container width */
+    block-size: auto;        /* preserve aspect ratio when width is constrained */
+  }
+
+  /* Lists — only strip when used as layout (with role="list") */
+  ul[role="list"], ol[role="list"] {
+    list-style: none; /* scoped to role="list" so assistive tech still announces other lists */
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* Form controls — inherit typography */
+  button, input, select, textarea {
+    font: inherit;        /* browsers default form controls to system-ui; match page font */
+    color: inherit;       /* match surrounding text color */
+    line-height: inherit; /* prevent mismatched line heights inside controls */
+    resize: none;
+  }
+
+  button {
+    cursor: pointer;   /* clarify interactivity */
+    user-select: none; /* prevent accidental text selection on click */
+  }
+
+  textarea {
+    resize: vertical; /* allow height resize only; horizontal resize breaks layouts */
+  }
+
+  textarea:not([rows]) {
+    field-sizing: content; /* auto-grow textarea to fit its content when rows is unset */
+  }
+
+  fieldset {
+    border: none; /* remove default browser fieldset border */
+  }
+
+  /* Dialog & Popover */
+  dialog, [popover] {
+    border: none;    /* remove default browser dialog border */
+    color: inherit;  /* inherit text color from stacking context */
+  }
+
+  [popover] {
+    inset: auto; /* cancel browser default centering so we can position manually */
+  }
+
+  dialog:not([open], [popover]), [popover]:not(:popover-open) {
+    display: none; /* hide closed dialogs and popovers (some browsers need explicit help) */
+  }
+
+  /* Scroll targets */
+  :target {
+    scroll-margin-block: 5ex; /* add breathing room above anchor-jumped elements */
+  }
+
+  /* Hidden */
+  [hidden]:not([hidden="until-found"]) {
+    display: none !important; /* enforce visibility:hidden while allowing hidden="until-found" for find-in-page */
+  }
+
+}

@@ -1,0 +1,3 @@
+<%= turbo_stream.replace "bullet_client_#{@bullet.client_id}" do %>
+  <%= render @bullet.to_partial_path, bullet: @bullet %>
+<% end %>

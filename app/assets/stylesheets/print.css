@@ -1,0 +1,54 @@
+@layer utilities {
+@media print {
+  * { box-shadow: none !important; }
+
+  body {
+    font-size: 11pt;
+    color: black;
+    background: white;
+  }
+
+  .tabbar--navigation,
+  .fab,
+  .header,
+  #pinned_list,
+  #home_create,
+  .bullet-menu,
+  .layout--header-actions,
+  .bullets-form--rail,
+  lexxy-toolbar,
+  .lexxy-floating-controls,
+  lexxy-table-tools,
+  lexxy-code-language-picker,
+  .pagination-trigger {
+    display: none !important;
+  }
+
+  .main-content {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .bullet {
+    break-inside: avoid;
+  }
+
+  .bullet--body {
+    border: 1px solid #ddd;
+  }
+
+  .bullet .bullet--content::before {
+    transform: none;
+  }
+
+  .layout--main {
+    max-width: 100%;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+  }
+}
+}

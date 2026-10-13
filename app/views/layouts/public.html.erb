@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title><%= content_for(:title) || "Dotted" %></title>
+
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"
+    >
+
+    <meta name="application-name" content="Dotted">
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+  </head>
+
+  <body>
+    <main>
+      <header>
+        <h1 class="branding-heading">dotted</h1>
+      </header>
+
+      <%= yield %>
+
+    </main>
+  </body>
+</html>

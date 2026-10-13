@@ -1,0 +1,33 @@
+@layer components {
+    .combobox {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-v-half);
+        width: 100%;
+    }
+
+    .combobox--item {
+        display: flex;
+        width: 100%;
+        align-items: flex-start;
+        gap: var(--space-h-half);
+        padding: var(--space-v) var(--space-h);
+        color: var(--color-invert-1);
+        text-decoration: none;
+        background: var(--color-2);
+        border: 1px solid transparent;
+        border-radius: var(--radius-base);
+
+        &:focus-visible {
+            outline: 1px solid var(--model-color-2);
+        }
+
+        &:hover {
+            background: var(--color-3);
+        }
+
+        &[aria-selected="true"] {
+            background: var(--color-3);
+        }
+    }
+}

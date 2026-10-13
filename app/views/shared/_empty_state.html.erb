@@ -1,0 +1,8 @@
+<%# locals: (icon_name:, name:, description:) %>
+<div class="empty-state" role="status">
+  <span class="empty-state--icon" aria-hidden="true"><%= icon(icon_name) %></span>
+  <div class="empty-state--copy">
+    <h2><span class="decoration--underline-swash decoration-colour--sky"><%= name %></span></h2>
+    <p><%= description %></p>
+  </div>
+</div>

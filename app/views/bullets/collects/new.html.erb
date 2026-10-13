@@ -1,0 +1,8 @@
+<turbo-frame id="collects_picker">
+  <%= render "picker",
+        bullet_ids: params[:bullet_ids].to_s,
+        return_to: @return_to,
+        collects_q: @collects_q,
+        collections: @collections,
+        collected_ids: @collected_collection_ids %>
+</turbo-frame>

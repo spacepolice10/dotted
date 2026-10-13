@@ -1,0 +1,6 @@
+<%= turbo_stream.update "search_section" do %>
+  <%= render "searches/results", entries: @entries, q: @q %>
+<% end %>
+<%= turbo_stream.update "search_dialog_results" do %>
+  <%= render "searches/results", entries: @entries, q: @q %>
+<% end %>

@@ -1,0 +1,10 @@
+
+<%= render "bullets/bullet", bullet: bullet %>
+<p>Public link:</p>
+<input class="public--published-link"
+type="text"
+autocomplete="off"
+value="<%= published_url(bullet.public_code) %>"
+readonly
+onclick="this.select()"
+>

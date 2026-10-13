@@ -1,0 +1,31 @@
+<% content_for(:title, "New access code") %>
+
+<%= render "shared/back_tabbar", url: access_codes_path, aria_label: "Back to Access codes" %>
+
+<main data-size="sm">
+  <header>
+    <h1>Access code</h1>
+  </header>
+
+  <article class="settings-form" data-elevation="2">
+    <header>
+      <h2>New access code</h2>
+      <p>Name the CLI or integration that will use this code. You’ll see the code once after creating it.</p>
+    </header>
+
+    <main>
+      <%= form_with model: @access_code, url: access_codes_path, html: { class: "form" } do |form| %>
+        <%= form.label :description, "Access code name", class: "utilities--sr-only" %>
+        <%= form.text_field :description, required: true, autofocus: true, placeholder: "Laptop CLI, agent, etc.", aria: { invalid: @access_code.errors[:description].any? } %>
+
+        <% if @access_code.errors[:description].any? %>
+          <small class="form--errors" role="alert"><%= @access_code.errors.full_messages_for(:description).to_sentence %></small>
+        <% end %>
+
+        <%= form.button type: "submit", data: { intent: "primary", radius: "full", size: "lg" } do %>
+          <%= icon("plus") %> Create access code
+        <% end %>
+      <% end %>
+    </main>
+  </article>
+</main>

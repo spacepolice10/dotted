@@ -1,0 +1,21 @@
+<%# locals: (bullet_ids:, return_to:, collections:, collected_ids: []) %>
+<div id="collects-collections-list">
+  <ul data-layout="column" role="listbox" class="combobox">
+    <br>
+
+    <li role="option">
+      <%= link_to new_collection_path(bullet_ids: bullet_ids, return_to: return_to),
+            data: {
+              turbo_frame: "_top",
+              combobox_target: "item"
+            } do %>
+        <%= icon("plus") %>
+        <p>New collection</p>
+      <% end %>
+    </li>
+
+    <%= render partial: "bullets/collects/collection",
+          collection: collections,
+          locals: { bullet_ids: bullet_ids, collected_ids: collected_ids } %>
+  </ul>
+</div>

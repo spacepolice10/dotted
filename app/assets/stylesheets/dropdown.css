@@ -1,0 +1,44 @@
+@layer components {
+  [popover]:not([popover="hint"]) {
+    position: fixed;
+    inset: unset;
+    z-index: var(--z-dropdown);
+    box-sizing: border-box;
+    width: max-content;
+    min-width: min(var(--space-h-10), calc(100dvw - var(--space-h-2)));
+    max-width: min(calc(var(--space-h-10) * 2),
+        calc(100dvw - var(--space-h-2)));
+    max-height: min(calc(var(--space-h-10) * 2),
+        calc(100dvh - var(--space-h-2)));
+    margin: var(--space-v-half) var(--space-h-half);
+    padding: var(--space-h-half);
+    overflow: auto;
+    background: var(--color-1);
+    border: var(--border-subtle);
+    border-radius: var(--radius-strong);
+    box-shadow: var(--shadow-subtle);
+
+    /* Anchor positioning */
+    position-area: block-end span-inline-end;
+
+    /* Animation */
+    opacity: 0;
+    transform: translateY(calc(var(--space-v-half) * -1));
+
+    transition:
+      opacity 80ms ease,
+      transform 80ms ease,
+      display 80ms allow-discrete,
+      overlay 80ms allow-discrete;
+
+    &:popover-open {
+      opacity: 1;
+      transform: translateY(0);
+
+      @starting-style {
+        opacity: 0;
+        transform: translateY(calc(var(--space-v-half) * -1));
+      }
+    }
+  }
+}

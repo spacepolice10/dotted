@@ -1,0 +1,37 @@
+<%# locals: (bullet_ids:, return_to:, collects_q:, collections:, collected_ids: []) %>
+
+  <header>
+    <h2 class="utilities--sr-only">To collection</h2>
+  </header>
+
+  <main
+    data-controller="combobox"
+    data-combobox-path-value="<%= new_collect_path %>"
+  >
+    <%= form_with url: new_collect_path,
+          method: :get,
+          class: "utilities--contents",
+          data: { combobox_target: "searchForm" } do %>
+      <%= hidden_field_tag :bullet_ids, bullet_ids, data: { bullet_menu_target: "idList" } %>
+      <%= hidden_field_tag :return_to, return_to if return_to.present? %>
+      <%= label_tag :q, "Search collections", class: "utilities--sr-only" %>
+
+      <%= search_field_tag :q, collects_q,
+            placeholder: "Search collections",
+            autofocus: !mobile_variant?,
+            class: "utilities--sticky",
+            style: "top: var(--space-v-5);",
+            data: {
+              combobox_target: "searchField",
+              action: "input->combobox#search search->combobox#commit keydown->combobox#navigate"
+            } %>
+    <% end %>
+
+    <div aria-label="Collections" data-action="turbo:submit-end->dialog#submitSuccess">
+      <%= render "bullets/collects/collections_list",
+            bullet_ids: bullet_ids,
+            return_to: return_to,
+            collections: collections,
+            collected_ids: collected_ids %>
+    </div>
+  </main>

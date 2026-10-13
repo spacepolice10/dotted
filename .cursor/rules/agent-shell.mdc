@@ -1,0 +1,20 @@
+---
+description: Agent shell — unset BUNDLE_PATH; do not reinstall gems
+alwaysApply: true
+---
+
+# Agent shell for Rails commands
+
+Gems are already installed. Do **not** run `bundle install`, `bundle update`, `gem install` for project deps, or `bin/setup` to "fix" Bundler in the agent shell.
+
+The agent shell does not run mise's per-directory hook, so plain `ruby` resolves to the global Ruby (from `~/.config/mise/config.toml`), not the project's. Always go through `mise exec --`; versions come from `mise.toml`.
+
+Cursor's sandbox can set `BUNDLE_PATH` to an empty cache. Unset it and request `all` permissions for Rails/test commands:
+
+```bash
+mise exec -- env -u BUNDLE_PATH bin/rails test test/path/to/test.rb
+```
+
+Same pattern for `bin/rubocop`, `bin/brakeman`, `bin/ci`, and other `bin/*` wrappers. Never switch Ruby/Node versions or edit `mise.toml` to make a command work.
+
+Run tests freely. If it still fails after `mise exec -- env -u BUNDLE_PATH` + `all`, give the user the exact local command.

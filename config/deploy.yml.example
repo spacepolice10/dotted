@@ -1,0 +1,44 @@
+# Copy to config/deploy.yml (ignored by git) and replace every example value.
+service: dotted
+
+image: your-registry-user/dotted
+
+servers:
+  web:
+    - 203.0.113.10
+
+proxy:
+  ssl: true
+  host: dotted.example.com
+  forward_headers: true
+
+registry:
+  username: your-registry-user
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+env:
+  secret:
+    - RAILS_MASTER_KEY
+  clear:
+    SOLID_QUEUE_IN_PUMA: true
+    APP_HOST: dotted.example.com
+    SMTP_ADDRESS: smtp.example.com
+    SMTP_DOMAIN: example.com
+    SMTP_PORT: 587
+    MAILER_FROM_ADDRESS: Dotted <no-reply@example.com>
+
+aliases:
+  console: app exec --interactive --reuse "bin/rails console"
+  shell: app exec --interactive --reuse "bash"
+  logs: app logs -f
+  dbc: app exec --interactive --reuse "bin/rails dbconsole --include-password"
+
+volumes:
+  - "dotted_storage:/rails/storage"
+
+asset_path: /rails/public/assets
+
+builder:
+  arch: amd64
+  context: .

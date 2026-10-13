@@ -1,0 +1,31 @@
+<% content_for(:title) { "#{@filter.name} export (#{@bullets.size} #{"bullet".pluralize(@bullets.size)})" } %>
+
+<header class="export--header">
+  <div data-intent="secondary" data-radius="base" data-size="sm">
+    <%= icon("folder") %>
+    <%= @filter.name %> export
+  </div>
+  <p class="export--meta">
+    <%= @bullets.size %> <%= "bullet".pluralize(@bullets.size) %> · exported <%= Time.current.strftime("%-d %b %Y") %>
+  </p>
+</header>
+
+<div class="export--list">
+  <% @bullets.each do |bullet| %>
+    <% task_completed = bullet.done? %>
+    <article class="export--bullet">
+      <header class="export--bullet-header">
+        <time datetime="<%= bullet.created_at.iso8601 %>"><%= bullet.created_at.strftime("%-d %b %Y") %></time>
+        <% if bullet.pops_on.present? %>
+          <span>Pop: <%= bullet.pops_on.strftime("%-d %b %Y") %></span>
+        <% end %>
+        <% if task_completed %>
+          <span class="export--tag">Completed</span>
+        <% end %>
+      </header>
+      <div class="export--bullet-body<%= " export--bullet-body--completed" if task_completed %>">
+        <%= bullet.body %>
+      </div>
+    </article>
+  <% end %>
+</div>

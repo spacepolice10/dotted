@@ -1,0 +1,31 @@
+<% content_for(:title, "New webhook") %>
+
+<%= render "shared/back_tabbar", url: webhooks_path, aria_label: "Back to Webhooks" %>
+
+<main data-size="sm">
+  <header>
+    <h1>Webhook</h1>
+  </header>
+
+  <article class="settings-form" data-elevation="2">
+    <header>
+      <h2>New webhook</h2>
+      <p>Give the integration a name. You’ll get a URL to share after creating it.</p>
+    </header>
+
+    <main>
+      <%= form_with model: @webhook, url: webhooks_path, html: { class: "form" } do |form| %>
+        <%= form.label :name, "Webhook name", class: "utilities--sr-only" %>
+        <%= form.text_field :name, required: true, autofocus: true, placeholder: "Zapier, Gmail, etc.", aria: { invalid: @webhook.errors[:name].any? } %>
+
+        <% if @webhook.errors[:name].any? %>
+          <small class="form--errors" role="alert"><%= @webhook.errors.full_messages_for(:name).to_sentence %></small>
+        <% end %>
+
+        <%= form.button type: "submit", data: { intent: "primary", radius: "full", size: "lg" } do %>
+          <%= icon("plus") %> Create webhook
+        <% end %>
+      <% end %>
+    </main>
+  </article>
+</main>

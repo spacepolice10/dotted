@@ -1,0 +1,40 @@
+<%# locals: (bullet_ids: "", postpone_options: []) %>
+
+<header>
+  <h2 class="utilities--sr-only">Schedule</h2>
+</header>
+
+<main aria-label="Schedule">
+  <% postpone_options.each do |option| %>
+    <%= form_with url: postpone_path, method: :post,
+            class: "utilities--contents",
+            data: { turbo_stream: true } do %>
+      <%= hidden_field_tag :bullet_ids, bullet_ids, data: { bullet_menu_target: "idList" } %>
+      <%= hidden_field_tag :pops_on, option[:pops_on].iso8601 %>
+
+      <%= button_tag type: :submit,
+              class: "picker--item",
+              data: {
+                grid_navigation_target: "item",
+                action: "focus->grid-navigation#syncPosition"
+              } do %>
+        <%= icon(option[:icon]) %>
+        <%= option[:name] %>
+
+        <% if option[:pops_on] %>
+          · <%= option[:pops_on].strftime("%a, %b %-d") %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <br>
+  <%= form_with url: postpone_path, method: :post,
+        class: "postpone-picker--manual-date",
+        data: { turbo_stream: true } do |f| %>
+    <%= f.hidden_field :bullet_ids, value: bullet_ids, data: { bullet_menu_target: "idList" } %>
+    <%= f.date_field :pops_on, value: Date.current, required: true,
+          class: "postpone-picker--date", aria: { label: "Choose date" } %>
+    <%= f.button "Confirm", type: :submit, data: { intent: "primary", size: "sm", radius: "base" } %>
+  <% end %>
+</main>

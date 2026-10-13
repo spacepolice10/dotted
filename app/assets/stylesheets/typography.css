@@ -1,0 +1,18 @@
+.landing-heading {
+  text-align: center;
+}
+
+.branding-heading {
+  font-size: clamp(72px, 10vw, 128px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-align: center;
+  margin: 0;
+}
+
+.branding-heading::before {
+  content: ".";
+  color: var(--model-color-9);
+  margin-inline-end: 0.1em;
+}

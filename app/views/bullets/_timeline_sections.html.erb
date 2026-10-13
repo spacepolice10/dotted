@@ -1,0 +1,15 @@
+<%# locals: (bullets:, timeline:, bullet_partial: "bullets/bullet", ensure_current_date: false) %>
+<% sections = bullets.group_by { |bullet| timeline.section_of(bullet.pops_on) }.to_a %>
+<% if ensure_current_date && sections.none? { |section, _| section.id == "current_date" } %>
+  <% first_future = sections.index { |_, section_bullets| section_bullets.first.pops_on > Date.current } %>
+  <% sections.insert(first_future || sections.length, [timeline.section_of(Date.current), []]) %>
+<% end %>
+
+<% sections.each do |section, section_bullets| %>
+  <div id="timeline_section_<%= section.id %>" class="timeline--section">
+    <h2 class="pill"><%= section.name %></h2>
+    <% section_bullets.each do |bullet| %>
+      <%= render partial: bullet_partial, locals: { bullet: bullet } %>
+    <% end %>
+  </div>
+<% end %>

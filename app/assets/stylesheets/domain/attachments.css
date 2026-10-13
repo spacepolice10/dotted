@@ -1,0 +1,87 @@
+@layer components {
+
+
+  .bullet--body :is(.attachment.attachment--preview, a.attachment--preview) {
+    display: grid;
+    justify-items: start;
+    max-inline-size: 100%;
+  }
+
+  /* Lexxy's content styles are unlayered, so sizes need !important to win. */
+  .bullet--body :is(.attachment--preview img) {
+    block-size: var(--space-h-5) !important;
+    inline-size: auto !important;
+    max-inline-size: 100%;
+    margin-inline: 0 !important;
+    object-fit: cover;
+    border-radius: var(--radius-base);
+    height: var(--space-h-10);
+  }
+
+  .attachment--file {
+    display: flex;
+    align-items: center;
+    gap: var(--space-h-half);
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .attachment--file-name {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .attachment--file small {
+    color: var(--color-invert-4);
+    font-size: var(--font-size-xs);
+  }
+
+  main.attachment--page {
+    height: auto;
+    min-block-size: auto;
+  }
+
+
+  .attachment--gallery {
+    display: block;
+    width: 100%;
+    height: auto;
+    column-width: var(--space-h-7);
+    column-gap: var(--space-h-half);
+  }
+
+  .attachment--tile {
+    display: block;
+    width: 100%;
+    margin-block-end: var(--space-h-half);
+    break-inside: avoid;
+    overflow: hidden;
+    border-radius: var(--radius-base);
+    background: var(--color-2);
+    color: inherit;
+    text-decoration: none;
+    padding: var(--space-v);
+    border: var(--border-base);
+    &[data-kind="picture"] {
+      padding: 0;
+    }
+  }
+
+  .attachment--tile-file .icon-wrap {
+    width: var(--space-h-2);
+    height: var(--space-h-2);
+    color: var(--color-invert-3);
+  }
+
+  .attachment--tile-name {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    color: var(--color-invert-2);
+  }
+
+  .attachment--tile-size {
+    color: var(--color-invert-4);
+    font-size: var(--font-size-xs);
+  }
+}

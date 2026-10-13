@@ -1,0 +1,59 @@
+<% content_for(:title, @collection.name) %>
+
+<%= render "shared/back_tabbar" %>
+
+<main data-size="sm">
+  <header>
+    <nav>
+      <h1><%= @collection.name %></h1>
+
+      <div class="dropdown--dock">
+        <button
+          type="button"
+          data-intent="secondary"
+          data-radius="full"
+          data-size="sm"
+          data-content="icon"
+          popovertarget="collection_actions"
+          aria-label="Collection options"
+          aria-haspopup="menu"
+        >
+          <%= icon("dots") %>
+        </button>
+
+        <div
+          id="collection_actions"
+          role="menu"
+          style="position-anchor: collection_actions"
+          popover
+          data-controller="grid-navigation"
+          data-grid-navigation-columns-value="1"
+          data-action="keydown->grid-navigation#navigate"
+        >
+          <nav role="listbox" aria-label="Collection options">
+            <%= link_to export_bullets_path(collection: @collection.name),
+                class: "dropdown-item picker--item",
+                data: { turbo: false, grid_navigation_target: "item", action: "focus->grid-navigation#syncPosition" } do %>
+              <%= icon("file") %> Export
+            <% end %>
+
+            <%= link_to edit_collection_path(@collection),
+                class: "dropdown-item picker--item",
+                data: { turbo_frame: "_top", grid_navigation_target: "item", action: "focus->grid-navigation#syncPosition" } do %>
+              <%= icon("pencil") %> Edit
+            <% end %>
+          </nav>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <%= turbo_frame_tag dom_id(@collection, :timeline),
+        class: "utilities--contents",
+        src: bullets_path(collection: @collection.name) do %>
+    <div class="timeline--load-more-trigger" aria-busy="true">
+      <%= icon("spinner", class: "icon icon--spin") %>
+      <span class="utilities--sr-only">Loading collection</span>
+    </div>
+  <% end %>
+</main>

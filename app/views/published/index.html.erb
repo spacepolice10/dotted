@@ -1,0 +1,11 @@
+<% content_for(:title) { "Published" } %>
+
+<main data-size="md">
+  <h1>Published</h1>
+
+      <% if @bullets.any? %>
+        <%= render partial: "published/bullet", collection: @bullets, as: :bullet %>
+      <% else %>
+        <%= render "shared/empty_state", icon_name: "link", name: "Nothing published yet", description: "Published bullets and their public links will appear here." %>
+      <% end %>
+</main>

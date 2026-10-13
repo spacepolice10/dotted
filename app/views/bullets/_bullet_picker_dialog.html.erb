@@ -1,0 +1,12 @@
+<%# locals: (name:, dialog_id:, frame_id:, size:, close_on_submit: true, frame_data: {}) %>
+<%= render "shared/dialog",
+      name: name,
+      id: dialog_id,
+      size: size,
+      standalone: true,
+      close_on_submit: close_on_submit do %>
+  <%= content_tag "turbo-frame", "",
+        id: frame_id,
+        loading: "lazy",
+        data: { bullet_menu_target: "pickerElement" }.merge(frame_data) %>
+<% end %>

@@ -1,0 +1,10 @@
+<%# locals: (url: search_path, label: "Back", aria_label: "Back") %>
+<nav class="tabbar--navigation tabbar--back" aria-label="<%= aria_label %>">
+  <%= back_link_to url,
+        class: "tabbar--back-link",
+        data: { turbo_frame: "_top" },
+        aria: { label: aria_label } do %>
+    <%= icon("arrow-left") %>
+    <span class="tabbar--back-name"><%= label %></span>
+  <% end %>
+</nav>

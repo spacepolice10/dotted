@@ -1,0 +1,28 @@
+@layer components {
+  .collection-chip {
+    justify-content: flex-start;
+    width: 100%;
+    min-width: 0;
+    padding: var(--space-v) var(--space-h-half);
+    color: var(--color-invert-2);
+    font-size: var(--font-size-base-type);
+    font-weight: var(--font-weight-medium);
+    text-decoration: none;
+    background: var(--color-2);
+    border: 1px solid transparent;
+    border-radius: var(--radius-full);
+
+    span {
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+  }
+
+  @media (hover: hover) {
+    .collection-chip:hover {
+      background: var(--color-3);
+    }
+  }
+}

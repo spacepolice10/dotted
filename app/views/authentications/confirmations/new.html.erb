@@ -1,0 +1,47 @@
+<% content_for(:title) { "Enter code" } %>
+
+<main data-size="sm">
+  <section>
+    <header>
+      <h1 class="branding-heading">dotted</h1>
+    </header>
+
+    <article id="confirmation_form" data-elevation="1">
+      <header>
+        <h2>Check your email</h2>
+      </header>
+
+      <main>
+        <%= form_with url: authentication_confirmation_path, data: { controller: "auto-submit", auto_submit_length_value: 6 } do |form| %>
+          <label>
+            <small>We sent a 6-character code to <strong><%= @email %></strong>. Enter the code to sign in or create an account.</small>
+
+            <%= form.text_field :code,
+        required: true,
+        autofocus: true,
+        autocomplete: "one-time-code",
+        inputmode: "text",
+        maxlength: 6,
+        placeholder: "······",
+        aria: { label: "6-character login code" },
+        data: { action: "input->auto-submit#submit" } %>
+          </label>
+
+          <%= form.button type: "submit", data: { intent: "primary", radius: "full", size: "lg" } do %>
+            Verify code
+          <% end %>
+        <% end %>
+      </main>
+    </article>
+
+    <br>
+
+    <footer class="utilities--mx-auto">
+      <nav>
+        <%= link_to new_authentication_path, class: "pill" do %>
+          <%= icon "arrow-left" %> Try again
+        <% end %>
+      </nav>
+    </footer>
+  </section>
+</main>

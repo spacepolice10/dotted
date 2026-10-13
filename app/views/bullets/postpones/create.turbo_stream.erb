@@ -1,0 +1,20 @@
+<% if @failed_bullet %>
+  <%= turbo_stream.update "toasts" do %>
+    <% messages = @failed_bullet.respond_to?(:errors) && @failed_bullet.errors.any? ? @failed_bullet.errors.full_messages : ["Could not postpone"] %>
+    <%= render "shared/toasts", type: "errmsg", messages: messages %>
+  <% end %>
+<% else %>
+  <%= turbo_stream.update "toasts" do %>
+    <% scheduled_on = @bullets.first.pops_on.strftime("%B %-d") %>
+    <% message = @bullets.size == 1 ? "Bullet scheduled for #{scheduled_on}" : "#{@bullets.size} bullets scheduled for #{scheduled_on}" %>
+    <%= render "shared/toasts", type: "notify", messages: [message] %>
+  <% end %>
+  <% @bullets.each do |bullet| %>
+    <%= turbo_stream.remove_all bullet %>
+    <% if bullet.pops_on == Date.current %>
+      <%= turbo_stream.append "timeline_section_current_date" do %>
+        <%= render partial: bullet.to_partial_path, locals: { bullet: bullet } %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

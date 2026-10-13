@@ -1,0 +1,13 @@
+<%# locals: (entries:, q:) %>
+
+<br>
+<ul role="listbox" class="combobox">
+  <% entries.each do |entry| %>
+    <%= render "searches/search_result", entry: entry, query: q %>
+  <% end %>
+
+</ul>
+
+<% if entries.empty? %>
+  <%= render "shared/empty_state", icon_name: "search", name: "No results", description: "Try another word or a shorter search." %>
+<% end %>

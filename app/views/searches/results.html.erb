@@ -1,0 +1,18 @@
+<% content_for(:title, "Search") %>
+
+<%= render "shared/tabbar" %>
+
+<main
+  class="search--window"
+  data-size="sm"
+  data-controller="search"
+  data-search-path-value="<%= search_results_path %>"
+>
+  <%= turbo_frame_tag "search_section", class: "search--section", data: { search_target: "section" } do %>
+    <%= render "searches/results", entries: @entries, q: @q %>
+  <% end %>
+
+  <div id="search_dock" class="search--dock">
+    <%= render "searches/form", q: @q %>
+  </div>
+</main>

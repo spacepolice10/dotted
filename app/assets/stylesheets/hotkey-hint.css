@@ -1,0 +1,65 @@
+@layer components {
+  /*
+   * Keyboard shortcut badges (::after on .hotkey-hint).
+   * --always: in-flow kbd (bullet menu).
+   * Shift-held: same kbd chrome, absolutely positioned to avoid layout shift.
+   */
+
+  @media (pointer: fine) {
+    .hotkey-hint[data-hotkey]::after {
+      content: attr(data-hotkey);
+      pointer-events: none;
+    }
+
+    .hotkey-hint[data-hotkey]::after,
+    .hotkey-hint--key {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+      min-width: 1.5rem;
+      height: 1.5rem;
+      padding: 0 var(--space-h-half);
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-strong);
+      line-height: 1;
+      letter-spacing: 0.02em;
+      color: var(--color-invert-2);
+      background: var(--color-2);
+      border: 1px solid color-mix(in oklch, var(--color-invert-4) 55%, transparent);
+      border-bottom-width: 2px;
+      border-radius: var(--radius-subtle);
+      box-shadow:
+        inset 0 1px 0 color-mix(in oklch, var(--color-1) 70%, transparent),
+        var(--shadow-subtle);
+    }
+
+    .button.hotkey-hint--always[data-hotkey]::after {
+      margin-inline-start: auto;
+    }
+
+    .hotkey-hint[data-hotkey]:not(.hotkey-hint--always) {
+      position: relative;
+    }
+
+    .hotkey-hint[data-hotkey]:not(.hotkey-hint--always)::after {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      translate: -50% -110%;
+      z-index: var(--z-dropdown);
+      opacity: 0;
+      transform: translateY(var(--space-v-half));
+      transition:
+        opacity 80ms ease,
+        transform 80ms ease;
+    }
+
+    html.show-hotkey-hint .hotkey-hint[data-hotkey]:not(.hotkey-hint--always)::after {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 0.6s;
+    }
+  }
+}

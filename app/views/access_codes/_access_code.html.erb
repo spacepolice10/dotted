@@ -1,0 +1,18 @@
+<%# locals: (access_code:) %>
+<article id="<%= dom_id(access_code) %>" data-elevation="2">
+  <header>
+    <strong><%= access_code.description.presence || "Access code" %></strong>
+    <code><%= access_code.code_prefix %>…</code>
+  </header>
+
+  <footer>
+    <%= button_to access_code_path(access_code),
+        method: :delete,
+        class: "utilities--mx-auto",
+        data: { intent: "secondary", radius: "full", size: "sm", status: "negative" },
+        form: { data: { turbo_confirm: "Revoke this access code? Anything using it will stop working." }, class: "utilities--contents" } do %>
+      <%= icon("trash") %>
+      Revoke
+    <% end %>
+  </footer>
+</article>

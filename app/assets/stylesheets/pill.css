@@ -1,0 +1,43 @@
+@layer components {
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-h-half);
+    padding: var(--space-v-half) var(--space-h);
+    border-radius: var(--radius-full);
+    border: var(--border-subtle);
+    background: var(--color-1);
+    color: var(--color-invert-4);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xs);
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    width: fit-content;
+    height: fit-content;
+  }
+
+  a,button {
+    &.pill:hover {
+      background: var(--color-2);
+    }
+  }
+
+  .pill--notify {
+    border: 1px solid var(--model-color-2);
+    background: var(--model-color-2-bg);
+    color: var(--model-color-2);
+  }
+  .pill--accent {
+    border: 1px solid var(--color-accent-1);
+    background: var(--color-accent-1-subtle);
+  }
+  .pill--warning {
+    border: 1px solid var(--color-accent-2);
+    background: var(--color-accent-2-subtle);
+  }
+  .pill--danger {
+    border: 1px solid var(--color-invert-negative);
+    background: var(--color-negative);
+  }
+}

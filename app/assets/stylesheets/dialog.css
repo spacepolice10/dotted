@@ -1,0 +1,109 @@
+@layer components {
+
+  dialog {
+    position: fixed;
+    z-index: var(--z-dialog);
+    margin-top: auto;
+    margin-bottom: 0;
+    margin-inline: auto;
+    border: 0;
+    border-top-left-radius: var(--radius-strong);
+    border-top-right-radius: var(--radius-strong);
+    background: var(--background-canvas-colour);
+    box-shadow:
+      var(--shadow-base),
+      0 0 0 1px color-mix(in oklch, var(--color-2) 35%, transparent);
+    color: var(--color-invert-2);
+    width: 100%;
+    max-width: 100%;
+    overflow: scroll;
+    height: 100%;
+    overscroll-behavior: none;
+    border-bottom: var(--border-subtle);
+
+    @container layout (width < 800px) {
+      max-height: min(75dvh,
+          100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    }
+
+    @container layout (width >=800px) {
+      max-height: min(75dvh,
+          100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+      max-width: 800px;
+    }
+
+    &[data-size="sm"] {
+      height: fit-content;
+      max-width: 400px;
+    }
+
+    &[data-size="lg"] {
+      max-width: 650px;
+      height: 100%;
+    }
+
+    opacity: 0;
+    transform: translateY(100%);
+    transition: transform 120ms ease,
+    opacity 120ms ease,
+    display 120ms allow-discrete,
+    overlay 120ms allow-discrete;
+
+    &:modal,
+    &[open] {
+      opacity: 1;
+      transform: translateY(0);
+
+      @starting-style {
+        opacity: 0;
+        transform: translateY(100%);
+      }
+    }
+
+    &::backdrop {
+      background: oklch(0% 0 0 / 0);
+      transition:
+        background 140ms ease,
+        transform 140ms ease,
+        display 140ms allow-discrete,
+        overlay 140ms allow-discrete;
+    }
+
+    &:modal::backdrop,
+    &[open]::backdrop {
+      background: oklch(0% 0 0 / 0.35);
+
+      @starting-style {
+        background: oklch(0% 0 0 / 0);
+      }
+    }
+    &>header {
+      position: sticky;
+      top: 0;
+      padding-inline: var(--space-h);
+      border-bottom: var(--border-subtle);
+      padding-block: var(--space-v);
+      background: var(--background-canvas-colour);
+      z-index: var(--z-dialog);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      margin-block-end: var(--space-v-half);
+      &>.dialog--hide {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        aspect-ratio: 1 / 1;
+        width: var(--space-v-6);
+        height: var(--space-v-4);
+        flex-shrink: 0;
+        border: var(--border-strong);
+        border-radius: var(--radius-full);
+      }
+    }
+    &>main {
+      padding: var(--space-v) var(--space-h);
+    }
+  }
+}

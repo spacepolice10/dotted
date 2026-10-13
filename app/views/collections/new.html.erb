@@ -1,0 +1,23 @@
+<% content_for(:title, "New collection") %>
+
+<%= render "shared/back_tabbar",
+      url: @return_to.presence || search_path,
+      aria_label: "Back to Search" %>
+
+<main data-size="sm">
+  <h1>Collection</h1>
+
+
+  <div id="<%= dom_id(@collection) %>" class="utilities--contents">
+    <%= render "form", collection: @collection, bullet_ids: @bullet_ids, return_to: @return_to %>
+    <br>
+
+    <% if @bullets.present? %>
+      <p><%= pluralize(@bullets.size, "bullet") %> will be added</p>
+      <br>
+      <ul role="list">
+        <%= render partial: "collections/bullet_preview", collection: @bullets, as: :bullet %>
+      </ul>
+    <% end %>
+  </div>
+</main>

@@ -1,0 +1,39 @@
+<% ids = local_assigns[:bullet_ids] %>
+<% destination = local_assigns[:return_to] %>
+<% form_id = dom_id(collection, :form) %>
+
+<% submit = if ids.present?
+              "Create and collect"
+            elsif collection.persisted?
+              "Save"
+            else
+              "Create"
+            end %>
+
+<article class="settings-form" data-elevation="2">
+  <header>
+    <h2><%= collection.persisted? ? "Edit collection" : "New collection" %></h2>
+    <p>Give related bullets a name and colour so they’re easy to find.</p>
+  </header>
+  <main>
+    <%= form_with model: collection, html: { id: form_id, class: "form" } do |f| %>
+      <% if ids.present? %>
+        <%= hidden_field_tag :bullet_ids, ids %>
+        <%= hidden_field_tag :return_to, destination if destination.present? %>
+      <% end %>
+
+      <%= f.label :name, "Collection name", class: "utilities--sr-only" %>
+      <%= f.text_field :name, required: true, autofocus: true, autocomplete: "off", maxlength: 140, placeholder: "Reading list, groceries, etc.", aria: { invalid: collection.errors[:name].any? } %>
+
+      <% if collection.errors[:name].any? %>
+        <small class="form--errors" role="alert"><%= collection.errors.full_messages_for(:name).to_sentence %></small>
+      <% end %>
+
+      <%= render "shared/form/colour_picker", form: f %>
+
+      <%= f.button type: "submit", data: { intent: "primary", radius: "full", size: "lg" } do %>
+        <%= submit %>
+      <% end %>
+    <% end %>
+  </main>
+</article>

@@ -1,0 +1,30 @@
+<% content_for(:title) { "Install Dotted with ONCE" } %>
+
+<main data-page="once" data-size="md">
+  <section class="once-card" aria-labelledby="once-heading">
+    <h1 id="once-heading">Dotted <small>ONCE-ready</small></h1>
+    <h2>Put it on your own server, without a subscription.</h2>
+
+    <p>
+      ONCE installs Docker apps with one command. It handles HTTPS, persistent
+      storage, updates, and backups. You keep the machine and the data. Dotted
+      is source-available under the
+      <a href="https://osaasy.dev/">O’Saasy license</a>.
+    </p>
+
+
+    <ul data-layout="column" data-divider="single">
+      <li>
+        <%= link_to "https://once.com/" do %>
+          <p>Explore ONCE</p>
+        <% end %>
+      </li>
+
+      <li>
+        <%= link_to "https://github.com/spacepolice10/digibujo#install-with-once" do %>
+          <p>Read Dotted installation instructions</p>
+        <% end %>
+      </li>
+    </ul>
+  </section>
+</main>

@@ -1,0 +1,279 @@
+@layer base {
+  :root {
+    --background-grid-size: 1.25rem;
+
+    --background-canvas-colour: light-dark(oklch(0.97 0 0), oklch(0.24 0 0));
+
+    --background-grid-colour: light-dark(
+      oklch(0.88 0 0),
+      oklch(0.45 0 0 / 0.55)
+    );
+
+    --background-grid-pattern: radial-gradient(
+      circle,
+      var(--background-grid-colour) 1px,
+      transparent 1px
+    );
+
+    --background-grid:
+      var(--background-grid-pattern) 0 0 / var(--background-grid-size)
+        var(--background-grid-size),
+      var(--background-canvas-colour);
+  }
+
+  html {
+    background: var(--background-grid);
+    background-attachment: fixed;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1280px;
+    min-height: 100dvh;
+    margin-inline: auto;
+    padding: 2.5px;
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-base-read);
+    line-height: var(--line-height-paragraph);
+    color: var(--color-invert-1);
+    container: layout / inline-size;
+    overscroll-behavior-y: none;
+    @media (max-width: 768px) {
+      border-top: var(--border-subtle);
+    }
+  }
+
+  body > main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+    min-block-size: 0;
+    gap: var(--space-v);
+    margin-inline: auto;
+    padding-block: var(--space-v-4);
+    padding-inline: var(--space-h);
+    padding-block-end: calc(
+      var(--tabbar-clearance) + var(--space-h-2) + var(--space-v-2)
+    );
+    container: inline-size;
+
+    & > header,
+    & > section > header {
+      margin-block: var(--space-v);
+      padding-inline: 0;
+      & > nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-h);
+      }
+    }
+
+    & > footer {
+      width: 100%;
+      margin-inline: auto;
+    }
+
+    &[data-size="xs"] {
+      max-width: 480px;
+    }
+
+    &[data-size="sm"] {
+      max-width: 640px;
+    }
+
+    &[data-size="lg"] {
+      max-width: 800px;
+    }
+
+    &[data-size="xl"] {
+      max-width: 1280px;
+    }
+  }
+
+  body:has(.tabbar--navigation) > main {
+    padding-block-end: calc(var(--tabbar-clearance) + var(--space-v-2));
+  }
+
+  section {
+    --layout: column;
+    --justify: space-between;
+
+    display: flex;
+    flex-direction: var(--layout);
+    justify-content: var(--justify);
+    flex: 1;
+
+    &[data-justify="centered"] {
+      --justify: center;
+    }
+
+    &[data-justify="between"] {
+      --justify: between;
+    }
+  }
+
+  section,
+  ul,
+  ol,
+  main {
+    &[data-layout="column"] {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &[data-layout="flex"] {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--space-h-half);
+    }
+
+    &[data-layout="grid"] {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--space-h-half);
+      align-items: stretch;
+    }
+
+    &[data-layout="auto-grid"] {
+      gap: var(--space-h-half);
+      align-items: stretch;
+      column-width: 24rem;
+      column-gap: var(--space-h);
+      & > * {
+        margin-bottom: var(--space-v);
+        display: inline-flex;
+      }
+    }
+  }
+
+  ul {
+    margin: 0;
+    padding: auto;
+
+    & > li {
+      list-style: none;
+    }
+
+    &[data-divider="single"] > li + li {
+      border-block-start: var(--border-subtle);
+    }
+
+    &[data-divider="double"] > li + li {
+      border-block-start: var(--border-subtle);
+    }
+
+    & > li > :is(a, button) {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      gap: var(--space-h-half);
+      padding: var(--space-v) var(--space-h);
+      border: 0;
+      background: none;
+      text-align: start;
+      text-decoration: none;
+
+      @media (pointer: coarse) {
+        padding: var(--space-v-2) var(--space-h);
+      }
+    }
+
+    li > :is(a, button) p {
+      flex: 1;
+      min-width: 0;
+      overflow-wrap: anywhere;
+      text-decoration: none;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: var(--line-height-heading);
+    font-family: var(--font-family-sans);
+    font-weight: var(--font-weight-medium);
+    text-wrap: balance;
+    overflow-wrap: break-word;
+    color: var(--color-invert-1);
+  }
+
+  p,
+  li {
+    text-wrap: pretty;
+    overflow-wrap: break-word;
+  }
+
+  h1 {
+    flex-shrink: 0;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-strong);
+    color: var(--color-invert-1);
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-h-half);
+    text-decoration: none;
+  }
+
+  a:not([class]) {
+    color: var(--color-invert-2);
+    text-decoration-skip-ink: auto;
+  }
+
+  :focus-visible {
+    outline: 1px solid
+      color-mix(in oklch, var(--color-accent-1) 80%, transparent);
+    box-shadow: none;
+    transition: none;
+  }
+
+  * {
+    scrollbar-width: none;
+  }
+
+  html[data-appearance="warm"] {
+    --color-1: light-dark(oklch(0.97 0.015 78), oklch(0.25 0.025 78));
+    --color-2: light-dark(oklch(0.99 0.01 78), oklch(0.3 0.018 78));
+    --background-grid-colour: light-dark(
+      oklch(0.64 0.018 78 / 0.72),
+      oklch(0.45 0.012 78 / 0.55)
+    );
+  }
+
+  html[data-appearance="cool"] {
+    --color-1: light-dark(oklch(0.97 0.015 250), oklch(0.25 0.025 255));
+    --color-2: light-dark(oklch(0.99 0.01 250), oklch(0.3 0.018 255));
+    --background-grid-colour: light-dark(
+      oklch(0.64 0.018 250 / 0.72),
+      oklch(0.45 0.012 255 / 0.55)
+    );
+  }
+
+  html[data-appearance="nature"] {
+    --color-1: light-dark(oklch(0.97 0.015 145), oklch(0.25 0.025 145));
+    --color-2: light-dark(oklch(0.99 0.01 145), oklch(0.3 0.018 145));
+    --background-grid-colour: light-dark(
+      oklch(0.64 0.018 145 / 0.72),
+      oklch(0.45 0.012 145 / 0.55)
+    );
+  }
+
+  html[data-appearance="cheese"] {
+    --color-1: light-dark(oklch(0.97 0.02 85), oklch(0.25 0.03 85));
+    --color-2: light-dark(oklch(0.99 0.014 85), oklch(0.3 0.022 85));
+    --background-grid-colour: light-dark(
+      oklch(0.64 0.022 85 / 0.72),
+      oklch(0.45 0.014 85 / 0.55)
+    );
+  }
+}

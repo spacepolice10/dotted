@@ -1,0 +1,76 @@
+@layer utilities {
+  .utilities--sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .utilities--contents {
+    display: contents;
+  }
+  .utilities--invisible {
+    display: none;
+  }
+
+  .utilities--sticky {
+    position: sticky;
+  }
+  .utilities--relative {
+    position: relative;
+  }
+
+  .utilities--desktop-only {
+    display: none;
+    @media (pointer: fine) {
+      display: block;
+    }
+  }
+  .utilities--mobile-only {
+    display: none;
+    @media (pointer: coarse) {
+      display: block;
+    }
+  }
+
+  .utilities--mx-auto {
+    margin-inline: auto;
+  }
+  .utilities--my-auto {
+    margin-block: auto;
+  }
+
+  .utilities--text-center {
+    text-align: center;
+  }
+  .utilities--text-balance {
+    text-align: balance;
+  }
+
+  .utilities--stretch {
+    height: stretch;
+    width: stretch;
+  }
+
+  .utilities--overscroll-none {
+      overscroll-behavior: none;
+  }
+  .utilities--overscroll-auto {
+    overscroll-behavior: auto;
+  }
+
+  .utilities--scrollable {
+    overflow: scroll;
+    height: 100dvh;
+  }
+
+  .utilities--padding-x-1 {
+    padding-inline: var(--space-h);
+  }
+  .utilities--padding-y-1 {
+    padding-block: var(--space-v);
+  }
+}
