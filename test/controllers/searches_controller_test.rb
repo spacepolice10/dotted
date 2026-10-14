@@ -252,6 +252,19 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
     assert_select 'turbo-frame#search_section a.combobox--item[href=?]', collection_path(collection)
   end
 
+  test 'results renders a recent bullet body without template markup' do
+    bullet = create_bullet!(@user, body: 'Buy <strong>milk</strong> today')
+    Search::Selection.record!(user: @user, searchable: bullet)
+
+    get search_results_path
+
+    assert_response :success
+    assert_select 'turbo-frame#search_section a.combobox--item[href=?] .search--result-body strong',
+                  bullet_path(bullet), text: 'milk'
+    assert_no_match(/&lt;!-- BEGIN app\/views/, response.body)
+    assert_no_match(/&lt;p&gt;Buy/, response.body)
+  end
+
   test 'results turbo-stream shows recent selections for a blank query' do
     collection = create_collection!(@user, name: 'recent alpha')
     Search::Selection.record!(user: @user, searchable: collection)

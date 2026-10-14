@@ -22,10 +22,15 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_includes html, '<strong><mark class="search--term decoration--circle decoration-colour--sky">milk</mark></strong>'
   end
 
-  test 'highlight_search_result returns the original html when nothing matches' do
-    html = '<p>Call mom</p>'.html_safe
+  test 'highlight_search_result renders sanitized rich text when nothing matches' do
+    html = '<!-- template annotation --><p>Call <strong>mom</strong></p><script>alert(1)</script>'
 
-    assert_same html, highlight_search_result(html, 'zzz')
+    result = highlight_search_result(html, 'zzz')
+
+    assert result.html_safe?
+    assert_includes result, '<p>Call <strong>mom</strong></p>'
+    assert_not_includes result, 'template annotation'
+    assert_not_includes result, '<script>'
   end
 
   test 'search_results_count marks a full page as a lower bound' do
