@@ -68,14 +68,14 @@ id="bullet_composer"
       <span class="bullet--marker" aria-hidden="true">
         <%= icon("circle", class: "bullet--marker-icon") %>
       </span>
-      <div class="bullet--content">
-        <div class="bullet--body">
-          <span class="attachment--file">
-            <%= icon("paperclip") %>
-            <span class="attachment--file-name utilities--line-clamp-1" data-pending-filename></span>
-          </span>
-          <img data-pending-image hidden alt="" class="attachment--preview">
-        </div>
+      <div class="bullet--body">
+        <span class="attachment--file">
+          <%= icon("paperclip") %>
+          <span class="attachment--file-name utilities--line-clamp-1" data-pending-filename></span>
+        </span>
+        <span class="attachment--preview" data-pending-preview hidden>
+          <img data-pending-image alt="">
+        </span>
       </div>
     </turbo-frame>
   </template>

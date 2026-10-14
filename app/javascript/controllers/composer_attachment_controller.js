@@ -67,19 +67,20 @@ export default class extends Controller {
       if (!file.type.startsWith("image/")) return
 
       const img = node.querySelector("[data-pending-image]")
-      if (!img) return
+      const preview = node.querySelector("[data-pending-preview]")
+      if (!img || !preview) return
 
       const url = URL.createObjectURL(file)
       img.src = url
       img.alt = file.name
-      img.hidden = false
+      preview.hidden = false
       node.querySelectorAll(".attachment--file").forEach((el) => {
         el.hidden = true
       })
       img.onload = () => URL.revokeObjectURL(url)
       img.onerror = () => {
         URL.revokeObjectURL(url)
-        img.hidden = true
+        preview.hidden = true
         node.querySelectorAll(".attachment--file").forEach((el) => {
           el.hidden = false
         })

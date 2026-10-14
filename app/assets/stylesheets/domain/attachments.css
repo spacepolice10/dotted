@@ -1,7 +1,7 @@
 @layer components {
 
 
-  .bullet--body :is(.attachment.attachment--preview, a.attachment--preview) {
+  .bullet--body :is(.attachment.attachment--preview, a.attachment--preview, span.attachment--preview:not([hidden])) {
     display: grid;
     justify-items: start;
     max-inline-size: 100%;
