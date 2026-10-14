@@ -184,6 +184,19 @@ class CollectionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'heart', collection.icon
   end
 
+  test 'edit offers a confirmed collection removal' do
+    collection = create_collection!(@user, name: 'Inbox')
+
+    get edit_collection_path(collection)
+
+    assert_response :success
+    assert_select 'form[action=?][method=post][data-turbo-confirm]', collection_path(collection) do
+      assert_select 'input[name=_method][value=delete]'
+      assert_select 'button[type=submit].utilities--mx-auto[data-intent=danger]', text: /Remove collection/
+    end
+    assert_match 'bullets will remain', response.body
+  end
+
   test 'destroy hard-deletes collection and keeps bullets untagged' do
     collection = create_collection!(@user, name: 'Gone')
     card = create_bullet!(@user, body: 'Stays', collection: collection)

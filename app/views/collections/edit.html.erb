@@ -9,6 +9,15 @@
   <div>
     <div id="<%= dom_id(@collection) %>" class="utilities--contents">
       <%= render "form", collection: @collection %>
+
+      <br>
+      <%= button_to collection_path(@collection),
+          method: :delete,
+          class: "utilities--mx-auto",
+          data: { intent: "danger", radius: "full", size: "lg" },
+          form: { data: { turbo_confirm: "Remove this collection? Its bullets will remain, but will no longer belong to a collection." } } do %>
+        <%= icon("trash") %> Remove collection
+      <% end %>
     </div>
   </div>
 </main>
