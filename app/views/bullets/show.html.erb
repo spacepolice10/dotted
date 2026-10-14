@@ -21,7 +21,7 @@
     data-controller="timeline-scroll"
     data-timeline-scroll-current-value="true"
   >
-    <section id="timeline_section_<%= @timeline.section_of(@bullet.pops_on).id %>" class="timeline--section">
+    <div id="timeline_section_<%= @timeline.section_of(@bullet.pops_on).id %>" class="timeline--section">
       <h2 class="pill"><%= @bullet.pops_on.strftime("%A, %b %-d") %></h2>
       <% @bullets.each do |bullet| %>
         <% if bullet == @bullet %>
@@ -30,6 +30,6 @@
           <%= render "bullets/bullet", bullet: bullet %>
         <% end %>
       <% end %>
-    </section>
+    </div>
   </div>
 </main>
