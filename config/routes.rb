@@ -60,7 +60,7 @@ Rails.application.routes.draw do
   resources :completed, only: %i[index]
 
   # --- Attachments ---
-  resources :attachments, only: %i[index show], param: :signed_id
+  resources :attachments, only: %i[index show]
 
   # --- Publishing ---
   resources :published, only: %i[index show], param: :code

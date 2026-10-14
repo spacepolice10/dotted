@@ -83,6 +83,15 @@ class BulletTest < ActiveSupport::TestCase
     assert_not bullet.valid?
   end
 
+  test 'with_attachment includes only bullets with an attached file' do
+    attached = create_file_bullet!(@user)
+    create_bullet!(@user, body: 'Plain text')
+    purged = create_file_bullet!(@user, filename: 'gone.pdf')
+    purged.file.purge
+
+    assert_equal [attached.id], @user.bullets.with_attachment.pluck(:id)
+  end
+
   test 'a very long filename saves and truncates safely in the search index' do
     bullet = create_file_bullet!(@user)
     bullet.update!(filename: "#{'n' * 300}.png")

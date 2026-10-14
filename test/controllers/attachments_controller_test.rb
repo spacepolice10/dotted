@@ -9,45 +9,56 @@ class AttachmentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'show renders a file owned by an attachment bullet' do
-    blob = attach_file_blob!(@user, filename: 'report.pdf')
+    bullet = file_bullet!(@user, filename: 'report.pdf')
 
-    get attachment_path(blob.signed_id)
+    get attachment_path(bullet)
 
     assert_response :success
     assert_match 'report.pdf', response.body
   end
 
   test 'show returns not found for another users attachment bullet file' do
-    blob = attach_file_blob!(users(:two), filename: 'foreign.pdf')
+    bullet = file_bullet!(users(:two), filename: 'foreign.pdf')
 
-    get attachment_path(blob.signed_id)
+    get attachment_path(bullet)
 
     assert_response :not_found
   end
 
-  test 'show returns not found for invalid signed id' do
-    get attachment_path('not-a-valid-signed-id')
+  test 'show returns not found for a bullet without a file' do
+    bullet = create_bullet!(@user, body: 'No file')
+
+    get attachment_path(bullet)
 
     assert_response :not_found
   end
 
   test 'index lists owned files and excludes another users files' do
-    file_blob = attach_file_blob!(@user, filename: 'report.pdf')
-    foreign_blob = attach_file_blob!(users(:two), filename: 'foreign.pdf')
+    bullet = file_bullet!(@user, filename: 'report.pdf')
+    foreign_bullet = file_bullet!(users(:two), filename: 'foreign.pdf')
 
     get attachments_path
 
     assert_response :success
     assert_select 'nav.tabbar--back a[href=?][aria-label=?]', search_path, 'Back', text: 'Back'
     assert_select 'a[aria-label="Back to Home"]', count: 0
-    assert_match file_blob.filename.to_s, response.body
-    assert_no_match foreign_blob.filename.to_s, response.body
+    assert_select "li#bullet_#{bullet.id} a[href=?]", attachment_path(bullet), text: /report.pdf/
+    assert_select "li#bullet_#{foreign_bullet.id}", count: 0
+  end
+
+  test 'index renders an image as a bullet tile' do
+    bullet = create_file_bullet!(@user, filename: 'picture.png')
+
+    get attachments_path
+
+    assert_response :success
+    assert_select "li#bullet_#{bullet.id} a[href=?] img[alt=?]", attachment_path(bullet), 'picture.png'
+    assert_select "li#bullet_#{bullet.id} a[href=?]", bullet_path(bullet), text: 'View bullet'
   end
 
   private
 
-  def attach_file_blob!(user, filename:)
-    bullet = create_file_bullet!(user, filename: filename, content_type: 'application/pdf', io: StringIO.new('%PDF-1.4'))
-    bullet.file.blob
+  def file_bullet!(user, filename:)
+    create_file_bullet!(user, filename: filename, content_type: 'application/pdf', io: StringIO.new('%PDF-1.4'))
   end
 end

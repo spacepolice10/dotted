@@ -12,83 +12,83 @@
 
 ActiveRecord::Schema[8.1].define(version: 2026_10_13_120000) do
   create_table "access_codes", force: :cascade do |t|
+    t.integer "user_id", null: false
     t.string "code_digest", null: false
     t.string "code_prefix", null: false
-    t.datetime "created_at", null: false
     t.string "description"
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id", null: false
     t.index ["code_digest"], name: "index_access_codes_on_code_digest", unique: true
     t.index ["user_id"], name: "index_access_codes_on_user_id"
   end
 
   create_table "action_text_rich_texts", force: :cascade do |t|
-    t.text "body"
-    t.datetime "created_at", null: false
     t.string "name", null: false
-    t.bigint "record_id", null: false
+    t.text "body"
     t.string "record_type", null: false
+    t.integer "record_id", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["record_type", "record_id", "name"], name: "index_action_text_rich_texts_uniqueness", unique: true
   end
 
   create_table "active_storage_attachments", force: :cascade do |t|
-    t.bigint "blob_id", null: false
-    t.datetime "created_at", null: false
     t.string "name", null: false
-    t.bigint "record_id", null: false
     t.string "record_type", null: false
+    t.integer "record_id", null: false
+    t.integer "blob_id", null: false
+    t.datetime "created_at", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
   create_table "active_storage_blobs", force: :cascade do |t|
-    t.bigint "byte_size", null: false
-    t.string "checksum"
-    t.string "content_type"
-    t.datetime "created_at", null: false
-    t.string "filename", null: false
     t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
     t.text "metadata"
     t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
   create_table "active_storage_variant_records", force: :cascade do |t|
-    t.bigint "blob_id", null: false
+    t.integer "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
   create_table "activities", force: :cascade do |t|
-    t.string "action", null: false
-    t.datetime "created_at", null: false
-    t.json "metadata", default: {}, null: false
-    t.integer "subject_id", null: false
-    t.string "subject_type", null: false
-    t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.string "subject_type", null: false
+    t.integer "subject_id", null: false
+    t.string "action", null: false
+    t.json "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["subject_type", "subject_id", "created_at"], name: "index_activities_on_subject_type_and_subject_id_and_created_at"
     t.index ["user_id", "created_at"], name: "index_activities_on_user_id_and_created_at"
     t.index ["user_id"], name: "index_activities_on_user_id"
   end
 
   create_table "auth_codes", force: :cascade do |t|
-    t.string "code_digest", null: false
-    t.datetime "created_at", null: false
-    t.datetime "expires_at", null: false
-    t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.string "code_digest", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_auth_codes_on_user_id"
   end
 
   create_table "bullets", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.date "pops_on", null: false
+    t.datetime "done_at"
     t.string "author_name"
     t.datetime "created_at", null: false
-    t.datetime "done_at"
-    t.date "pops_on", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id", null: false
     t.string "filename"
     t.string "client_id"
     t.integer "collection_id"
@@ -102,25 +102,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_120000) do
   end
 
   create_table "collections", force: :cascade do |t|
-    t.string "colour"
-    t.datetime "created_at", null: false
-    t.text "description"
-    t.string "icon"
-    t.string "name", null: false
-    t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.string "name", null: false
+    t.string "colour"
+    t.string "icon"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["user_id", "name"], name: "index_collections_on_user_id_and_name", unique: true
     t.index ["user_id"], name: "index_collections_on_user_id"
   end
 
   create_table "published_entities", force: :cascade do |t|
-    t.string "code", null: false
-    t.datetime "created_at", null: false
-    t.integer "publishable_id", null: false
-    t.string "publishable_type", null: false
-    t.datetime "published_at", null: false
-    t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.string "publishable_type", null: false
+    t.integer "publishable_id", null: false
+    t.string "code", null: false
+    t.datetime "published_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["code"], name: "index_published_entities_on_code", unique: true
     t.index ["publishable_type", "publishable_id"], name: "index_published_entities_on_publishable"
     t.index ["user_id", "publishable_type", "publishable_id"], name: "idx_published_on_user_and_publishable", unique: true
@@ -128,24 +128,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_120000) do
   end
 
   create_table "search_records", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.text "search_body"
-    t.string "search_name"
-    t.integer "searchable_id", null: false
-    t.string "searchable_type", null: false
-    t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.string "searchable_type", null: false
+    t.integer "searchable_id", null: false
+    t.string "search_name"
+    t.text "search_body"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["user_id", "searchable_type", "searchable_id"], name: "index_search_records_on_user_and_searchable", unique: true
     t.index ["user_id"], name: "index_search_records_on_user_id"
   end
 
   create_table "search_selections", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.integer "searchable_id", null: false
-    t.string "searchable_type", null: false
-    t.datetime "selected_at", null: false
-    t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.string "searchable_type", null: false
+    t.integer "searchable_id", null: false
+    t.datetime "selected_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["searchable_type", "searchable_id"], name: "index_search_selections_on_searchable"
     t.index ["user_id", "searchable_type", "searchable_id"], name: "index_search_selections_on_user_and_searchable", unique: true
     t.index ["user_id", "selected_at"], name: "index_search_selections_on_user_id_and_selected_at"
@@ -153,37 +153,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_120000) do
   end
 
   create_table "sessions", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.string "ip_address"
-    t.datetime "updated_at", null: false
-    t.string "user_agent"
     t.integer "user_id", null: false
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
   create_table "user_settings", force: :cascade do |t|
+    t.integer "user_id", null: false
     t.string "appearance", default: "default", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id", null: false
     t.index ["user_id"], name: "index_user_settings_on_user_id", unique: true
   end
 
   create_table "users", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.string "email_address", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
   create_table "webhooks", force: :cascade do |t|
-    t.boolean "active", default: true, null: false
+    t.integer "user_id", null: false
+    t.string "name", null: false
     t.string "code_digest", null: false
     t.string "code_prefix", null: false
+    t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
-    t.string "name", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id", null: false
     t.index ["code_digest"], name: "index_webhooks_on_code_digest", unique: true
     t.index ["user_id"], name: "index_webhooks_on_user_id"
   end

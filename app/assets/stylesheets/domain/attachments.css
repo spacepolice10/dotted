@@ -44,28 +44,48 @@
 
 
   .attachment--gallery {
-    display: block;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+    align-items: start;
     width: 100%;
-    height: auto;
-    column-width: var(--space-h-7);
-    column-gap: var(--space-h-half);
+    gap: var(--space-h-half);
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
   .attachment--tile {
-    display: block;
-    width: 100%;
-    margin-block-end: var(--space-h-half);
-    break-inside: avoid;
     overflow: hidden;
     border-radius: var(--radius-base);
     background: var(--color-2);
     color: inherit;
-    text-decoration: none;
-    padding: var(--space-v);
     border: var(--border-base);
-    &[data-kind="picture"] {
+
+    > a {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+      padding: var(--space-v);
+    }
+
+    a[data-kind="picture"] {
       padding: 0;
     }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  .attachment--tile-details {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-h-half);
+    padding: var(--space-v);
+    color: var(--color-invert-4);
+    font-size: var(--font-size-xs);
   }
 
   .attachment--tile-file .icon-wrap {

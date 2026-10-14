@@ -2,7 +2,7 @@
 
 <%= render "shared/back_tabbar" %>
 
-<main data-size="sm" data-bullet-menu-target="list">
+<main data-size="sm">
   <header>
     <h1>Attachments</h1>
 
@@ -11,29 +11,34 @@
     </p>
   </header>
 
-  <% if @attachments.any? %>
-    <section class="attachment--gallery">
-      <% @attachments.each do |attachment| %>
-        <% blob = attachment.blob %>
+  <% if @bullets.any? %>
+    <ul class="attachment--gallery">
+      <% @bullets.each do |bullet| %>
+        <% file = bullet.file %>
 
-        <%= link_to attachment_path(blob.signed_id),
-              class: "attachment--tile",
-              data: { kind: blob.variable? ? "picture" : "file", turbo_frame: "_top" },
-              aria: { label: "View #{blob.filename}" } do %>
-          <% if blob.variable? %>
-            <%= image_tag blob.representation(resize_to_limit: [800, 1600]),
-                  alt: blob.filename.to_s,
-                  loading: "lazy" %>
-          <% else %>
-            <span class="attachment--tile-file">
-              <%= icon("paperclip") %>
-              <span class="attachment--tile-name"><%= blob.filename %></span>
-              <span class="attachment--tile-size"><%= number_to_human_size(blob.byte_size) %></span>
-            </span>
+        <li class="attachment--tile" id="<%= dom_id(bullet) %>">
+          <%= link_to attachment_path(bullet),
+                data: { kind: file.variable? ? "picture" : "file", turbo_frame: "_top" },
+                aria: { label: "View #{file.filename}" } do %>
+            <% if file.variable? %>
+              <%= image_tag file.variant(:display),
+                    alt: file.filename.to_s,
+                    loading: "lazy" %>
+            <% else %>
+              <span class="attachment--tile-file">
+                <%= icon("paperclip") %>
+                <span class="attachment--tile-name"><%= file.filename %></span>
+                <span class="attachment--tile-size"><%= number_to_human_size(file.byte_size) %></span>
+              </span>
+            <% end %>
           <% end %>
-        <% end %>
+          <div class="attachment--tile-details">
+            <span><%= bullet.pops_on.strftime("%b %-d, %Y") %></span>
+            <%= link_to "View bullet", bullet_path(bullet), data: { turbo_frame: "_top" } %>
+          </div>
+        </li>
       <% end %>
-    </section>
+    </ul>
   <% else %>
     <%= render "shared/empty_state", icon_name: "paperclip", name: "Nothing attached yet", description: "Files you add to bullets will appear here." %>
   <% end %>

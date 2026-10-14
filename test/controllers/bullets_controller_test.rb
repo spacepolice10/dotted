@@ -377,9 +377,10 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_match %(turbo-stream action="replace" target="bullet_client_#{client_id}"), response.body
+    bullet = @user.bullets.order(:created_at).last
     assert_select 'turbo-stream[action=replace] a.attachment--preview[href=?] img[alt=?][src]',
-                  attachment_path(blob.signed_id), 'pixel.png'
-    assert_equal client_id, @user.bullets.order(:created_at).last.client_id
+                  attachment_path(bullet), 'pixel.png'
+    assert_equal client_id, bullet.client_id
   end
 
   test 'create with the same client_id is idempotent' do

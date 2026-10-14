@@ -39,7 +39,7 @@
       <% file = bullet.file %>
       <% if file.variable? %>
         <% width, height = file.blob.metadata.values_at("width", "height") %>
-        <%= link_to attachment_path(file.blob.signed_id), class: "attachment--preview", data: { turbo_frame: "_top" } do %>
+        <%= link_to attachment_path(bullet), class: "attachment--preview", data: { turbo_frame: "_top" } do %>
           <%= image_tag file.variant(:thumb),
                   alt: file.filename.to_s,
                   style: (width.present? && height.present? ? "aspect-ratio: #{width} / #{height}" : nil) %>

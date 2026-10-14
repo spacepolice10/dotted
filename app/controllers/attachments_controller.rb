@@ -1,18 +1,13 @@
 # frozen_string_literal: true
 
-# Lists and renders files that can be traced back to the current user.
+# Lists and renders the current user's bullets with files.
 class AttachmentsController < ApplicationController
   def index
-    @attachments = user_attachments.attachments
+    @bullets = Current.user.bullets.with_attachment.order(created_at: :desc).preload(file_attachment: :blob)
   end
 
   def show
-    @blob = user_attachments.find_blob!(params[:signed_id])
-  end
-
-  private
-
-  def user_attachments
-    @user_attachments ||= User::Attachments.new(Current.user)
+    @bullet = Current.user.bullets.with_attachment.find(params[:id])
+    @blob = @bullet.file.blob
   end
 end

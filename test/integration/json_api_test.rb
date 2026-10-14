@@ -107,20 +107,22 @@ class JsonApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'attachment JSON is scoped to the signed-in user' do
-    owned = create_file_bullet!(@user, filename: 'owned.pdf').file.blob
-    foreign = create_file_bullet!(users(:two), filename: 'foreign.pdf').file.blob
+    owned = create_file_bullet!(@user, filename: 'owned.pdf')
+    foreign = create_file_bullet!(users(:two), filename: 'foreign.pdf')
 
     get attachments_path, as: :json
     assert_response :success
     assert_includes response.parsed_body.map { |item| item['filename'] }, 'owned.pdf'
     assert_not_includes response.parsed_body.map { |item| item['filename'] }, 'foreign.pdf'
+    assert_includes response.parsed_body.map { |item| item['bullet_id'] }, owned.id
 
-    get attachment_path(owned.signed_id), as: :json
+    get attachment_path(owned), as: :json
     assert_response :success
-    assert_equal owned.signed_id, response.parsed_body['signed_id']
+    assert_equal owned.id, response.parsed_body['bullet_id']
+    assert_equal attachment_url(owned), response.parsed_body['url']
     assert response.parsed_body['download_url'].present?
 
-    get attachment_path(foreign.signed_id), as: :json
+    get attachment_path(foreign), as: :json
     assert_response :not_found
   end
 

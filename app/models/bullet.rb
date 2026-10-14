@@ -28,6 +28,7 @@ class Bullet < ApplicationRecord
 
   scope :current, -> { where(pops_on: ..Date.current) }
   scope :upcoming, -> { where(pops_on: (Date.current + 1.day)..) }
+  scope :with_attachment, -> { joins(:file_attachment) }
   scope :tagged_with, lambda { |collection|
     where(collection_id: collection.id)
   }
