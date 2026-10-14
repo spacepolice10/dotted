@@ -24,6 +24,25 @@ class ComposerAttachmentSystemTest < ApplicationSystemTestCase
     end
 
     bullet = @user.bullets.reload.last
+    image_bullet = find("#bullet_#{bullet.id}")
+    assert_selector "##{image_bullet[:id]} .bullet--marker[aria-label='Select bullet']"
+    image_style = page.evaluate_script(<<~JS)
+      (() => {
+        const body = document.querySelector('##{image_bullet[:id]} .bullet--body')
+        const style = getComputedStyle(body)
+        return { padding: style.padding, overflow: style.overflow, border: style.borderTopColor }
+      })()
+    JS
+    assert_equal '0px', image_style['padding']
+    assert_equal 'hidden', image_style['overflow']
+
+    page.execute_script("document.querySelector('##{image_bullet[:id]} .bullet--select-checkbox').click()")
+    assert_selector "##{image_bullet[:id]} [data-bullet-menu-target=checkbox]:checked", visible: :all
+    selected_border = page.evaluate_script(
+      "getComputedStyle(document.querySelector('##{image_bullet[:id]} .bullet--body')).borderTopColor"
+    )
+    assert_not_equal image_style['border'], selected_border
+
     assert bullet.file.attached?
     assert_equal File.basename(path), bullet.file.filename.to_s
     assert_empty bullet.body_as_text

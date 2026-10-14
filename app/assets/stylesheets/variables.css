@@ -76,7 +76,7 @@
                 --line-height-heading: 1.25;
 
                 --font-size-2xl: clamp(2.2rem, 4vw + 1rem, 3.4rem);
-                --font-size-xl: clamp(1rem, 1.4vw + 0.24rem, 2rem);
+                --font-size-xl: clamp(1.2rem, 1.4vw + 0.24rem, 2rem);
                 --font-size-base-type: clamp(1rem, 1vw + 0.2rem, 1.2rem);
                 --font-size-base-read: clamp(0.85rem, 1.2vw + 0.12rem, 1rem);
                 --font-size-xs: clamp(0.66rem, 0.6vw + 0.48rem, 0.8rem);

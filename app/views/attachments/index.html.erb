@@ -34,7 +34,7 @@
           <% end %>
           <div class="attachment--tile-details">
             <span><%= bullet.pops_on.strftime("%b %-d, %Y") %></span>
-            <%= link_to "View bullet", bullet_path(bullet), data: { turbo_frame: "_top" } %>
+            <%= link_to "To bullet", bullet_path(bullet), data: { turbo_frame: "_top" } %>
           </div>
         </li>
       <% end %>

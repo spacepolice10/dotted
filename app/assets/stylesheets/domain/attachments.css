@@ -44,11 +44,10 @@
 
 
   .attachment--gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+    column-width: var(--space-h-10);
+    column-gap: var(--space-h-half);
     align-items: start;
     width: 100%;
-    gap: var(--space-h-half);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -59,8 +58,8 @@
     border-radius: var(--radius-base);
     background: var(--color-2);
     color: inherit;
-    border: var(--border-base);
-
+    border: var(--border-subtle);
+    margin-top: var(--space-v);
     > a {
       display: block;
       color: inherit;

@@ -34,10 +34,6 @@
      first without needing a heavy border. */
   .bullet--current {
     position: relative;
-
-    .bullet--body {
-      background: var(--color-accent-1-subtle);
-    }
   }
 
   .bullet--current::before {
@@ -67,7 +63,6 @@
 
     @media (hover: hover) {
       &:hover .bullet--body {
-        background: var(--color-2);
         border-color: var(--color-2);
         box-shadow: var(--shadow-subtle);
       }
@@ -95,24 +90,47 @@
   }
 
   .bullet--body {
-    --lexxy-color-ink: var(--color-invert-1);
-
-    min-width: 5rem;
     max-width: 100%;
     width: fit-content;
     box-sizing: border-box;
-    align-items: center;
-    gap: var(--space-v-half);
-    border: 1px solid var(--color-1);
+    overflow: hidden;
+    border: 1px solid transparent;
     border-radius: var(--radius-base);
-    padding: var(--space-v) var(--space-h);
-    background: var(--color-1);
     box-shadow: var(--shadow-subtle);
     color: var(--color-invert-1);
-    line-height: 1.5;
 
     & a {
       overflow-wrap: anywhere;
+    }
+
+    /* A direct preview is the whole bullet; rich-text attachments stay on the text surface. */
+    &:not(:has(> .attachment--preview:not([hidden]))) {
+      --lexxy-color-ink: var(--color-invert-1);
+
+      min-width: 5rem;
+      padding: var(--space-v) var(--space-h);
+      border-color: var(--color-1);
+      background: var(--color-1);
+      line-height: 1.5;
+
+      .bullet--current & {
+        background: var(--color-accent-1-subtle);
+      }
+
+      @media (hover: hover) {
+        .bullet:hover & {
+          background: var(--color-2);
+        }
+      }
+
+      .bullet[data-bullet-done="true"] & {
+        text-decoration: line-through;
+        color: var(--color-invert-3);
+      }
+
+      .bullet:has(input:checked) & {
+        background: var(--model-color-2-bg);
+      }
     }
   }
 
@@ -138,11 +156,6 @@
 
   .bullet[data-bullet-done="true"] {
     opacity: 0.85;
-
-    .bullet--body {
-      text-decoration: line-through;
-      color: var(--color-invert-3);
-    }
   }
 
   @keyframes bullet-select-bounce {
@@ -163,7 +176,6 @@
     .bullet--body {
       border-color: var(--model-color-2);
       box-shadow: 0 0 0 1px var(--model-color-2), var(--shadow-subtle);
-      background: var(--model-color-2-bg);
       color: var(--color-invert-1);
       animation: bullet-select-bounce 0.18s ease-out;
     }
