@@ -4,6 +4,7 @@ class CreateSchema < ActiveRecord::Migration[8.1]
   def change
     create_table :users do |t|
       t.string :email_address, null: false
+      t.boolean :onboarded, default: false, null: false
       t.timestamps
       t.index :email_address, unique: true
     end
@@ -37,7 +38,7 @@ class CreateSchema < ActiveRecord::Migration[8.1]
       t.index :code_digest, unique: true
     end
 
-    create_table :webhooks do |t|
+    create_table :hooks do |t|
       t.references :user, null: false, foreign_key: true
       t.string :name, null: false
       t.string :code_digest, null: false
