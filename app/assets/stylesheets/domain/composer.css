@@ -206,3 +206,65 @@ lexxy-editor {
         animation: none;
     }
 }
+
+/* Link chips */
+
+.link-chip {
+  display: inline;
+  color: var(--color-accent-1);
+  font: var(--font-size-base-read) / var(--line-height-paragraph) var(--font-family-mono);
+  overflow-wrap: anywhere;
+  text-decoration: none;
+  white-space: normal;
+  cursor: pointer;
+  & > span {
+    max-width: 24ch;
+  }
+}
+
+lexxy-editor .link-chip {
+  pointer-events: none;
+  cursor: text;
+}
+
+lexxy-editor action-text-attachment[content-type="application/vnd.dotted.link-chip"].node--selected {
+  background: var(--color-accent-1-subtle);
+  border-radius: var(--radius-subtle);
+}
+
+.link-chip:is(:hover, :focus-visible) {
+  text-decoration: underline;
+}
+
+lexxy-editor lexxy-attachment-toolbar[data-presentation="inline"] {
+  font-size: var(--font-size-base-type);
+  line-height: var(--line-height-paragraph);
+  --button-size: 1lh;
+}
+
+.link-chip--icon {
+  display: inline-block;
+  width: 1rem !important;
+  height: 1rem !important;
+  max-width: none;
+  margin: 0;
+  vertical-align: sub;
+  object-fit: contain;
+  border: var(--border-subtle);
+  border-radius: var(--radius-subtle);
+}
+
+.link-chip--icon .icon {
+  --icon-mask: var(--icon-link);
+}
+
+.link-chip--open-icon {
+  display: inline-block;
+  width: 0.75rem !important;
+  margin-top: -5px;
+  vertical-align: middle;
+}
+
+.link-chip--open-icon .icon {
+  --icon-mask: var(--icon-external-link);
+}

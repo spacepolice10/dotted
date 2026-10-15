@@ -14,6 +14,7 @@ gem 'puma', '>= 5.0'
 gem 'importmap-rails'
 # Use Lexxy as the Action Text editor
 gem 'lexxy', '~> 1.0'
+gem 'surfguard', '~> 0.2'
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem 'turbo-rails'
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]

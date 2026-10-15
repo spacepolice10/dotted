@@ -92,6 +92,15 @@ class BulletTest < ActiveSupport::TestCase
     assert_equal [attached.id], @user.bullets.with_attachment.pluck(:id)
   end
 
+  test 'with_urls includes each linked bullet once' do
+    linked = create_bullet!(@user, body: 'Links')
+    linked.bookmarks.create!(link: 'https://example.com/one')
+    linked.bookmarks.create!(link: 'https://example.com/two')
+    create_bullet!(@user, body: 'No link')
+
+    assert_equal [linked.id], @user.bullets.with_urls.pluck(:id)
+  end
+
   test 'a very long filename saves and truncates safely in the search index' do
     bullet = create_file_bullet!(@user)
     bullet.update!(filename: "#{'n' * 300}.png")

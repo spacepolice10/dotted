@@ -6,30 +6,37 @@ const APPEND_TO = "timeline_section_current_date"
 
 export default class extends Controller {
   static targets = ["form", "editor", "pendingTextTemplate"]
+  #submitting = false
 
   async submit(event) {
     event.preventDefault()
-    if (this.editorTarget.isBlank) return
-
-    const form = this.formTarget
-    const action = form.action
-    const container = document.getElementById(APPEND_TO)
-    if (!container) return
-
-    const body = new FormData(form)
-    body.delete("bullet[file]")
-    const id = clientId()
-
-    this.#insertTextPending(id, container)
-    body.set("bullet[client_id]", id)
-
-    this.restore()
-
+    if (this.#submitting) return
+    this.#submitting = true
     try {
-      const response = await post(action, { body, responseKind: "turbo-stream" })
-      if (!response.ok) removePending(id)
-    } catch {
-      failPending(id)
+      if (this.editorTarget.isBlank) return
+
+      const form = this.formTarget
+      const action = form.action
+      const container = document.getElementById(APPEND_TO)
+      if (!container) return
+
+      const body = new FormData(form)
+      body.delete("bullet[file]")
+      const id = clientId()
+
+      this.#insertTextPending(id, container)
+      body.set("bullet[client_id]", id)
+
+      this.restore()
+
+      try {
+        const response = await post(action, { body, responseKind: "turbo-stream" })
+        if (!response.ok) removePending(id)
+      } catch {
+        failPending(id)
+      }
+    } finally {
+      this.#submitting = false
     }
   }
 

@@ -2,7 +2,7 @@
 
 class Bullet < ApplicationRecord
   include Completable, Collectable, Postponable, Publishable, Bullet::Pageable,
-          Bullet::Searchable, ActivityTrackable
+          Bullet::Searchable, Bullet::Bookmarkable, ActivityTrackable
 
   belongs_to :user
   belongs_to :collection, optional: true

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_13_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_15_140000) do
   create_table "access_codes", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "code_digest", null: false
@@ -80,6 +80,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_auth_codes_on_user_id"
+  end
+
+  create_table "bookmarks", force: :cascade do |t|
+    t.integer "bullet_id", null: false
+    t.text "link", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "title"
+    t.text "image_url"
+    t.text "icon_link"
+    t.datetime "unfurled_at"
+    t.index ["bullet_id", "link"], name: "index_bookmarks_on_bullet_id_and_link", unique: true
+    t.index ["bullet_id"], name: "index_bookmarks_on_bullet_id"
   end
 
   create_table "bullets", force: :cascade do |t|
@@ -193,6 +206,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_120000) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activities", "users"
   add_foreign_key "auth_codes", "users"
+  add_foreign_key "bookmarks", "bullets"
   add_foreign_key "bullets", "collections"
   add_foreign_key "bullets", "users"
   add_foreign_key "collections", "users"

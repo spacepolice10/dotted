@@ -1,0 +1,9 @@
+<a href="<%= bookmark.link %>" class="link-chip" target="_blank" rel="noopener noreferrer">
+  <% if bookmark.favicon.attached? %>
+    <%= image_tag bookmark.favicon, class: "link-chip--icon", alt: "" %>
+  <% else %>
+    <%= icon("link", class: "link-chip--icon") %>
+  <% end %>
+  <span class="link-chip--name"><%= bookmark.title.presence || URI.parse(bookmark.link).host %></span>
+  <%= icon("external-link", class: "link-chip--open-icon") %>
+</a>
