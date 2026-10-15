@@ -14,8 +14,6 @@ class AuthenticationControllerTest < ActionDispatch::IntegrationTest
     assert_select 'h2', text: 'Sign in', count: 1
     assert_select 'form[action=?][data-controller=?]', authentication_path, 'valid-email'
     assert_select 'input[type=email][data-valid-email-target=?]', 'input'
-    assert_select 'a[href=?]', features_path, text: /Features/
-    assert_select 'a[href=?]', support_path, text: /Support/
   end
 
   test 'create with known email sends code and redirects to confirmation page' do

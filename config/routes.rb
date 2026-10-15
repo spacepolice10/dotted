@@ -15,14 +15,6 @@ Rails.application.routes.draw do
     end
   end
 
-  get 'features', to: 'landings#features', as: :features
-  get 'terminal', to: 'landings#terminal', as: :terminal
-  get 'agents', to: redirect('/terminal')
-  get 'support', to: 'landings#support', as: :support
-  get 'faqs', to: 'landings#faqs', as: :faqs
-  get 'landing', to: 'landings#landing', as: :landing
-  get 'once', to: 'landings#once', as: :once
-
   # --- Bullets ---
   scope 'bullets', module: :bullets do
     resource :postpone, only: %i[new create]

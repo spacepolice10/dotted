@@ -37,7 +37,7 @@ records return 404. Unauthenticated JSON requests return 401.
 | `/search`, `/completed`, `/user` | Navigation screens. Use search results, filtered bullets, and access-code/webhook routes. |
 | `/published/:code` | Public HTML page. A public JSON representation still needs an explicit exposure contract. |
 | `/bullets/export` | Downloadable HTML export. Use the JSON bullet feed for machine-readable data. |
-| `/features`, `/support`, `/landing`, `/manifest`, `/service-worker`, `/up` | Public pages or system endpoints, not CLI data operations. |
+| `/manifest`, `/service-worker`, `/up` | System endpoints, not CLI data operations. |
 
 The route table now declares only implemented publish actions; Rails previously
 generated `new`, `edit`, `show`, and `update` routes for publish controllers
