@@ -11,4 +11,6 @@
   content: ".";
   color: var(--model-color-9);
   margin-inline-end: 0.1em;
+  position: absolute;
+  margin-left: -0.25em;
 }

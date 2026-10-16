@@ -1,12 +1,12 @@
 <% content_for(:title) { "Dotted — Welcome" } %>
 
-<main data-size="sm">
+<main data-size="xs">
   <section>
     <header>
       <h1 class="branding-heading">dotted</h1>
     </header>
 
-    <article id="sign_in_form" data-elevation="1">
+    <article id="sign_in_form" data-elevation="1" data-container-size="sm">
       <header>
         <h2>Sign in</h2>
       </header>
@@ -49,5 +49,15 @@
         <% end %>
       </main>
     </article>
+
+    <br>
+
+    <footer class="utilities--mx-auto">
+      <nav>
+        <%= link_to "https://dotted.naysdemo.online", data: { intent: "secondary", size: "sm" } do %>
+          .dotted
+        <% end %>
+      </nav>
+    </footer>
   </section>
 </main>

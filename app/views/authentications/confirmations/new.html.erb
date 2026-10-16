@@ -1,6 +1,6 @@
 <% content_for(:title) { "Enter code" } %>
 
-<main data-size="sm">
+<main data-size="xs">
   <section>
     <header>
       <h1 class="branding-heading">dotted</h1>
@@ -37,7 +37,7 @@
 
     <footer class="utilities--mx-auto">
       <nav>
-        <%= link_to new_authentication_path, class: "pill" do %>
+        <%= link_to new_authentication_path, data: { intent: "secondary", size: "sm" } do %>
           <%= icon "arrow-left" %> Try again
         <% end %>
       </nav>
