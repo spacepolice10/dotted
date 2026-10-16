@@ -53,6 +53,23 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
     assert_select '[data-timeline-scroll-path-value=?]', bullets_path(completed: true)
   end
 
+  test 'timeline shows coloured status marks for postponed and completed bullets' do
+    collection = create_collection!(@user, name: 'Plans', colour: 'violet')
+    postponed = create_bullet!(@user, body: 'Moved task', collection: collection)
+    postponed.update!(last_postponed_at: Time.current)
+    completed = create_bullet!(@user, body: 'Finished task', collection: collection)
+    completed.complete!
+
+    get bullets_path
+
+    assert_select "#bullet_#{postponed.id} .bullet--status--postponed[role=img][aria-label=Postponed][style='color: var(--model-color-1)']", count: 1
+    assert_select "#bullet_#{completed.id} .bullet--status", count: 0
+
+    get bullets_path(completed: true)
+
+    assert_select "#bullet_#{completed.id} .bullet--status--done[role=img][aria-label=Completed][style='color: var(--model-color-1)']", count: 1
+  end
+
   test 'bullet menu gates complete and publish by selection status' do
     create_bullet!(@user, body: 'Selectable')
 
@@ -380,6 +397,7 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
     bullet = @user.bullets.order(:created_at).last
     assert_select 'turbo-stream[action=replace] a.attachment--preview[href=?] img[alt=?][src]',
                   attachment_path(bullet), 'pixel.png'
+    assert_select 'turbo-stream[action=replace] a.attachment--preview .pill', text: 'pixel.png'
     assert_equal client_id, bullet.client_id
   end
 

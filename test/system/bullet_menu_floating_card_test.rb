@@ -47,7 +47,7 @@ class BulletMenuFloatingCardSystemTest < ApplicationSystemTestCase
           return rect.top >= 0 && rect.bottom < cardTop && !row.querySelector('input').checked;
         });
         if (!bullet) return false;
-        const rect = bullet.querySelector('.bullet--marker').getBoundingClientRect();
+        const rect = bullet.querySelector('.bullet--body').getBoundingClientRect();
         const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
         if (!bullet.contains(hit)) return false;
         hit.click();

@@ -49,8 +49,8 @@
   .bullet {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     position: relative;
-    gap: var(--space-v-half);
     width: 100%;
     box-sizing: border-box;
     padding: 0;
@@ -69,28 +69,51 @@
     }
   }
 
-  .bullet--marker {
-    display: grid;
-    place-items: center;
-    flex: none;
-    width: var(--space-h);
-    height: var(--space-h);
-    cursor: pointer;
+  .bullet--content {
+    position: relative;
+    max-width: 100%;
+    min-width: 0;
+    width: fit-content;
   }
 
-  .bullet--marker-icon {
-    scale: 0.8;
-    border-radius: var(--radius-full);
-    background: var(--background-canvas-colour);
-    color: light-dark(oklch(0.57 0.04 241), oklch(0.72 0.045 241));
+  .bullet--content:not(:has(> .bullet--body > .attachment--preview:not([hidden]))) {
+    min-width: min(35rem, 100%);
+  }
 
-    .icon {
-      color: inherit;
-    }
+  .bullet--status {
+    position: absolute;
+    z-index: 2;
+    top: calc(var(--space-v-half) * -1);
+    left: calc(var(--space-h-half) * -1);
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    box-sizing: border-box;
+    border: 1px solid currentColor;
+    border-radius: var(--radius-subtle);
+    background: color-mix(in oklch, currentColor 14%, var(--color-1));
+    box-shadow: var(--shadow-subtle);
+    transform: rotate(-10deg);
+    pointer-events: none;
+  }
+
+  .bullet--status--postponed {
+    color: var(--model-color-1);
+  }
+
+  .bullet--status--done {
+    color: var(--model-color-3);
+  }
+
+  .bullet--status .icon-wrap {
+    width: 1rem;
+    height: 1rem;
   }
 
   .bullet--body {
     max-width: 100%;
+    min-width: 0;
     width: fit-content;
     box-sizing: border-box;
     overflow: hidden;
@@ -109,7 +132,7 @@
     &:not(:has(> .attachment--preview:not([hidden]))) {
       --lexxy-color-ink: var(--color-invert-1);
 
-      min-width: 5rem;
+      min-width: min(35rem, 100%);
       padding: var(--space-v) var(--space-h);
       border-color: var(--color-1);
       background: var(--color-1);
@@ -134,6 +157,11 @@
         background: var(--model-color-2-bg);
       }
     }
+  }
+
+  .bullet--body:has(> .attachment--preview:not([hidden])) {
+    border-color: transparent;
+    box-shadow: none;
   }
 
   .bullet--select-checkbox {

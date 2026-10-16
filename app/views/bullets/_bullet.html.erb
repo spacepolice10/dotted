@@ -22,38 +22,42 @@
     class="utilities--sr-only"
   >
 
-  <label
-    class="bullet--marker"
-    for="<%= dom_id(bullet, :select_checkbox) %>"
-    aria-label="Select bullet"
-  >
-    <%= icon(
-          bullet.marker_icon.to_s.dasherize,
-          class: "bullet--marker-icon",
-          style: bullet_marker_colour(bullet)
-        ) %>
-  </label>
+  <div class="bullet--content">
+    <% if bullet.done? || bullet.last_postponed_at.present? %>
+      <span
+        class="bullet--status <%= bullet.done? ? "bullet--status--done" : "bullet--status--postponed" %>"
+        role="img"
+        aria-label="<%= bullet.done? ? "Completed" : "Postponed" %>"
+        style="<%= "color: #{bullet.collection.colour_variable}" if bullet.collection&.colour_variable %>"
+      >
+        <%= icon(bullet.marker_icon) %>
+      </span>
+    <% end %>
 
-  <div class="bullet--body">
-    <% if bullet.file.attached? %>
-      <% file = bullet.file %>
-      <% if file.variable? %>
-        <% width, height = file.blob.metadata.values_at("width", "height") %>
-        <%= link_to attachment_path(bullet), class: "attachment--preview", data: { turbo_frame: "_top" } do %>
-          <%= image_tag file.variant(:thumb),
-                  alt: file.filename.to_s,
-                  style: (width.present? && height.present? ? "aspect-ratio: #{width} / #{height}" : nil) %>
+    <div class="bullet--body">
+      <% if bullet.file.attached? %>
+        <% file = bullet.file %>
+        <% if file.variable? %>
+          <% width, height = file.blob.metadata.values_at("width", "height") %>
+          <%= link_to attachment_path(bullet), class: "attachment--preview", data: { turbo_frame: "_top" } do %>
+            <%= image_tag file.variant(:preview),
+                    alt: file.filename.to_s,
+                    style: (width.present? && height.present? ? "aspect-ratio: #{width} / #{height}" : nil) %>
+            <span class="pill attachment--preview-name" title="<%= file.filename %>">
+              <span class="attachment--preview-filename"><%= file.filename %></span>
+            </span>
+          <% end %>
+        <% else %>
+          <%= link_to rails_blob_path(file, disposition: "attachment"), class: "attachment--file", data: { turbo: false } do %>
+            <%= icon("paperclip") %>
+            <span class="attachment--file-name utilities--line-clamp-1"><%= file.filename %></span>
+            <small><%= number_to_human_size(file.byte_size) %></small>
+          <% end %>
         <% end %>
       <% else %>
-        <%= link_to rails_blob_path(file, disposition: "attachment"), class: "attachment--file", data: { turbo: false } do %>
-          <%= icon("paperclip") %>
-          <span class="attachment--file-name utilities--line-clamp-1"><%= file.filename %></span>
-          <small><%= number_to_human_size(file.byte_size) %></small>
-        <% end %>
+        <%= bullet.body %>
       <% end %>
-    <% else %>
-      <%= bullet.body %>
-    <% end %>
+    </div>
   </div>
 
 </turbo-frame>

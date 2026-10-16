@@ -21,8 +21,15 @@
     data-controller="timeline-scroll"
     data-timeline-scroll-current-value="true"
   >
-    <div id="timeline_section_<%= @timeline.section_of(@bullet.pops_on).id %>" class="timeline--section">
-      <h2 class="pill"><%= @bullet.pops_on.strftime("%A, %b %-d") %></h2>
+    <div id="timeline_section_<%= @timeline.section_of(@bullet.pops_on).id %>" class="timeline--section" data-controller="timeline-count">
+      <div class="timeline--section-header">
+        <h2 class="pill"><%= @bullet.pops_on.strftime("%A, %b %-d") %></h2>
+        <div class="timeline--section-counts">
+          <span class="timeline--bullet-number-pill" data-timeline-count-target="count"><%= pluralize(@bullets.size, "bullet") %> loaded</span>
+          <span class="timeline--section-count-divider" aria-hidden="true">•</span>
+          <span class="timeline--bullet-number-pill" data-timeline-count-target="completed" data-completed-count="<%= @completed_count %>"><%= pluralize(@completed_count, "bullet") %> completed</span>
+        </div>
+      </div>
       <% @bullets.each do |bullet| %>
         <% if bullet == @bullet %>
           <%= render "bullets/current_bullet", bullet: bullet %>

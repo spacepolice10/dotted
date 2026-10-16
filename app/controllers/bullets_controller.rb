@@ -43,6 +43,7 @@ class BulletsController < ApplicationController
     # A completed or not-yet-due bullet has no active siblings on its day, and
     # an empty rail would leave the page with nothing to look at.
     @bullets = [@bullet] if @bullets.empty?
+    @completed_count = Current.user.bullets.completed.where(pops_on: @bullet.pops_on).count
   end
 
   def update

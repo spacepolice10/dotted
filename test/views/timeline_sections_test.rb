@@ -23,6 +23,7 @@ class TimelineSectionsTest < ActionView::TestCase
     html = render partial: 'bullets/timeline_sections', locals: { bullets: @user.bullets, timeline: @timeline }
 
     assert_select fragment(html), 'div#timeline_section_current_date > turbo-frame.bullet', count: 1
+    assert_select fragment(html), 'div#timeline_section_current_date .timeline--count-pill', text: '1 bullet loaded'
   end
 
   test 'does not mount an empty today append target' do

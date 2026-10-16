@@ -3,7 +3,7 @@
     display: flex;
     height: auto;
     flex-direction: column;
-    gap: var(--space-v);
+    gap: calc(var(--space-v) * 1.5);
     position: relative;
     padding-block-end: var(--space-v);
   }
@@ -12,21 +12,30 @@
     content: "";
     position: absolute;
     inset-block: var(--space-v-2) -10px;
-    inset-inline-start: calc(var(--space-h) - 0.5px);
+    inset-inline-start: calc(50% - 0.5px);
     border-inline-start: 1px dashed
       color-mix(in oklch, var(--model-color-2) 22%, transparent);
     pointer-events: none;
   }
 
-  .timeline--section:not(:has(.bullet)) {
+  .timeline--section:not(:has(.bullet)):not(
+      .timeline--section--completed-only
+    ) {
     display: none;
   }
 
-  .timeline--section > .pill {
+  .timeline--section-header {
     position: sticky;
     top: 0;
-    align-self: flex-start;
+    align-self: center;
     z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-v-half);
+  }
+
+  .timeline--section-header > h2.pill {
     border: 1px solid color-mix(in oklch, var(--model-color-2) 12%, transparent);
     background: light-dark(oklch(0.975 0.008 241), oklch(0.27 0.015 241));
     color: light-dark(oklch(0.51 0.04 241), oklch(0.72 0.04 241));
@@ -37,7 +46,32 @@
     line-height: 1.25;
   }
 
-  .timeline--scroller:has(.bullet) > .empty-state {
+  .timeline--section-count-divider {
+    color: var(--color-invert-3);
+    font-size: 1.1em;
+    font-weight: var(--font-weight-strong);
+    line-height: 1;
+  }
+
+  .timeline--section-counts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--space-v-half);
+  }
+
+  .timeline--bullet-number-pill {
+    padding: calc(var(--space-v-half) / 2) var(--space-h-half);
+    background: var(--background-canvas-colour);
+    font-size: var(--font-size-xs);
+    color: var(--color-invert-4);
+    border-radius: var(--radius-base);
+    width: fit-content;
+  }
+
+  .timeline--scroller:has(.bullet, .timeline--section--completed-only)
+    > .empty-state {
     display: none;
   }
 

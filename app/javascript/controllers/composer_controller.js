@@ -41,11 +41,13 @@ export default class extends Controller {
   }
 
   submitByKeyboard(event) {
+    if (!event.composedPath().includes(this.editorTarget)) return
+
     event.stopPropagation()
     event.stopImmediatePropagation()
     const metaReturn = event.key == "Enter" && (event.metaKey || event.ctrlKey)
     const justReturn = event.keyCode == 13 && !event.shiftKey && !event.isComposing
-    if (metaReturn || justReturn) {
+    if (!this.#coarsePointer && (metaReturn || justReturn)) {
       event.preventDefault()
       this.submit(event)
     }

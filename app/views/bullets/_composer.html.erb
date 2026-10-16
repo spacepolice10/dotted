@@ -52,9 +52,6 @@ id="bullet_composer"
 
   <template data-composer-target="pendingTextTemplate">
     <turbo-frame id="bullet_client_CLIENT_ID" class="bullet bullet--pending" data-bullet-done="false">
-      <span class="bullet--marker" aria-hidden="true">
-        <%= icon("circle", class: "bullet--marker-icon") %>
-      </span>
       <div class="bullet--content">
         <div class="bullet--body">
           <div class="bullet--note utilities--line-clamp-3" data-pending-body></div>
@@ -65,9 +62,6 @@ id="bullet_composer"
 
   <template data-composer-attachment-target="pendingFileTemplate">
     <turbo-frame id="bullet_client_CLIENT_ID" class="bullet bullet--pending" data-bullet-done="false">
-      <span class="bullet--marker" aria-hidden="true">
-        <%= icon("circle", class: "bullet--marker-icon") %>
-      </span>
       <div class="bullet--body">
         <span class="attachment--file">
           <%= icon("paperclip") %>
@@ -75,6 +69,9 @@ id="bullet_composer"
         </span>
         <span class="attachment--preview" data-pending-preview hidden>
           <img data-pending-image alt="">
+          <span class="pill attachment--preview-name" data-pending-filename>
+            <span class="attachment--preview-filename" data-pending-filename></span>
+          </span>
         </span>
       </div>
     </turbo-frame>

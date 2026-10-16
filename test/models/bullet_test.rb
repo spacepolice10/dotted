@@ -21,6 +21,15 @@ class BulletTest < ActiveSupport::TestCase
     assert_equal :check, bullet.marker_icon
   end
 
+  test 'completion takes precedence over postponement for the marker' do
+    bullet = create_bullet!(@user, body: 'Later')
+    bullet.update!(last_postponed_at: Time.current)
+
+    assert_equal 'arrow-forward-up', bullet.marker_icon
+    bullet.complete!
+    assert_equal :check, bullet.marker_icon
+  end
+
   test 'complete and uncomplete toggle done' do
     bullet = create_bullet!(@user, body: 'Do it')
 
@@ -33,6 +42,14 @@ class BulletTest < ActiveSupport::TestCase
     assert_nil bullet.done_at
   end
 
+  test 'completed scope includes only completed bullets' do
+    completed = create_bullet!(@user, body: 'Finished', pops_on: Date.current + 1)
+    completed.complete!
+    create_bullet!(@user, body: 'In progress')
+
+    assert_equal [completed.id], @user.bullets.completed.pluck(:id)
+  end
+
   test 'a file and a body together are invalid' do
     bullet = @user.bullets.new(body: 'Both')
     bullet.file.attach(create_blob!(filename: 'a.png', content_type: 'image/png'))
@@ -42,6 +59,15 @@ class BulletTest < ActiveSupport::TestCase
 
   test 'neither a file nor text is invalid' do
     assert_not @user.bullets.new.valid?
+  end
+
+  test 'a link chip alone can be saved and completed' do
+    original = create_bullet!(@user, body: 'https://example.com/article')
+    bullet = @user.bullets.create!(body: original.rich_text_body.body.to_html)
+
+    assert_equal ['https://example.com/article'], bullet.bookmarks.pluck(:link)
+    bullet.complete!
+    assert bullet.reload.done?
   end
 
   test 'blank client_id normalizes to nil' do

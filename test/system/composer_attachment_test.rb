@@ -25,7 +25,8 @@ class ComposerAttachmentSystemTest < ApplicationSystemTestCase
 
     bullet = @user.bullets.reload.last
     image_bullet = find("#bullet_#{bullet.id}")
-    assert_selector "##{image_bullet[:id]} .bullet--marker[aria-label='Select bullet']"
+    assert_selector "##{image_bullet[:id]} .attachment--preview .pill", text: File.basename(path)
+    assert_selector "##{image_bullet[:id]} .bullet--select-checkbox[aria-label='Select bullet']"
     image_style = page.evaluate_script(<<~JS)
       (() => {
         const body = document.querySelector('##{image_bullet[:id]} .bullet--body')

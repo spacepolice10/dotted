@@ -5,7 +5,7 @@ class SearchesController < ApplicationController
   def show
     @collections = Current.user.collections.order(:name)
     @attachments_count = Current.user.bullets.with_attachment.count
-    @completed_count = Current.user.bullets.done.count
+    @completed_count = Current.user.bullets.completed.count
     @collections_count = Current.user.collections.count
     @upcoming_count = Current.user.bullets.upcoming.count
   end

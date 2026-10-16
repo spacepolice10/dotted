@@ -1,13 +1,42 @@
 <%# locals: (bullets:, timeline:, bullet_partial: "bullets/bullet", ensure_current_date: false) %>
 <% sections = bullets.group_by { |bullet| timeline.section_of(bullet.pops_on) }.to_a %>
+
 <% if ensure_current_date && sections.none? { |section, _| section.id == "current_date" } %>
   <% first_future = sections.index { |_, section_bullets| section_bullets.first.pops_on > Date.current } %>
   <% sections.insert(first_future || sections.length, [timeline.section_of(Date.current), []]) %>
 <% end %>
 
+<% completed_counts = timeline.completed_counts if sections.any? && !timeline.filter.completed? %>
+
 <% sections.each do |section, section_bullets| %>
-  <div id="timeline_section_<%= section.id %>" class="timeline--section">
-    <h2 class="pill"><%= section.name %></h2>
+  <div
+    id="timeline_section_<%= section.id %>"
+    class="<%= class_names('timeline--section', 'timeline--section--completed-only': section_bullets.empty? && (completed_counts || {}).fetch(section.id, 0).positive?) %>"
+    data-controller="timeline-count"
+  >
+    <div class="timeline--section-header">
+      <h2 class="pill"><%= section.name %></h2>
+    </div>
+
+    <span class="timeline--section-counts utilities-mx-auto">
+      <span
+        class="timeline--bullet-number-pill"
+        data-timeline-count-target="count"
+      >
+        <%= pluralize(section_bullets.size, "bullet") %> loaded
+      </span>
+
+      <% unless timeline.filter.completed? %>
+        <span
+          class="timeline--bullet-number-pill"
+          data-timeline-count-target="completed"
+          data-completed-count="<%= completed_counts[section.id] %>"
+        >
+          <%= pluralize(completed_counts[section.id], "bullet") %> completed
+        </span>
+      <% end %>
+    </span>
+
     <% section_bullets.each do |bullet| %>
       <%= render partial: bullet_partial, locals: { bullet: bullet } %>
     <% end %>

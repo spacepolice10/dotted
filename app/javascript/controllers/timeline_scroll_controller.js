@@ -103,8 +103,8 @@ export default class extends Controller {
     const existing = incoming && this.element.querySelector(`.timeline--section[id="${incoming.id}"]`)
     if (!existing) return fragment
 
-    const rows = [...incoming.children].filter((child) => !child.matches("h2"))
-    const anchor = existing.querySelector(":scope > :not(h2)")
+    const rows = [...incoming.children].filter((child) => !child.matches(".timeline--section-header"))
+    const anchor = existing.querySelector(":scope > :not(.timeline--section-header)")
     anchor ? anchor.before(...rows) : existing.append(...rows)
     incoming.remove()
 

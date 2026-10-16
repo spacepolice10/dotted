@@ -53,7 +53,6 @@ class Bullet::Filter
   end
 
   def filtered(relation)
-    relation = completed? ? relation.done : relation.not_done
     relation = filter_by_date(relation) unless skip_default_date_window?
     relation = relation.tagged_with(collection) if collection
     relation

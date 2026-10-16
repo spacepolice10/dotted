@@ -52,14 +52,13 @@
       opacity: 0;
       transform: translateY(var(--space-v-half));
       transition:
-        opacity 80ms ease,
-        transform 80ms ease;
+        opacity 20ms ease,
+        transform 20ms ease;
     }
 
     html.show-hotkey-hint .hotkey-hint[data-hotkey]:not(.hotkey-hint--always)::after {
       opacity: 1;
       transform: translateY(0);
-      transition-delay: 0.6s;
     }
   }
 }

@@ -9,7 +9,7 @@ class Bullet < ApplicationRecord
 
   has_rich_text :body
   has_one_attached :file do |attachable|
-    attachable.variant :thumb, resize_to_limit: [400, 160]
+    attachable.variant :preview, resize_to_limit: [800, 320]
     attachable.variant :display, resize_to_limit: [1600, 1600]
   end
 
@@ -28,6 +28,7 @@ class Bullet < ApplicationRecord
 
   scope :current, -> { where(pops_on: ..Date.current) }
   scope :upcoming, -> { where(pops_on: (Date.current + 1.day)..) }
+  scope :completed, -> { done }
   scope :with_attachment, -> { joins(:file_attachment) }
   scope :tagged_with, lambda { |collection|
     where(collection_id: collection.id)
@@ -37,9 +38,9 @@ class Bullet < ApplicationRecord
   def name = body_as_text.lines.first&.strip.presence || filename.presence || 'Untitled'
 
   def marker_icon
+    return :check if done?
     return 'arrow-forward-up' if last_postponed_at.present?
     return 'link' if published?
-    return 'check' if done?
 
     :circle
   end
@@ -52,8 +53,13 @@ class Bullet < ApplicationRecord
 
   def content_is_either_file_or_text
     has_file = file.attached?
-    has_text = body_as_text.present?
+    has_text = body_as_text.present? || link_chip_present?
     errors.add(:base, 'Enter text or attach a file, not both') if has_file == has_text
+  end
+
+  def link_chip_present?
+    html = rich_text_body&.body&.to_html.to_s
+    Nokogiri::HTML.fragment(html).at_css("action-text-attachment[content-type='#{Bookmark::CONTENT_TYPE}']").present?
   end
 
   def file_must_be_smaller

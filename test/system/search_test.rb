@@ -223,6 +223,26 @@ class SearchSystemTest < ApplicationSystemTestCase
     assert_equal 'true', find(second)['aria-selected']
   end
 
+  test 'enter opens the selected search result' do
+    first = create_bullet!(@user, body: 'Buy milk today')
+    second = create_bullet!(@user, body: 'Buy milk tomorrow')
+
+    visit bullets_path
+    page.execute_script("document.querySelector('button[commandfor=search_picker_dialog]').click()")
+    field = find('dialog#search_picker_dialog input[name=q]')
+    field.set('milk')
+    assert_selector 'dialog#search_picker_dialog a.combobox--item', count: 2
+
+    field.send_keys(:arrow_down)
+    selected = find('dialog#search_picker_dialog a.combobox--item[aria-selected=true]')
+    selected_path = URI.parse(selected[:href]).path
+    assert_includes [bullet_path(first), bullet_path(second)], selected_path
+
+    field.send_keys(:enter)
+
+    assert_current_path selected_path
+  end
+
   private
 
   # Ten unclamped rows only overflow on a short viewport.

@@ -10,15 +10,25 @@ class ComposerSystemTest < ApplicationSystemTestCase
   end
 
   test 'creates a text bullet through the shared composer' do
+    count = page.evaluate_script("Number.parseInt(document.querySelector('#timeline_section_current_date [data-timeline-count-target=count]').textContent)")
     editor = find('#bullet_composer lexxy-editor .lexxy-editor__content')
     editor.send_keys('Fresh note')
     find('#bullet_composer .composer--submit-button').click
 
     assert_text 'Fresh note'
+    assert_selector '#timeline_section_current_date [data-timeline-count-target=count]', text: "#{count + 1} #{'bullet'.pluralize(count + 1)} loaded"
     assert_equal 'Fresh note', @user.bullets.reload.last.body_as_text
   end
 
-  test 'optimistic pending templates include the marker circle' do
+  test 'enter in the editor submits the composer' do
+    editor = find('#bullet_composer lexxy-editor .lexxy-editor__content')
+    editor.send_keys('Keyboard note', :enter)
+
+    assert_text 'Keyboard note'
+    assert_equal 'Keyboard note', @user.bullets.reload.last.body_as_text
+  end
+
+  test 'optimistic pending templates render without marker circles' do
     text_html = page.evaluate_script(
       "document.querySelector('[data-composer-target=\"pendingTextTemplate\"]').innerHTML"
     )
@@ -26,8 +36,8 @@ class ComposerSystemTest < ApplicationSystemTestCase
       "document.querySelector('[data-composer-attachment-target=\"pendingFileTemplate\"]').innerHTML"
     )
 
-    assert_includes text_html, 'bullet--marker'
-    assert_includes file_html, 'bullet--marker'
+    assert_not_includes text_html, 'bullet--marker'
+    assert_not_includes file_html, 'bullet--marker'
   end
 
   test 'shift f focuses the composer from elsewhere on the page' do

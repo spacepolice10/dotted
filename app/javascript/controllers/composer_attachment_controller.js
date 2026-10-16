@@ -64,6 +64,7 @@ export default class extends Controller {
       node.querySelectorAll("[data-pending-filename]").forEach((el) => {
         el.textContent = file.name
       })
+      node.querySelector("[data-pending-filename]")?.setAttribute("title", file.name)
       if (!file.type.startsWith("image/")) return
 
       const img = node.querySelector("[data-pending-image]")

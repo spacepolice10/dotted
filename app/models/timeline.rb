@@ -11,7 +11,8 @@ class Timeline
   attr_reader :user, :filter
 
   def filtered
-    filter.filtered(user.bullets)
+    bullets = filter.completed? ? user.bullets.completed : user.bullets.not_done
+    filter.filtered(bullets)
   end
 
   def last_page
@@ -20,6 +21,12 @@ class Timeline
 
   def prev_page(bullet)
     filtered.preload(:collection).prev_page(bullet)
+  end
+
+  def completed_counts
+    filter.filtered(user.bullets.completed).group(:pops_on).count.each_with_object(Hash.new(0)) do |(date, count), totals|
+      totals[section_of(date).id] += count
+    end
   end
 
   # Every active bullet due on one day, oldest first. A single day is a bounded
@@ -44,9 +51,10 @@ class Timeline
     when 2..6    then Section.new('this-week', 'This week')
     when 7..13   then Section.new('last-week', 'Last week')
     when 14..30  then Section.new('last-month', 'Last month')
-    when 31..90  then Section.new('last-3-months', 'Last 3 months')
-    when 91..365 then Section.new('last-year', 'Last year')
-    else              Section.new("year-#{date.year}", date.year.to_s)
+    else
+      name = date.strftime('%B')
+      name = "#{name} #{date.year}" if date.year != Date.current.year
+      Section.new(date.strftime('month-%Y-%m'), name)
     end
   end
 end

@@ -17,11 +17,13 @@ class TimelineTest < ActiveSupport::TestCase
     assert_equal 'last-week', section(13).id
     assert_equal 'last-month', section(14).id
     assert_equal 'last-month', section(30).id
-    assert_equal 'last-3-months', section(31).id
-    assert_equal 'last-3-months', section(90).id
-    assert_equal 'last-year', section(91).id
-    assert_equal 'last-year', section(365).id
-    assert_equal 'year-2025', section(366).id
+    assert_equal 'month-2026-08', section(31).id
+    assert_equal 'August', section(31).name
+    assert_equal 'month-2026-07', section(90).id
+    assert_equal 'month-2026-07', section(91).id
+    assert_equal 'month-2025-09', section(365).id
+    assert_equal 'September 2025', section(365).name
+    assert_equal 'month-2025-09', section(366).id
   end
 
   test 'a future day gets its own section' do
@@ -104,6 +106,23 @@ class TimelineTest < ActiveSupport::TestCase
     bullet = create_bullet!(user, body: 'Done line')
     bullet.complete!
     assert_not_includes timeline.filtered, bullet
+  end
+
+  test 'completed counts use the same date and collection scope as the timeline' do
+    user = users(:one)
+    collection = create_collection!(user, name: 'Work')
+    create_bullet!(user, body: 'Done today', collection: collection).complete!
+    create_bullet!(user, body: 'Done yesterday', collection: collection, pops_on: Date.current - 1).complete!
+    create_bullet!(user, body: 'Other collection').complete!
+    create_bullet!(user, body: 'Future done', collection: collection, pops_on: Date.current + 1).complete!
+    create_bullet!(users(:two), body: 'Another user').complete!
+
+    filter = Bullet::Filter.from_params({ collection: collection.name }, user: user)
+    counts = Timeline.new(user, filter: filter).completed_counts
+
+    assert_equal 1, counts['current_date']
+    assert_equal 1, counts['yesterday']
+    assert_equal 0, counts[(Date.current + 1).iso8601]
   end
 
   test 'completed filter uses the same date ordering and pagination' do

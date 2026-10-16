@@ -106,13 +106,40 @@ class BulletMenuPickerSystemTest < ApplicationSystemTestCase
     assert_no_selector '.bullet-menu', visible: true
   end
 
+  test 'enter collects into the selected collection' do
+    create_collection!(@user, name: 'Ideas')
+    visit bullets_path
+    select_bullet
+    find_button('Tag').click
+    field = find('dialog#collects_dialog input[name=q]')
+    field.set('read')
+    assert_selector 'dialog#collects_dialog #collects-collections-list button.combobox--item', text: 'reading'
+    assert_no_selector 'dialog#collects_dialog #collects-collections-list button.combobox--item', text: 'ideas'
+
+    field.send_keys(:arrow_down)
+    assert_selector 'dialog#collects_dialog button.combobox--item[aria-selected=true]', text: 'reading'
+    field.send_keys(:enter)
+
+    assert_no_selector 'dialog#collects_dialog[open]'
+    assert_equal 'reading', @bullet.reload.collection.name
+  end
+
   test 'submitting a bullet menu action clears the selection' do
     visit bullets_path
+    initial_completed = find('#timeline_section_current_date [data-timeline-count-target="completed"]').text.to_i
     select_bullet
 
     find_button('Complete').click
 
     assert_no_selector '.bullet-menu', visible: true
+    assert_selector '#timeline_section_current_date [data-timeline-count-target="completed"]',
+                    text: "#{initial_completed + 1} #{'bullet'.pluralize(initial_completed + 1)} completed"
+
+    select_bullet
+    find_button('Uncomplete').click
+
+    assert_selector '#timeline_section_current_date [data-timeline-count-target="completed"]',
+                    text: "#{initial_completed} #{'bullet'.pluralize(initial_completed)} completed"
   end
 
   private

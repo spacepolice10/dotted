@@ -55,7 +55,7 @@ class BulletMenuMobileSystemTest < ApplicationSystemTestCase
         window.selectionScrollBefore = scroller.scrollTop
         window.selectionScrollEvents = []
         scroller.addEventListener('scroll', () => window.selectionScrollEvents.push(scroller.scrollTop))
-        return { x: rect.left + rect.width / 2, y: Math.max(rect.top + rect.height / 2, scroller.getBoundingClientRect().top + 15) }
+        return { x: rect.left + 15, y: Math.max(rect.top + rect.height / 2, scroller.getBoundingClientRect().top + 15) }
       })()
     JS
     assert point

@@ -87,7 +87,7 @@ class Bullet::FilterTest < ActiveSupport::TestCase
 
     ids = filter.filtered(@user.bullets).map(&:id)
     assert_includes ids, future_done.id
-    assert_not_includes ids, active.id
+    assert_includes ids, active.id
   end
 
   test 'inverted date range raises' do

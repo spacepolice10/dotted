@@ -4,18 +4,33 @@
   .bullet--body :is(.attachment.attachment--preview, a.attachment--preview, span.attachment--preview:not([hidden])) {
     display: grid;
     justify-items: start;
+    row-gap: var(--space-v-half);
     max-inline-size: 100%;
+  }
+
+  .bullet--body > :is(a.attachment--preview, span.attachment--preview:not([hidden])) {
+    justify-items: center;
+  }
+
+  .attachment--preview-name {
+    box-sizing: border-box;
+    max-inline-size: min(100%, 20rem);
+  }
+
+  .attachment--preview-filename {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* Lexxy's content styles are unlayered, so sizes need !important to win. */
   .bullet--body :is(.attachment--preview img) {
-    block-size: var(--space-h-5) !important;
+    block-size: var(--space-h-10) !important;
     inline-size: auto !important;
     max-inline-size: 100%;
     margin-inline: 0 !important;
     object-fit: cover;
     border-radius: var(--radius-base);
-    height: var(--space-h-10);
   }
 
   .attachment--file {

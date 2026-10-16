@@ -38,6 +38,20 @@ class TimelinesControllerTest < ActionDispatch::IntegrationTest
     assert_select '#timeline_section_last-month h2.pill', text: 'Last month'
   end
 
+  test 'older sections show their month and separate years' do
+    travel_to Date.new(2026, 9, 30) do
+      create_bullet!(@user, body: 'Late August', pops_on: Date.new(2026, 8, 29))
+      create_bullet!(@user, body: 'Early August', pops_on: Date.new(2026, 8, 1))
+      create_bullet!(@user, body: 'Previous August', pops_on: Date.new(2025, 8, 15))
+
+      get bullets_path
+
+      assert_select '#timeline_section_month-2026-08 h2.pill', text: 'August', count: 1
+      assert_select '#timeline_section_month-2026-08 .bullet', count: 2
+      assert_select '#timeline_section_month-2025-08 h2.pill', text: 'August 2025'
+    end
+  end
+
   test 'sections read oldest first' do
     create_bullet!(@user, body: 'Ancient line', pops_on: Date.current - 20)
     create_bullet!(@user, body: 'Today line')

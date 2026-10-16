@@ -65,6 +65,33 @@ class TimelineChatSystemTest < ApplicationSystemTestCase
     assert_operator gap, :<=, 2, 'expected the short list to sit on the bottom of the scroller'
   end
 
+  test 'a short text bullet keeps the minimum card width' do
+    create_lines(1)
+    visit bullets_path
+
+    widths = page.evaluate_script(<<~JS)
+      (() => {
+        const bullet = document.querySelector('#timeline .bullet')
+        const body = bullet.querySelector('.bullet--body')
+        const styles = getComputedStyle(bullet)
+        const available = bullet.getBoundingClientRect().width - parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight)
+        const minimum = 35 * parseFloat(getComputedStyle(document.documentElement).fontSize)
+        return [body.getBoundingClientRect().width, Math.min(minimum, available)]
+      })()
+    JS
+
+    assert_operator widths.first, :>=, widths.last - 1
+  end
+
+  test 'today still shows a completed count when no active bullets remain' do
+    create_bullet!(@user, body: 'Finished today').complete!
+    visit bullets_path
+
+    assert_selector '#timeline_section_current_date.timeline--section--completed-only', visible: true
+    assert_selector '#timeline_section_current_date [data-timeline-count-target="completed"]', text: '1 bullet completed'
+    assert_no_selector '.timeline--scroller > .empty-state', visible: true
+  end
+
   test 'the older trigger disappears once the whole timeline is loaded' do
     create_lines(PAGE + 5)
     visit bullets_path
@@ -74,6 +101,7 @@ class TimelineChatSystemTest < ApplicationSystemTestCase
 
     assert_no_selector '.timeline--load-more-trigger'
     assert_selector "#{@list} .bullet", count: PAGE + 5
+    assert_selector '#timeline_section_current_date [data-timeline-count-target=count]', text: "#{PAGE + 5} bullets loaded"
     assert_text 'Line 0'
   end
 
