@@ -97,7 +97,8 @@
   }
 
   .bullet--content:not(:has(> .bullet--body > .attachment--preview:not([hidden]))) {
-    min-width: min(40rem, 100%);
+    max-width: 40rem;
+    width: 100%;
   }
 
   .bullet--status {

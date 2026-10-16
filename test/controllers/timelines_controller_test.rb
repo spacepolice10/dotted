@@ -90,7 +90,8 @@ class TimelinesControllerTest < ActionDispatch::IntegrationTest
 
     assert_select '.timeline--load-more-trigger', count: 1
     assert_select '[data-timeline-count]', count: 0
-    assert_select '.timeline--section-header a[href=?]' , bullets_path(from: Date.current.iso8601, to: Date.current.iso8601), text: 'Press to show all the bullets'
+    assert_select '.timeline--section-header a[href=?]',
+                  bullets_path(from: Date.current.iso8601, to: Date.current.iso8601), text: 'Press to show all the bullets'
     assert_select '#timeline .bullet', count: Bullet::Pageable::PAGE_SIZE
   end
 
