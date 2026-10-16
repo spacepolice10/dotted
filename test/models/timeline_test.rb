@@ -7,23 +7,14 @@ class TimelineTest < ActiveSupport::TestCase
     travel_to Date.new(2026, 9, 30)
   end
 
-  test 'sections split recent days and then widen' do
+  test 'each day has its own section' do
     assert_equal 'current_date', section(0).id
-    assert_equal 'yesterday', section(1).id
-    assert_equal 'this-week', section(2).id
-    assert_equal 'This week', section(2).name
-    assert_equal 'this-week', section(6).id
-    assert_equal 'last-week', section(7).id
-    assert_equal 'last-week', section(13).id
-    assert_equal 'last-month', section(14).id
-    assert_equal 'last-month', section(30).id
-    assert_equal 'month-2026-08', section(31).id
-    assert_equal 'August', section(31).name
-    assert_equal 'month-2026-07', section(90).id
-    assert_equal 'month-2026-07', section(91).id
-    assert_equal 'month-2025-09', section(365).id
-    assert_equal 'September 2025', section(365).name
-    assert_equal 'month-2025-09', section(366).id
+    assert_equal '2026-09-29', section(1).id
+    assert_equal 'Yesterday', section(1).name
+    assert_equal '2026-09-28', section(2).id
+    assert_equal 'Monday, Sep 28', section(2).name
+    assert_equal '2025-09-30', section(365).id
+    assert_equal 'Tuesday, Sep 30, 2025', section(365).name
   end
 
   test 'a future day gets its own section' do
@@ -83,8 +74,8 @@ class TimelineTest < ActiveSupport::TestCase
     bullets = Array.new(5) { |index| create_bullet!(user, body: "Day #{index}", pops_on: Date.current - (4 - index)) }
     timeline = Timeline.new(user)
 
-    assert_equal bullets.map(&:id), timeline.last_page.map(&:id)
-    assert_equal bullets.first(2).map(&:id), timeline.prev_page(bullets[2]).map(&:id)
+    assert_equal [bullets.last.id], timeline.filtered.last_page.map(&:id)
+    assert_equal [bullets[1].id], timeline.filtered.prev_page(bullets[2]).map(&:id)
   end
 
   test 'prev_page skips completed and upcoming bullets' do
@@ -95,8 +86,8 @@ class TimelineTest < ActiveSupport::TestCase
     create_bullet!(user, body: 'Upcoming', pops_on: Date.current + 1)
     timeline = Timeline.new(user)
 
-    assert_equal [bullets.first.id], timeline.prev_page(bullets[1]).map(&:id)
-    assert_empty timeline.prev_page(bullets.first)
+    assert_equal [bullets.first.id], timeline.filtered.prev_page(bullets[1]).map(&:id)
+    assert_empty timeline.filtered.prev_page(bullets.first)
     assert_not_includes timeline.filtered, done
   end
 
@@ -108,23 +99,6 @@ class TimelineTest < ActiveSupport::TestCase
     assert_not_includes timeline.filtered, bullet
   end
 
-  test 'completed counts use the same date and collection scope as the timeline' do
-    user = users(:one)
-    collection = create_collection!(user, name: 'Work')
-    create_bullet!(user, body: 'Done today', collection: collection).complete!
-    create_bullet!(user, body: 'Done yesterday', collection: collection, pops_on: Date.current - 1).complete!
-    create_bullet!(user, body: 'Other collection').complete!
-    create_bullet!(user, body: 'Future done', collection: collection, pops_on: Date.current + 1).complete!
-    create_bullet!(users(:two), body: 'Another user').complete!
-
-    filter = Bullet::Filter.from_params({ collection: collection.name }, user: user)
-    counts = Timeline.new(user, filter: filter).completed_counts
-
-    assert_equal 1, counts['current_date']
-    assert_equal 1, counts['yesterday']
-    assert_equal 0, counts[(Date.current + 1).iso8601]
-  end
-
   test 'completed filter uses the same date ordering and pagination' do
     user = users(:one)
     old_done = create_bullet!(user, body: 'Old done', pops_on: Date.current - 3).tap(&:complete!)
@@ -132,23 +106,41 @@ class TimelineTest < ActiveSupport::TestCase
     fresh_done.update!(done_at: 10.days.ago)
     create_bullet!(user, body: 'Not done')
     timeline = Timeline.new(user, filter: Bullet::Filter.from_params({ completed: 'true' }, user: user))
-    assert_equal [old_done.id, fresh_done.id], timeline.last_page.map(&:id)
-    assert_equal [old_done.id], timeline.prev_page(fresh_done).map(&:id)
-    assert_empty timeline.prev_page(old_done)
+    assert_equal [fresh_done.id], timeline.filtered.last_page.map(&:id)
+    assert_equal [old_done.id], timeline.filtered.prev_page(fresh_done).map(&:id)
+    assert_empty timeline.filtered.prev_page(old_done)
   end
 
   test 'completed pages do not overlap' do
     user = users(:one)
     bullets = Array.new(Bullet::Pageable::PAGE_SIZE + 5) do |index|
-      create_bullet!(user, body: "Done #{index}", pops_on: Date.current - (Bullet::Pageable::PAGE_SIZE + 5 - index)).tap(&:complete!)
+      create_bullet!(user, body: "Done #{index}",
+                           created_at: (Bullet::Pageable::PAGE_SIZE + 5 - index).minutes.ago).tap(&:complete!)
     end
     timeline = Timeline.new(user, filter: Bullet::Filter.from_params({ completed: true }, user: user))
 
-    newest_page = timeline.last_page
-    older_page = timeline.prev_page(newest_page.first)
+    newest_page = timeline.filtered.last_page
 
     assert_equal bullets.last(Bullet::Pageable::PAGE_SIZE).map(&:id), newest_page.map(&:id)
-    assert_equal bullets.first(5).map(&:id), older_page.map(&:id)
+    assert timeline.filtered.more_on_date?(newest_page.first)
+    assert_empty timeline.filtered.prev_page(newest_page.first)
+  end
+
+  test 'automatic pages move by date and the rest of a date is explicit' do
+    user = users(:one)
+    older = create_bullet!(user, body: 'Earlier day', pops_on: Date.current - 3)
+    today = Array.new(Bullet::Pageable::PAGE_SIZE + 5) do |index|
+      create_bullet!(user, body: "Today #{index}", created_at: (Bullet::Pageable::PAGE_SIZE + 5 - index).minutes.ago)
+    end
+    timeline = Timeline.new(user)
+
+    first = timeline.filtered.last_page
+    second = timeline.filtered.prev_page(first.first)
+
+    assert_equal today.last(Bullet::Pageable::PAGE_SIZE).map(&:id), first.map(&:id)
+    assert timeline.filtered.more_on_date?(first.first)
+    assert_equal [older.id], second.map(&:id)
+    assert_not timeline.filtered.previous_page?(second.first)
   end
 
   private

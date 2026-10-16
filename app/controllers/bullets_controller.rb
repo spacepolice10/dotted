@@ -10,8 +10,9 @@ class BulletsController < ApplicationController
     if params[:before].present?
       load_prev_page
     else
-      @bullets = @timeline.last_page
-      @more_bullets = @bullets.size == Bullet::Pageable::PAGE_SIZE
+      relation = @timeline.filtered.preload(:collection)
+      @bullets = @filter.single_date? ? relation.by_date.to_a : relation.last_page
+      @more_bullets = !@filter.single_date? && @timeline.filtered.previous_page?(@bullets.first)
     end
   end
 
@@ -43,7 +44,6 @@ class BulletsController < ApplicationController
     # A completed or not-yet-due bullet has no active siblings on its day, and
     # an empty rail would leave the page with nothing to look at.
     @bullets = [@bullet] if @bullets.empty?
-    @completed_count = Current.user.bullets.completed.where(pops_on: @bullet.pops_on).count
   end
 
   def update
@@ -77,7 +77,7 @@ class BulletsController < ApplicationController
     cursor = @timeline.filtered.find_by(id: params[:before])
     return head :no_content unless cursor
 
-    @bullets = @timeline.prev_page(cursor)
+    @bullets = @timeline.filtered.preload(:collection).prev_page(cursor)
     return head :no_content if @bullets.empty?
 
     respond_to do |format|

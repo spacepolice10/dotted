@@ -51,6 +51,10 @@
 # Accidental duplicate migrate folders (e.g. Finder copy)
 /db/migrate */
 
+# Local demo account and its assets
+/db/demo_account.rb
+/db/demo_assets/
+
 /ignored/
 
 # SQLite databases and scratch copies must never be committed

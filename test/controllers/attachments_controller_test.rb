@@ -46,14 +46,15 @@ class AttachmentsControllerTest < ActionDispatch::IntegrationTest
     assert_select "li#bullet_#{foreign_bullet.id}", count: 0
   end
 
-  test 'index renders an image as a bullet tile' do
+  test 'index renders an image with a filename pill' do
     bullet = create_file_bullet!(@user, filename: 'picture.png')
 
     get attachments_path
 
     assert_response :success
     assert_select "li#bullet_#{bullet.id} a[href=?] img[alt=?]", attachment_path(bullet), 'picture.png'
-    assert_select "li#bullet_#{bullet.id} a[href=?]", bullet_path(bullet), text: 'View bullet'
+    assert_select "li#bullet_#{bullet.id} .pill.attachment--preview-name", text: 'picture.png'
+    assert_select "li#bullet_#{bullet.id} a[href=?]", bullet_path(bullet), count: 0
   end
 
   private

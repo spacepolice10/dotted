@@ -79,6 +79,13 @@ class Bullet::FilterTest < ActiveSupport::TestCase
     assert_not Bullet::Filter.from_params({ completed: true }, user: @user).includes_date?(today)
   end
 
+  test 'matching range bounds identify a single date timeline' do
+    date = Date.current.iso8601
+
+    assert Bullet::Filter.from_params({ from: date, to: date }, user: @user).single_date?
+    assert_not Bullet::Filter.from_params({ from: date }, user: @user).single_date?
+  end
+
   test 'completed flag ignores the default due-date window' do
     filter = Bullet::Filter.from_params({ completed: 'true' }, user: @user)
     future_done = create_bullet!(@user, body: 'Future done', pops_on: Date.current + 5)

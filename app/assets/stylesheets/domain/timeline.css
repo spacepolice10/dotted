@@ -13,14 +13,13 @@
     position: absolute;
     inset-block: var(--space-v-2) -10px;
     inset-inline-start: calc(50% - 0.5px);
-    border-inline-start: 1px dashed
-      color-mix(in oklch, var(--model-color-2) 22%, transparent);
+    border-inline-start: 2px dashed
+      color-mix(in oklch, var(--model-color-2) 28%, transparent);
     pointer-events: none;
+    z-index: -1;
   }
 
-  .timeline--section:not(:has(.bullet)):not(
-      .timeline--section--completed-only
-    ) {
+  .timeline--section:not(:has(.bullet)) {
     display: none;
   }
 
@@ -46,31 +45,7 @@
     line-height: 1.25;
   }
 
-  .timeline--section-count-divider {
-    color: var(--color-invert-3);
-    font-size: 1.1em;
-    font-weight: var(--font-weight-strong);
-    line-height: 1;
-  }
-
-  .timeline--section-counts {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    gap: var(--space-v-half);
-  }
-
-  .timeline--bullet-number-pill {
-    padding: calc(var(--space-v-half) / 2) var(--space-h-half);
-    background: var(--background-canvas-colour);
-    font-size: var(--font-size-xs);
-    color: var(--color-invert-4);
-    border-radius: var(--radius-base);
-    width: fit-content;
-  }
-
-  .timeline--scroller:has(.bullet, .timeline--section--completed-only)
+  .timeline--scroller:has(.bullet)
     > .empty-state {
     display: none;
   }

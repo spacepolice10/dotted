@@ -23,7 +23,7 @@ class TimelineChatSystemTest < ApplicationSystemTestCase
   end
 
   test 'scrolling to the top loads older pages without moving the read row' do
-    create_lines(70)
+    create_lines_on_dates(PAGE, 3)
     visit bullets_path
     assert_selector "#{@list} .bullet", count: PAGE
 
@@ -83,26 +83,35 @@ class TimelineChatSystemTest < ApplicationSystemTestCase
     assert_operator widths.first, :>=, widths.last - 1
   end
 
-  test 'today still shows a completed count when no active bullets remain' do
-    create_bullet!(@user, body: 'Finished today').complete!
+  test 'rich text lists keep their markers in bullets' do
+    create_bullet!(@user, body: '<ul><li>Apples</li></ul><ol><li>First</li></ol>')
     visit bullets_path
 
-    assert_selector '#timeline_section_current_date.timeline--section--completed-only', visible: true
-    assert_selector '#timeline_section_current_date [data-timeline-count-target="completed"]', text: '1 bullet completed'
-    assert_no_selector '.timeline--scroller > .empty-state', visible: true
+    styles = page.evaluate_script(<<~JS)
+      [...document.querySelectorAll('#timeline .bullet--body .lexxy-content li')]
+        .map((item) => getComputedStyle(item).listStyleType)
+    JS
+    assert_equal %w[disc decimal], styles
+  end
+
+  test 'completed bullets are available in the completed timeline' do
+    create_bullet!(@user, body: 'Finished today').complete!
+    visit bullets_path(completed: true)
+
+    assert_selector '#timeline_section_current_date .bullet', text: 'Finished today'
   end
 
   test 'the older trigger disappears once the whole timeline is loaded' do
-    create_lines(PAGE + 5)
+    create_lines(PAGE)
+    create_bullet!(@user, body: 'Previous date', pops_on: Date.current - 1)
     visit bullets_path
     assert_selector '.timeline--load-more-trigger'
 
     scroll_to_top
 
     assert_no_selector '.timeline--load-more-trigger'
-    assert_selector "#{@list} .bullet", count: PAGE + 5
-    assert_selector '#timeline_section_current_date [data-timeline-count-target=count]', text: "#{PAGE + 5} bullets loaded"
-    assert_text 'Line 0'
+    assert_selector "#{@list} .bullet", count: PAGE + 1
+    assert_text 'Previous date'
   end
 
   test 'sending a bullet keeps the reader at the newest row' do
@@ -156,33 +165,29 @@ class TimelineChatSystemTest < ApplicationSystemTestCase
     assert_in_delta 0, gap, 2
   end
 
-  test 'loading an older part of today keeps one append target at the end' do
+  test 'show all opens a timeline containing the full date' do
     create_lines(PAGE + 5)
     visit bullets_path
 
-    scroll_to_top
-    wait_for_stable_bullet_count(minimum: PAGE + 5)
+    assert_selector '#timeline .bullet', count: PAGE
+    assert_no_selector '.timeline--load-more-trigger'
+    find('#timeline_section_current_date a', text: 'Show all bullets').click
 
+    assert_selector '#timeline .bullet', count: PAGE + 5
+    assert_no_selector '#timeline_section_current_date a', text: 'Show all bullets'
     assert_selector '#timeline_section_current_date', count: 1
-    editor = find('#bullet_composer lexxy-editor .lexxy-editor__content')
-    editor.send_keys('Newest line')
-    find('#bullet_composer .composer--submit-button').click
-
-    assert_selector '#timeline_section_current_date > turbo-frame.bullet', count: PAGE + 6
-    assert_equal 'Newest line', page.evaluate_script(
-      "document.querySelector('#timeline_section_current_date > turbo-frame.bullet:last-child').innerText.trim()"
-    )
+    assert_current_path bullets_path(from: Date.current.iso8601, to: Date.current.iso8601)
   end
 
-  test 'older bullets are grouped under a heading for their span' do
+  test 'older bullets load under their own day heading' do
     create_bullet!(@user, body: 'Today line', pops_on: Date.current)
     create_bullet!(@user, body: 'Old line', pops_on: Date.current - 10.days)
 
     visit bullets_path
 
     assert_selector '#timeline_section_current_date h2.pill', text: 'Today'
-    assert_selector '#timeline_section_last-week h2.pill', text: 'Last week'
-    assert_selector '#timeline_section_last-week .bullet', text: 'Old line'
+    scroll_to_top
+    assert_selector '.timeline--section .bullet', text: 'Old line'
   end
 
   private
@@ -227,6 +232,14 @@ class TimelineChatSystemTest < ApplicationSystemTestCase
   def create_lines(count)
     Array.new(count) do |index|
       create_bullet!(@user, body: "Line #{index}", created_at: (count - index).minutes.ago)
+    end
+  end
+
+  def create_lines_on_dates(count_per_date, date_count)
+    date_count.times do |date_index|
+      count_per_date.times do |index|
+        create_bullet!(@user, body: "Date #{date_index} line #{index}", pops_on: Date.current - date_index)
+      end
     end
   end
 

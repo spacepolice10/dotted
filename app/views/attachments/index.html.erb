@@ -15,27 +15,22 @@
     <ul class="attachment--gallery">
       <% @bullets.each do |bullet| %>
         <% file = bullet.file %>
-
         <li class="attachment--tile" id="<%= dom_id(bullet) %>">
           <%= link_to attachment_path(bullet),
-                data: { kind: file.variable? ? "picture" : "file", turbo_frame: "_top" },
+                class: "attachment--tile-preview", data: { turbo_frame: "_top" },
                 aria: { label: "View #{file.filename}" } do %>
             <% if file.variable? %>
-              <%= image_tag file.variant(:display),
-                    alt: file.filename.to_s,
-                    loading: "lazy" %>
+              <%= image_tag file.variant(:display), alt: file.filename.to_s, loading: "lazy" %>
             <% else %>
               <span class="attachment--tile-file">
                 <%= icon("paperclip") %>
-                <span class="attachment--tile-name"><%= file.filename %></span>
-                <span class="attachment--tile-size"><%= number_to_human_size(file.byte_size) %></span>
+                <span><%= number_to_human_size(file.byte_size) %></span>
               </span>
             <% end %>
+            <span class="pill attachment--preview-name" title="<%= file.filename %>">
+              <span class="attachment--preview-filename"><%= file.filename %></span>
+            </span>
           <% end %>
-          <div class="attachment--tile-details">
-            <span><%= bullet.pops_on.strftime("%b %-d, %Y") %></span>
-            <%= link_to "To bullet", bullet_path(bullet), data: { turbo_frame: "_top" } %>
-          </div>
         </li>
       <% end %>
     </ul>

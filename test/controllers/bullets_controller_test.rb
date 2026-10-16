@@ -46,28 +46,33 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal 'Completed', @controller.instance_variable_get(:@filter).name
-    assert_operator response.body.index('Old done'), :<, response.body.index('Fresh done')
-    assert_no_match 'Not done', response.body
-    assert_select '#timeline_section_yesterday .bullet', text: /Old done/
     assert_select '#timeline_section_current_date .bullet', text: /Fresh done/
+    assert_no_match 'Old done', response.body
+    assert_no_match 'Not done', response.body
     assert_select '[data-timeline-scroll-path-value=?]', bullets_path(completed: true)
+
+    get bullets_path(before: fresh_done.id, completed: true)
+    assert_select "#timeline_section_#{old_done.pops_on.iso8601} .bullet", text: /Old done/
   end
 
-  test 'timeline shows coloured status marks for postponed and completed bullets' do
+  test 'timeline shows status marks for postponed, published, and completed bullets' do
     collection = create_collection!(@user, name: 'Plans', colour: 'violet')
     postponed = create_bullet!(@user, body: 'Moved task', collection: collection)
     postponed.update!(last_postponed_at: Time.current)
+    published = create_bullet!(@user, body: 'Shared note', collection: collection)
+    published.publish!
     completed = create_bullet!(@user, body: 'Finished task', collection: collection)
     completed.complete!
 
     get bullets_path
 
     assert_select "#bullet_#{postponed.id} .bullet--status--postponed[role=img][aria-label=Postponed][style='color: var(--model-color-1)']", count: 1
+    assert_select "#bullet_#{published.id} .bullet--status--published[role=img][aria-label=Published][style='color: var(--model-color-1)']", count: 1
     assert_select "#bullet_#{completed.id} .bullet--status", count: 0
 
     get bullets_path(completed: true)
 
-    assert_select "#bullet_#{completed.id} .bullet--status--done[role=img][aria-label=Completed][style='color: var(--model-color-1)']", count: 1
+    assert_select "#bullet_#{completed.id} .bullet--status--done[role=img][aria-label=Done][style='color: var(--model-color-1)']", count: 1
   end
 
   test 'bullet menu gates complete and publish by selection status' do
@@ -184,7 +189,7 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
     get bullet_path(bullet)
 
     assert_response :success
-    assert_select '#bullet_actions form[action=?][method=post]', completion_path do
+    assert_select '.bullet-menu form[action=?][method=post]', completion_path do
       assert_select 'input[name=_method][value=delete]'
       assert_select 'button', text: /Uncomplete/
     end
@@ -375,6 +380,17 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'pixel.png', bullet.name
   end
 
+  test 'create rejects multiple images' do
+    blobs = 2.times.map { |index| create_blob!(filename: "image-#{index}.png", content_type: 'image/png') }
+
+    assert_no_difference -> { @user.bullets.count } do
+      post bullets_path, params: { bullet: { images: blobs.map(&:signed_id) } }, as: :json
+    end
+
+    assert_response :unprocessable_entity
+    assert response.parsed_body['base'].present?
+  end
+
   test 'create rejects a bullet without content' do
     assert_no_difference -> { @user.bullets.count } do
       post bullets_path, params: { bullet: { body: '' } }, as: :json
@@ -395,9 +411,8 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match %(turbo-stream action="replace" target="bullet_client_#{client_id}"), response.body
     bullet = @user.bullets.order(:created_at).last
-    assert_select 'turbo-stream[action=replace] a.attachment--preview[href=?] img[alt=?][src]',
-                  attachment_path(bullet), 'pixel.png'
-    assert_select 'turbo-stream[action=replace] a.attachment--preview .pill', text: 'pixel.png'
+    assert_select 'turbo-stream[action=replace] label.attachment--preview img[alt=?][src]', 'pixel.png'
+    assert_select 'turbo-stream[action=replace] label.attachment--preview .pill', text: 'pixel.png'
     assert_equal client_id, bullet.client_id
   end
 

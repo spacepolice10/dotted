@@ -83,32 +83,15 @@ export default class extends Controller {
 
     pauseInertiaScroll(this.element)
     keepScroll(this.element, () => {
-      const fragment = this.#mergeBoundarySection(template.content)
       // The trigger is the scroller's first child (it owns the pinning auto
       // margin), so older rows slot in right after it.
       if (this.hasTriggerTarget) {
-        this.triggerTarget.after(fragment)
+        this.triggerTarget.after(template.content)
       } else {
-        this.element.prepend(fragment)
+        this.element.prepend(template.content)
       }
     })
     if (this.hasTriggerTarget) this.#observeTrigger(this.triggerTarget)
-  }
-
-  // A page can end mid-section (a week or day split across two requests). Its
-  // last section then continues the one already on screen, so its rows move
-  // there instead of duplicating the heading.
-  #mergeBoundarySection(fragment) {
-    const incoming = [...fragment.children].filter((child) => child.matches(".timeline--section[id]")).at(-1)
-    const existing = incoming && this.element.querySelector(`.timeline--section[id="${incoming.id}"]`)
-    if (!existing) return fragment
-
-    const rows = [...incoming.children].filter((child) => !child.matches(".timeline--section-header"))
-    const anchor = existing.querySelector(":scope > :not(.timeline--section-header)")
-    anchor ? anchor.before(...rows) : existing.append(...rows)
-    incoming.remove()
-
-    return fragment
   }
 
   #stopLoadingPrevPage() {

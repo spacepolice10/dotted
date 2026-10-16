@@ -21,12 +21,11 @@ class Bullet::PageableTest < ActiveSupport::TestCase
     assert_equal bullets.map(&:id), @user.bullets.last_page(size: 3).map(&:id)
   end
 
-  test 'prev_page returns the batch just older than the cursor' do
-    bullets = create_bullets(6)
+  test 'prev_page moves to the previous date' do
+    older = create_bullet!(@user, body: 'Older', pops_on: Date.current - 1)
+    cursor = create_bullet!(@user, body: 'Cursor')
 
-    page = @user.bullets.prev_page(bullets[3], size: 2)
-
-    assert_equal bullets[1..2].map(&:id), page.map(&:id)
+    assert_equal [older.id], @user.bullets.prev_page(cursor).map(&:id)
   end
 
   test 'prev_page is empty once the oldest bullet is the cursor' do
@@ -35,25 +34,36 @@ class Bullet::PageableTest < ActiveSupport::TestCase
     assert_empty @user.bullets.prev_page(bullets.first)
   end
 
-  test 'prev_page breaks created_at ties on id' do
+  test 'more_on_date handles created_at ties using id' do
     timestamp = 2.hours.ago
     bullets = Array.new(3) do |index|
       create_bullet!(@user, body: "Tied #{index}", created_at: timestamp)
     end
 
-    page = @user.bullets.prev_page(bullets.last)
-
-    assert_equal bullets.first(2).map(&:id), page.map(&:id)
+    assert @user.bullets.more_on_date?(bullets.last)
+    assert_not @user.bullets.more_on_date?(bullets.first)
   end
 
   test 'last_page reads by day before creation time' do
     late_today = create_bullet!(@user, body: 'Late today', pops_on: Date.current, created_at: 1.minute.ago)
-    early_yesterday = create_bullet!(@user, body: 'Early yesterday', pops_on: Date.current - 1, created_at: 1.minute.ago)
-    old_created_today = create_bullet!(@user, body: 'Moved to yesterday', pops_on: Date.current - 1, created_at: 2.hours.ago)
+    early_yesterday = create_bullet!(@user, body: 'Early yesterday', pops_on: Date.current - 1,
+                                            created_at: 1.minute.ago)
+    old_created_today = create_bullet!(@user, body: 'Moved to yesterday', pops_on: Date.current - 1,
+                                              created_at: 2.hours.ago)
 
     ids = @user.bullets.last_page.map(&:id)
 
-    assert_equal [old_created_today, early_yesterday, late_today].map(&:id), ids
+    assert_equal [late_today.id], ids
+    assert_equal [old_created_today, early_yesterday].map(&:id), @user.bullets.prev_page(late_today).map(&:id)
+  end
+
+  test 'a date with more than one page exposes a show all link' do
+    bullets = create_bullets(Bullet::Pageable::PAGE_SIZE + 5)
+    first = @user.bullets.last_page
+
+    assert_equal bullets.last(Bullet::Pageable::PAGE_SIZE).map(&:id), first.map(&:id)
+    assert @user.bullets.more_on_date?(first.first)
+    assert_not @user.bullets.previous_page?(first.first)
   end
 
   test 'prev_page returns bullets from earlier days first' do

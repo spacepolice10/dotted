@@ -23,6 +23,10 @@ class Bullet::Filter
     !!@completed
   end
 
+  def single_date?
+    from.present? && from == to
+  end
+
   def empty?
     to_params.empty?
   end

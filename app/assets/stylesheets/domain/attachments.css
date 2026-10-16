@@ -1,15 +1,46 @@
 @layer components {
 
 
-  .bullet--body :is(.attachment.attachment--preview, a.attachment--preview, span.attachment--preview:not([hidden])) {
+  .bullet--body :is(.attachment.attachment--preview, a.attachment--preview, label.attachment--preview, span.attachment--preview:not([hidden])) {
     display: grid;
     justify-items: start;
     row-gap: var(--space-v-half);
     max-inline-size: 100%;
   }
 
-  .bullet--body > :is(a.attachment--preview, span.attachment--preview:not([hidden])) {
+  .attachment--preview-picture {
+    position: relative;
+    display: block;
+    max-inline-size: 100%;
+    width: fit-content;
+  }
+
+  .attachment--preview-picture::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-base);
+    background: color-mix(in oklch, var(--color-accent-1) 32%, transparent);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .bullet:has(> input:checked) .attachment--preview-picture::after {
+    opacity: 1;
+  }
+
+  .bullet:has(> input:checked) .attachment--preview-name {
+    border-color: var(--color-accent-1);
+    background: var(--color-accent-1-subtle);
+    color: var(--color-invert-1);
+  }
+
+  .bullet--body > :is(a.attachment--preview, label.attachment--preview, span.attachment--preview:not([hidden])) {
     justify-items: center;
+  }
+
+  .bullet--body label.attachment--preview {
+    cursor: pointer;
   }
 
   .attachment--preview-name {
@@ -52,16 +83,9 @@
     font-size: var(--font-size-xs);
   }
 
-  main.attachment--page {
-    height: auto;
-    min-block-size: auto;
-  }
-
-
   .attachment--gallery {
     column-width: var(--space-h-10);
     column-gap: var(--space-h-half);
-    align-items: start;
     width: 100%;
     margin: 0;
     padding: 0;
@@ -69,53 +93,36 @@
   }
 
   .attachment--tile {
-    overflow: hidden;
-    border-radius: var(--radius-base);
-    background: var(--color-2);
+    break-inside: avoid;
+  }
+
+  .attachment--tile-preview {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-v-half);
     color: inherit;
-    border: var(--border-subtle);
-    margin-top: var(--space-v);
-    > a {
-      display: block;
-      color: inherit;
-      text-decoration: none;
-      padding: var(--space-v);
-    }
-
-    a[data-kind="picture"] {
-      padding: 0;
-    }
-
-    img {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
+    text-decoration: none;
   }
 
-  .attachment--tile-details {
+  .attachment--tile-preview img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-base);
+  }
+
+  .attachment--tile-file {
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
     gap: var(--space-h-half);
-    padding: var(--space-v);
-    color: var(--color-invert-4);
-    font-size: var(--font-size-xs);
-  }
-
-  .attachment--tile-file .icon-wrap {
-    width: var(--space-h-2);
-    height: var(--space-h-2);
-    color: var(--color-invert-3);
-  }
-
-  .attachment--tile-name {
-    max-width: 100%;
-    overflow-wrap: anywhere;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: var(--space-h-10);
+    padding: var(--space-v) var(--space-h-half);
+    border: 1px solid var(--color-1);
+    border-radius: var(--radius-base);
+    background: var(--color-1);
     color: var(--color-invert-2);
-  }
-
-  .attachment--tile-size {
-    color: var(--color-invert-4);
-    font-size: var(--font-size-xs);
   }
 }

@@ -126,20 +126,17 @@ class BulletMenuPickerSystemTest < ApplicationSystemTestCase
 
   test 'submitting a bullet menu action clears the selection' do
     visit bullets_path
-    initial_completed = find('#timeline_section_current_date [data-timeline-count-target="completed"]').text.to_i
     select_bullet
 
     find_button('Complete').click
 
     assert_no_selector '.bullet-menu', visible: true
-    assert_selector '#timeline_section_current_date [data-timeline-count-target="completed"]',
-                    text: "#{initial_completed + 1} #{'bullet'.pluralize(initial_completed + 1)} completed"
+    assert_selector "#bullet_#{@bullet.id}[data-bullet-done=true]"
 
     select_bullet
     find_button('Uncomplete').click
 
-    assert_selector '#timeline_section_current_date [data-timeline-count-target="completed"]',
-                    text: "#{initial_completed} #{'bullet'.pluralize(initial_completed)} completed"
+    assert_selector "#bullet_#{@bullet.id}[data-bullet-done=false]"
   end
 
   private

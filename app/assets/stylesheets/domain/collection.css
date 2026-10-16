@@ -1,4 +1,38 @@
 @layer components {
+  .collection-page {
+    --collection-header-height: max(
+      var(--coarse-target),
+      calc(var(--font-size-xl) + var(--space-v))
+    );
+    --timeline-header-clearance: calc(
+      var(--space-v-3) + var(--collection-header-height) + 2px
+    );
+
+    position: relative;
+    padding-block: 0;
+  }
+
+  .collection-page > .collection-header {
+    position: absolute;
+    top: var(--space-v);
+    left: 50%;
+    z-index: 2;
+    width: max-content;
+    max-width: calc(100% - var(--space-h-2));
+    margin: 0;
+    padding: var(--space-v-half) var(--space-h);
+    transform: translateX(-50%);
+    border: var(--border-subtle);
+    border-radius: var(--radius-full);
+    background: var(--color-1);
+    box-shadow: var(--shadow-base);
+
+    h1 {
+      min-width: 0;
+      font-size: var(--font-size-xl);
+    }
+  }
+
   .collection-chip {
     justify-content: flex-start;
     width: 100%;

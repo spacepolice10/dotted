@@ -10,13 +10,11 @@ class ComposerSystemTest < ApplicationSystemTestCase
   end
 
   test 'creates a text bullet through the shared composer' do
-    count = page.evaluate_script("Number.parseInt(document.querySelector('#timeline_section_current_date [data-timeline-count-target=count]').textContent)")
     editor = find('#bullet_composer lexxy-editor .lexxy-editor__content')
     editor.send_keys('Fresh note')
     find('#bullet_composer .composer--submit-button').click
 
     assert_text 'Fresh note'
-    assert_selector '#timeline_section_current_date [data-timeline-count-target=count]', text: "#{count + 1} #{'bullet'.pluralize(count + 1)} loaded"
     assert_equal 'Fresh note', @user.bullets.reload.last.body_as_text
   end
 
@@ -45,6 +43,18 @@ class ComposerSystemTest < ApplicationSystemTestCase
     find('body').send_keys([:shift, 'f'])
 
     assert_selector '#bullet_composer lexxy-editor .lexxy-editor__content:focus'
+  end
+
+  test 'shift d opens the file picker from elsewhere on the daylog' do
+    assert_selector '#bullet_composer button[aria-label="Attach file"].hotkey-hint[data-hotkey="D"]'
+    page.execute_script(<<~JS)
+      const input = document.querySelector('#bullet_composer_attachment_file')
+      input.click = () => { input.dataset.pickerOpened = 'true' }
+    JS
+
+    find('body').send_keys([:shift, 'd'])
+
+    assert_selector '#bullet_composer_attachment_file[data-picker-opened="true"]', visible: :all
   end
 
   test 'the editor has no formatting toolbar' do

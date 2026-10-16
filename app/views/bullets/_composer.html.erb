@@ -25,8 +25,10 @@ id="bullet_composer"
     <span class="utilities--contents">
       <button
         type="button"
-        data-action="composer-attachment#choose"
-        class="composer--control composer--attach"
+        data-controller="hotkey"
+        data-action="composer-attachment#choose keydown.shift+d@document->hotkey#click"
+        data-hotkey="D"
+        class="composer--control composer--attach hotkey-hint"
         aria-label="Attach file"
       >
         <%= icon("paperclip") %>

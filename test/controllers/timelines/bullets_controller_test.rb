@@ -16,19 +16,18 @@ module Timelines
       get bullets_path(before: cursor.id)
 
       assert_response :success
-      assert_select 'div#timeline_section_last-month .bullet', text: /Old row/
+      assert_select "div#timeline_section_#{old.pops_on.iso8601} .bullet", text: /Old row/
       assert_no_match 'Cursor row', response.body
       assert_equal old.id, @user.bullets.find_by!(pops_on: Date.current - 20).id
     end
 
-    test 'before repeats the boundary section so the client can merge it' do
+    test 'before skips the rest of the current date' do
       earlier = create_bullet!(@user, body: 'Earlier today', created_at: 2.hours.ago)
       cursor = create_bullet!(@user, body: 'Later today', created_at: 1.hour.ago)
 
       get bullets_path(before: cursor.id)
 
-      assert_response :success
-      assert_select 'div#timeline_section_current_date .bullet', text: /#{earlier.name}/
+      assert_response :no_content
     end
 
     test 'before omits an empty today section so pagination cannot duplicate the append target' do
@@ -96,7 +95,7 @@ module Timelines
       get bullets_path(before: cursor.id, completed: true)
 
       assert_response :success
-      assert_select '#timeline_section_this-week .bullet', text: /Old done/
+      assert_select "#timeline_section_#{old_done.pops_on.iso8601} .bullet", text: /Old done/
       assert_no_match 'Cursor done', response.body
       assert_no_match 'Not done', response.body
     end

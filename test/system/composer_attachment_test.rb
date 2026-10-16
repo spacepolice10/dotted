@@ -31,18 +31,30 @@ class ComposerAttachmentSystemTest < ApplicationSystemTestCase
       (() => {
         const body = document.querySelector('##{image_bullet[:id]} .bullet--body')
         const style = getComputedStyle(body)
-        return { padding: style.padding, overflow: style.overflow, border: style.borderTopColor }
+        const pill = document.querySelector('##{image_bullet[:id]} .attachment--preview-name')
+        return { padding: style.padding, overflow: style.overflow, border: style.borderTopColor,
+                 pillBorder: getComputedStyle(pill).borderTopColor }
       })()
     JS
     assert_equal '0px', image_style['padding']
     assert_equal 'hidden', image_style['overflow']
 
-    page.execute_script("document.querySelector('##{image_bullet[:id]} .bullet--select-checkbox').click()")
+    find("##{image_bullet[:id]} .attachment--preview img").click
     assert_selector "##{image_bullet[:id]} [data-bullet-menu-target=checkbox]:checked", visible: :all
-    selected_border = page.evaluate_script(
-      "getComputedStyle(document.querySelector('##{image_bullet[:id]} .bullet--body')).borderTopColor"
-    )
-    assert_not_equal image_style['border'], selected_border
+    assert_current_path bullets_path
+    selected_style = page.evaluate_script(<<~JS)
+      (() => {
+        const bullet = document.querySelector('##{image_bullet[:id]}')
+        return {
+          border: getComputedStyle(bullet.querySelector('.bullet--body')).borderTopColor,
+          pillBorder: getComputedStyle(bullet.querySelector('.attachment--preview-name')).borderTopColor,
+          tint: getComputedStyle(bullet.querySelector('.attachment--preview-picture'), '::after').opacity
+        }
+      })()
+    JS
+    assert_equal image_style['border'], selected_style['border']
+    assert_not_equal image_style['pillBorder'], selected_style['pillBorder']
+    assert_equal '1', selected_style['tint']
 
     assert bullet.file.attached?
     assert_equal File.basename(path), bullet.file.filename.to_s
@@ -65,4 +77,5 @@ class ComposerAttachmentSystemTest < ApplicationSystemTestCase
     assert_equal 'Fresh note', bullet.body_as_text
     assert bullet.client_id.present?
   end
+
 end

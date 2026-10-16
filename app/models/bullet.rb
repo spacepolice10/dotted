@@ -37,10 +37,18 @@ class Bullet < ApplicationRecord
   def body_as_text = body.to_plain_text.to_s
   def name = body_as_text.lines.first&.strip.presence || filename.presence || 'Untitled'
 
+  def status
+    return 'done' if done?
+    return 'postponed' if last_postponed_at.present?
+    return 'published' if published?
+
+    nil
+  end
+
   def marker_icon
-    return :check if done?
-    return 'arrow-forward-up' if last_postponed_at.present?
-    return 'link' if published?
+    return 'arrow-forward-up' if status == 'postponed'
+    return 'link' if status == 'published'
+    return 'check' if status == 'done'
 
     :circle
   end

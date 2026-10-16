@@ -23,7 +23,7 @@ class TimelineSectionsTest < ActionView::TestCase
     html = render partial: 'bullets/timeline_sections', locals: { bullets: @user.bullets, timeline: @timeline }
 
     assert_select fragment(html), 'div#timeline_section_current_date > turbo-frame.bullet', count: 1
-    assert_select fragment(html), 'div#timeline_section_current_date .timeline--count-pill', text: '1 bullet loaded'
+    assert_select fragment(html), '[data-timeline-count]', count: 0
   end
 
   test 'does not mount an empty today append target' do
@@ -33,7 +33,7 @@ class TimelineSectionsTest < ActionView::TestCase
     fragment = fragment(html)
 
     assert_select fragment, 'div#timeline_section_current_date', count: 0
-    assert_equal 'timeline_section_yesterday', fragment.css('.timeline--section').last['id']
+    assert_equal "timeline_section_#{(Date.current - 1).iso8601}", fragment.css('.timeline--section').last['id']
   end
 
   test 'ensures one empty current date section after older bullets' do
@@ -43,7 +43,7 @@ class TimelineSectionsTest < ActionView::TestCase
                   locals: { bullets: @user.bullets.by_date, timeline: @timeline, ensure_current_date: true }
     sections = fragment(html).css('.timeline--section')
 
-    assert_equal %w[timeline_section_yesterday timeline_section_current_date], sections.map { |section| section['id'] }
+    assert_equal ["timeline_section_#{(Date.current - 1).iso8601}", 'timeline_section_current_date'], sections.map { |section| section['id'] }
     assert_equal 0, sections.last.css('.bullet').size
   end
 

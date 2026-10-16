@@ -6,36 +6,20 @@
   <% sections.insert(first_future || sections.length, [timeline.section_of(Date.current), []]) %>
 <% end %>
 
-<% completed_counts = timeline.completed_counts if sections.any? && !timeline.filter.completed? %>
-
 <% sections.each do |section, section_bullets| %>
   <div
     id="timeline_section_<%= section.id %>"
-    class="<%= class_names('timeline--section', 'timeline--section--completed-only': section_bullets.empty? && (completed_counts || {}).fetch(section.id, 0).positive?) %>"
-    data-controller="timeline-count"
+    class="timeline--section"
   >
     <div class="timeline--section-header">
       <h2 class="pill"><%= section.name %></h2>
-    </div>
-
-    <span class="timeline--section-counts utilities-mx-auto">
-      <span
-        class="timeline--bullet-number-pill"
-        data-timeline-count-target="count"
-      >
-        <%= pluralize(section_bullets.size, "bullet") %> loaded
-      </span>
-
-      <% unless timeline.filter.completed? %>
-        <span
-          class="timeline--bullet-number-pill"
-          data-timeline-count-target="completed"
-          data-completed-count="<%= completed_counts[section.id] %>"
-        >
-          <%= pluralize(completed_counts[section.id], "bullet") %> completed
-        </span>
+      <% if !timeline.filter.single_date? && section_bullets.any? && timeline.filtered.more_on_date?(section_bullets.first) %>
+        <%= link_to "Show all bullets",
+              bullets_path(timeline.filter.to_params.merge(from: section_bullets.first.pops_on.iso8601,
+                                                            to: section_bullets.first.pops_on.iso8601)),
+              data: { turbo_frame: "_top", intent: "secondary", size: "sm", radius: "base" } %>
       <% end %>
-    </span>
+    </div>
 
     <% section_bullets.each do |bullet| %>
       <%= render partial: bullet_partial, locals: { bullet: bullet } %>

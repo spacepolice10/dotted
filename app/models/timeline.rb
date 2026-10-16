@@ -15,23 +15,7 @@ class Timeline
     filter.filtered(bullets)
   end
 
-  def last_page
-    filtered.preload(:collection).last_page
-  end
-
-  def prev_page(bullet)
-    filtered.preload(:collection).prev_page(bullet)
-  end
-
-  def completed_counts
-    filter.filtered(user.bullets.completed).group(:pops_on).count.each_with_object(Hash.new(0)) do |(date, count), totals|
-      totals[section_of(date).id] += count
-    end
-  end
-
-  # Every active bullet due on one day, oldest first. A single day is a bounded
-  # rail, so `bullets#show` renders it whole instead of windowing around a
-  # focal row.
+  # The focused bullet page renders the whole date around its selected row.
   def on(date)
     filtered.preload(:collection).by_date.where(pops_on: date)
   end
@@ -42,19 +26,10 @@ class Timeline
 
   def self.section_of(date)
     date = date.to_date
-    days_span = (Date.current - date).to_i
+    return Section.new('current_date', 'Today') if date == Date.current
 
-    case days_span
-    when ...0    then Section.new(date.iso8601, date.strftime('%A, %b %-d'))
-    when 0       then Section.new('current_date', 'Today')
-    when 1       then Section.new('yesterday', 'Yesterday')
-    when 2..6    then Section.new('this-week', 'This week')
-    when 7..13   then Section.new('last-week', 'Last week')
-    when 14..30  then Section.new('last-month', 'Last month')
-    else
-      name = date.strftime('%B')
-      name = "#{name} #{date.year}" if date.year != Date.current.year
-      Section.new(date.strftime('month-%Y-%m'), name)
-    end
+    name = date == Date.yesterday ? 'Yesterday' : date.strftime('%A, %b %-d')
+    name = "#{name}, #{date.year}" if date.year != Date.current.year
+    Section.new(date.iso8601, name)
   end
 end
