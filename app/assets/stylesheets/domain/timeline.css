@@ -1,4 +1,9 @@
 @layer components {
+  body:has(.timeline--scroller) {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
   .timeline--section {
     display: flex;
     height: auto;

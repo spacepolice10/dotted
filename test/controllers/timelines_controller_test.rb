@@ -25,7 +25,7 @@ class TimelinesControllerTest < ActionDispatch::IntegrationTest
     assert_select '.timeline--load-more-trigger', count: 0
   end
 
-  test 'index loads the latest day and pages back one day at a time' do
+  test 'index loads bullets across dates in one page' do
     today = create_bullet!(@user, body: 'Today line')
     yesterday = create_bullet!(@user, body: 'Yesterday line', pops_on: Date.current - 1)
     create_bullet!(@user, body: 'Ancient line', pops_on: Date.current - 20)
@@ -33,18 +33,19 @@ class TimelinesControllerTest < ActionDispatch::IntegrationTest
     get bullets_path
 
     assert_select '#timeline_section_current_date .bullet', text: /Today line/
-    assert_no_match 'Yesterday line', response.body
-    assert_select '.timeline--load-more-trigger'
+    assert_match 'Yesterday line', response.body
+    assert_match 'Ancient line', response.body
+    assert_select '.timeline--load-more-trigger', count: 0
 
     get bullets_path(before: today.id)
     assert_select "#timeline_section_#{yesterday.pops_on.iso8601} .bullet", text: /Yesterday line/
-    assert_no_match 'Ancient line', response.body
+    assert_match 'Ancient line', response.body
 
     get bullets_path(before: yesterday.id)
     assert_select '.timeline--section .bullet', text: /Ancient line/
   end
 
-  test 'older days show their date and separate years' do
+  test 'older dates show their date and separate years' do
     travel_to Date.new(2026, 9, 30) do
       recent = create_bullet!(@user, body: 'Late August', pops_on: Date.new(2026, 8, 29))
       older = create_bullet!(@user, body: 'Early August', pops_on: Date.new(2026, 8, 1))
@@ -61,7 +62,7 @@ class TimelinesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test 'rows within a day read oldest first' do
+  test 'rows within a date read oldest first' do
     create_bullet!(@user, body: 'Earlier', created_at: 2.hours.ago)
     create_bullet!(@user, body: 'Later', created_at: 1.hour.ago)
 
@@ -87,9 +88,29 @@ class TimelinesControllerTest < ActionDispatch::IntegrationTest
 
     get bullets_path
 
-    assert_select '.timeline--load-more-trigger', count: 0
-    assert_select '.timeline--section-header a[href=?]', bullets_path(from: Date.current.iso8601, to: Date.current.iso8601), text: 'Show all bullets'
+    assert_select '.timeline--load-more-trigger', count: 1
+    assert_select '[data-timeline-count]', count: 0
+    assert_select '.timeline--section-header a[href=?]' , bullets_path(from: Date.current.iso8601, to: Date.current.iso8601), text: 'Press to show all the bullets'
     assert_select '#timeline .bullet', count: Bullet::Pageable::PAGE_SIZE
+  end
+
+  test 'a date with exactly 50 bullets has no show all link' do
+    Bullet::Pageable::PAGE_SIZE.times { |i| create_bullet!(@user, body: "Line #{i}") }
+
+    get bullets_path
+
+    assert_select '.timeline--section-header a', count: 0
+    assert_select '[data-timeline-count]', count: 0
+  end
+
+  test 'a split date with fewer than 50 bullets has no show all link' do
+    30.times { |i| create_bullet!(@user, body: "Older #{i}", pops_on: Date.yesterday) }
+    30.times { |i| create_bullet!(@user, body: "Current #{i}") }
+
+    get bullets_path
+
+    assert_select '#timeline .bullet', count: Bullet::Pageable::PAGE_SIZE
+    assert_select '.timeline--section-header a', count: 0
   end
 
   test 'a timeline filtered to one date loads every matching bullet' do
@@ -102,7 +123,7 @@ class TimelinesControllerTest < ActionDispatch::IntegrationTest
     get bullets_path(from: date.iso8601, to: date.iso8601)
 
     assert_select '#timeline .bullet', count: Bullet::Pageable::PAGE_SIZE + 5
-    assert_select '.timeline--section-header a', text: 'Show all bullets', count: 0
+    assert_select '.timeline--section-header a', text: 'Press to show all the bullets', count: 0
     assert_select '.timeline--load-more-trigger', count: 0
     assert_no_match 'Other date', response.body
   end
@@ -117,7 +138,7 @@ class TimelinesControllerTest < ActionDispatch::IntegrationTest
 
     assert_select '.timeline--section-header a[href=?]',
                   bullets_path(collection: collection.name, from: Date.current.iso8601, to: Date.current.iso8601),
-                  text: 'Show all bullets'
+                  text: 'Press to show all the bullets'
   end
 
   test 'requires authentication' do

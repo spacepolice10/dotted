@@ -53,7 +53,7 @@ class Bullet::PageableTest < ActiveSupport::TestCase
 
     ids = @user.bullets.last_page.map(&:id)
 
-    assert_equal [late_today.id], ids
+    assert_equal [old_created_today, early_yesterday, late_today].map(&:id), ids
     assert_equal [old_created_today, early_yesterday].map(&:id), @user.bullets.prev_page(late_today).map(&:id)
   end
 
@@ -63,7 +63,16 @@ class Bullet::PageableTest < ActiveSupport::TestCase
 
     assert_equal bullets.last(Bullet::Pageable::PAGE_SIZE).map(&:id), first.map(&:id)
     assert @user.bullets.more_on_date?(first.first)
-    assert_not @user.bullets.previous_page?(first.first)
+    assert @user.bullets.previous_page?(first.first)
+  end
+
+  test 'pages handle creation time ties without overlaps' do
+    timestamp = 2.hours.ago
+    bullets = Array.new(7) { |i| create_bullet!(@user, body: "Tie #{i}", created_at: timestamp) }
+    first = @user.bullets.last_page(size: 4)
+    second = @user.bullets.prev_page(first.first, size: 4)
+
+    assert_equal bullets.map(&:id), (second + first).map(&:id)
   end
 
   test 'prev_page returns bullets from earlier days first' do

@@ -6,17 +6,20 @@
   <% sections.insert(first_future || sections.length, [timeline.section_of(Date.current), []]) %>
 <% end %>
 
+<% dates_over_page_limit = timeline.filter.single_date? ? [] : timeline.dates_over_page_limit(bullets.map(&:pops_on).uniq) %>
+
 <% sections.each do |section, section_bullets| %>
+  <% date = section_bullets.first&.pops_on || Date.current %>
   <div
     id="timeline_section_<%= section.id %>"
     class="timeline--section"
   >
     <div class="timeline--section-header">
       <h2 class="pill"><%= section.name %></h2>
-      <% if !timeline.filter.single_date? && section_bullets.any? && timeline.filtered.more_on_date?(section_bullets.first) %>
-        <%= link_to "Show all bullets",
-              bullets_path(timeline.filter.to_params.merge(from: section_bullets.first.pops_on.iso8601,
-                                                            to: section_bullets.first.pops_on.iso8601)),
+      <% if dates_over_page_limit.include?(date) %>
+        <%= link_to "Press to show all the bullets",
+              bullets_path(timeline.filter.to_params.merge(from: date.iso8601,
+                                                            to: date.iso8601)),
               data: { turbo_frame: "_top", intent: "secondary", size: "sm", radius: "base" } %>
       <% end %>
     </div>

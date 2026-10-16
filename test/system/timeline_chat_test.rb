@@ -48,6 +48,21 @@ class TimelineChatSystemTest < ApplicationSystemTestCase
     assert_in_delta before, row_top(anchor), 2
   end
 
+  test 'pages within one date merge into a single section' do
+    create_lines(70)
+    visit bullets_path
+    assert_selector "#{@list} .bullet", count: PAGE
+
+    scroll_to_top
+
+    assert_selector "#{@list} .bullet", count: 70
+    assert_selector '#timeline_section_current_date', count: 1
+    assert_no_selector '[data-timeline-count]'
+    assert_selector '.timeline--section-header a', text: 'Press to show all the bullets'
+    ids = page.all("#{@list} .bullet").map { |row| row[:id] }
+    assert_equal ids.uniq, ids
+  end
+
   test 'a short timeline keeps bullets on the composer edge' do
     create_lines(2)
     visit bullets_path
@@ -170,11 +185,11 @@ class TimelineChatSystemTest < ApplicationSystemTestCase
     visit bullets_path
 
     assert_selector '#timeline .bullet', count: PAGE
-    assert_no_selector '.timeline--load-more-trigger'
-    find('#timeline_section_current_date a', text: 'Show all bullets').click
+    assert_selector '.timeline--load-more-trigger'
+    find('#timeline_section_current_date a', text: 'Press to show all the bullets').click
 
     assert_selector '#timeline .bullet', count: PAGE + 5
-    assert_no_selector '#timeline_section_current_date a', text: 'Show all bullets'
+    assert_no_selector '#timeline_section_current_date a', text: 'Press to show all the bullets'
     assert_selector '#timeline_section_current_date', count: 1
     assert_current_path bullets_path(from: Date.current.iso8601, to: Date.current.iso8601)
   end

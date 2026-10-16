@@ -15,6 +15,10 @@
     width: fit-content;
   }
 
+  a.attachment--preview-picture {
+    cursor: zoom-in;
+  }
+
   .attachment--preview-picture::after {
     content: "";
     position: absolute;
@@ -39,7 +43,7 @@
     justify-items: center;
   }
 
-  .bullet--body label.attachment--preview {
+  .bullet--body .attachment--preview-name {
     cursor: pointer;
   }
 

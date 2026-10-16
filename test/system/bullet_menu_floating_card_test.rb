@@ -19,12 +19,12 @@ class BulletMenuFloatingCardSystemTest < ApplicationSystemTestCase
     8.times { |i| create_bullet!(@user, body: "Selectable line #{i}", created_at: Time.current) }
   end
 
-  test "expanded card leaves uncovered bullets clickable and collapses into a pill" do
+  test "docked menu stays expanded while selecting more bullets" do
     visit bullets_path
     page.execute_script("document.querySelector('[data-bullet-menu-target=checkbox]').click()")
-    assert_selector ".bullet-menu--card[open]"
+    assert_selector ".bullet-menu--card"
 
-    assert_equal "none", page.evaluate_script(
+    assert_equal "auto", page.evaluate_script(
       "getComputedStyle(document.querySelector('.bullet-menu')).pointerEvents"
     )
     assert_equal "auto", page.evaluate_script(
@@ -50,24 +50,19 @@ class BulletMenuFloatingCardSystemTest < ApplicationSystemTestCase
         const rect = bullet.querySelector('.bullet--body').getBoundingClientRect();
         const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
         if (!bullet.contains(hit)) return false;
-        hit.click();
+        bullet.querySelector("[data-bullet-menu-target=checkbox]").click();
         return true;
       })()
     JS
     assert clicked_bullet, "expected an uncovered bullet to receive a tap"
     assert_selector '[data-bullet-menu-target=checkbox]:checked', count: 2, visible: :all
 
-    find('.bullet-menu--card summary').click
-    assert_selector '.bullet-menu--card:not([open])'
-    assert_no_selector '.bullet-menu--actions', visible: true
-    assert_selector '.bullet-menu--card summary', text: '2 selected', visible: true
+    assert_selector '.bullet-menu--actions', visible: true
+    assert_selector '.bullet-menu--heading', text: '2 selected'
 
     page.execute_script("document.querySelectorAll('[data-bullet-menu-target=checkbox]')[2].click()")
-    assert_selector '.bullet-menu--card:not([open])'
-    assert_selector '.bullet-menu--card summary', text: '3 selected', visible: true
-
-    find('.bullet-menu--card summary').click
-    assert_selector '.bullet-menu--card[open]'
+    assert_selector '.bullet-menu--heading', text: '3 selected'
     assert_selector '.bullet-menu--actions', visible: true
+    assert_no_selector '.bullet-menu details, .bullet-menu summary', visible: :all
   end
 end

@@ -32,14 +32,14 @@ class ComposerAttachmentSystemTest < ApplicationSystemTestCase
         const body = document.querySelector('##{image_bullet[:id]} .bullet--body')
         const style = getComputedStyle(body)
         const pill = document.querySelector('##{image_bullet[:id]} .attachment--preview-name')
-        return { padding: style.padding, overflow: style.overflow, border: style.borderTopColor,
+        return { padding: style.paddingTop, overflow: style.overflow, border: style.borderTopColor,
                  pillBorder: getComputedStyle(pill).borderTopColor }
       })()
     JS
     assert_equal '0px', image_style['padding']
     assert_equal 'hidden', image_style['overflow']
 
-    find("##{image_bullet[:id]} .attachment--preview img").click
+    find("##{image_bullet[:id]} .attachment--preview-name").click
     assert_selector "##{image_bullet[:id]} [data-bullet-menu-target=checkbox]:checked", visible: :all
     assert_current_path bullets_path
     selected_style = page.evaluate_script(<<~JS)
@@ -55,6 +55,12 @@ class ComposerAttachmentSystemTest < ApplicationSystemTestCase
     assert_equal image_style['border'], selected_style['border']
     assert_not_equal image_style['pillBorder'], selected_style['pillBorder']
     assert_equal '1', selected_style['tint']
+
+    zoom_link = find("##{image_bullet[:id]} .attachment--preview-picture")
+    assert_equal 'false', zoom_link['data-turbo']
+    zoom_link.click
+    assert_current_path %r{/rails/active_storage/disk/.*/#{Regexp.escape(File.basename(path))}}
+    assert_selector "img", count: 1
 
     assert bullet.file.attached?
     assert_equal File.basename(path), bullet.file.filename.to_s

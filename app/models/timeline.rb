@@ -20,6 +20,11 @@ class Timeline
     filtered.preload(:collection).by_date.where(pops_on: date)
   end
 
+  def dates_over_page_limit(dates)
+    filtered.where(pops_on: dates).group(:pops_on)
+            .having("COUNT(*) > ?", Bullet::Pageable::PAGE_SIZE).pluck(:pops_on)
+  end
+
   def section_of(date)
     self.class.section_of(date)
   end

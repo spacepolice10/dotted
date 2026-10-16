@@ -18,19 +18,17 @@ module Bullet::Pageable
   end
 
   class_methods do
-    # Load at most one date at a time, newest bullets first in the feed but
-    # returned in reading order. Older bullets on the date are explicit.
+    # Fetch a bounded number of bullets across dates, returned in reading order.
     def last_page(size: PAGE_SIZE)
-      date = maximum(:pops_on)
-      date ? where(pops_on: date).by_date.last(size) : []
+      by_date.last(size)
     end
 
     def prev_page(bullet, size: PAGE_SIZE)
-      where(pops_on: ...bullet.pops_on).last_page(size: size)
+      earlier_date_than(bullet).last_page(size: size)
     end
 
     def previous_page?(bullet)
-      bullet.present? && where(pops_on: ...bullet.pops_on).exists?
+      bullet.present? && earlier_date_than(bullet).exists?
     end
 
     def more_on_date?(bullet)

@@ -21,7 +21,7 @@ class BulletMenuMobileSystemTest < ApplicationSystemTestCase
     create_bullet!(@user, body: 'Selectable line', created_at: Time.current)
   end
 
-  test 'tapping the bullet body selects it' do
+  test 'text bullets select with the left checkbox while tapping the body does not select' do
     visit bullets_path
     assert_selector '.bullet--body', text: 'Selectable line'
     page.driver.browser.execute_cdp('Emulation.setTouchEmulationEnabled', enabled: true)
@@ -32,51 +32,42 @@ class BulletMenuMobileSystemTest < ApplicationSystemTestCase
       document.elementFromPoint(body.right - 8, body.top + body.height / 2).click()
     JS
 
+    assert_no_selector '[data-bullet-menu-target=checkbox]:checked', visible: :all
+    assert_no_selector '.bullet--select-checkbox'
+    find('.bullet--select-square').click
     assert_selector '[data-bullet-menu-target=checkbox]:checked', visible: :all
     assert_selector '.bullet-menu', visible: true
   end
 
-  test 'selecting a partly visible bullet does not move the timeline' do
+  test 'opening and closing the menu keeps the newest bullet above the dock' do
     18.times { |i| create_bullet!(@user, body: "Older line #{i}", created_at: (18 - i).minutes.ago) }
     visit bullets_path
-    page.driver.browser.execute_cdp('Emulation.setTouchEmulationEnabled', enabled: true)
+    assert_selector '.bullet--body', text: 'Selectable line'
 
-    point = page.evaluate_script(<<~JS)
+    before = page.evaluate_script("document.querySelector('.timeline--scroller').scrollTop")
+    page.execute_script("document.querySelector('.timeline--scroller .bullet:last-of-type input').click()")
+    assert_selector '.bullet-menu'
+
+    metrics = page.evaluate_script(<<~JS)
       (() => {
-        const scroller = document.querySelector('.timeline--scroller')
-        scroller.scrollTop = 35
-        const row = [...scroller.querySelectorAll('.bullet')].find((row) => {
-          const rect = row.getBoundingClientRect()
-          const top = scroller.getBoundingClientRect().top
-          return rect.top < top + 60 && rect.bottom > top + 10
-        })
-        if (!row) return null
-        const rect = row.querySelector('.bullet--select-checkbox').getBoundingClientRect()
-        window.selectionScrollBefore = scroller.scrollTop
-        window.selectionScrollEvents = []
-        scroller.addEventListener('scroll', () => window.selectionScrollEvents.push(scroller.scrollTop))
-        return { x: rect.left + 15, y: Math.max(rect.top + rect.height / 2, scroller.getBoundingClientRect().top + 15) }
+        const list = document.querySelector('.timeline--scroller')
+        const rows = list.querySelectorAll('.bullet')
+        return { rowBottom: rows[rows.length - 1].getBoundingClientRect().bottom,
+                 listBottom: list.getBoundingClientRect().bottom,
+                 scrollTop: list.scrollTop }
       })()
     JS
-    assert point
+    assert_operator metrics['rowBottom'], :<=, metrics['listBottom']
+    assert_operator metrics['scrollTop'], :>, before
 
-    browser = page.driver.browser
-    browser.execute_cdp('Input.dispatchTouchEvent', type: 'touchStart', touchPoints: [{ x: point['x'], y: point['y'] }])
-    browser.execute_cdp('Input.dispatchTouchEvent', type: 'touchEnd', touchPoints: [])
-
-    assert_selector '[data-bullet-menu-target=checkbox]:checked', visible: :all
-    result = page.evaluate_script(<<~JS)
-      ({ before: window.selectionScrollBefore,
-         after: document.querySelector('.timeline--scroller').scrollTop,
-         events: window.selectionScrollEvents,
-         menuFocused: document.activeElement === document.querySelector('.bullet-menu') })
-    JS
-    assert result['menuFocused']
-    assert_in_delta result['before'], result['after'], 1
-    assert result['events'].all? { |position| (position - result['before']).abs <= 1 }
+    find('button[aria-label="Clear selection"]').click
+    assert_no_selector '.bullet-menu'
+    assert_in_delta before, page.evaluate_script(
+      "document.querySelector('.timeline--scroller').scrollTop"
+    ), 1
   end
 
-  test 'on mobile the open menu overlays without moving the page' do
+  test 'on mobile the menu sits below and shrinks the timeline' do
     visit bullets_path
 
     before = page.evaluate_script(<<~JS)
@@ -111,10 +102,17 @@ class BulletMenuMobileSystemTest < ApplicationSystemTestCase
       })()
     JS
 
-    assert_in_delta before['mainHeight'], after['mainHeight'], 1
+    assert_operator after['mainHeight'], :<, before['mainHeight']
     assert_in_delta before['tabbarHeight'], after['tabbarHeight'], 1
-    assert_in_delta before['composerHeight'], after['composerHeight'], 1
-    assert_operator after['menuTop'], :<, after['mainBottom']
+    assert_equal 0, after['composerHeight']
+    assert_no_selector '.composer--dock'
+
+    find('button[aria-label="Clear selection"]').click
+    assert_selector '.composer--dock'
+    assert_in_delta before['mainHeight'], page.evaluate_script(
+      "document.querySelector('body > main').getBoundingClientRect().height"
+    ), 1
+    assert_in_delta after['mainBottom'], after['menuTop'], 1
   end
 end
 
@@ -125,7 +123,7 @@ class BulletMenuDesktopSystemTest < ApplicationSystemTestCase
     create_bullet!(@user, body: 'Selectable line', created_at: Time.current)
   end
 
-  test 'on desktop the menu overlays the page without shrinking it' do
+  test 'on desktop the menu sits below and shrinks the timeline' do
     visit bullets_path
 
     before_height = page.evaluate_script(
@@ -147,7 +145,7 @@ class BulletMenuDesktopSystemTest < ApplicationSystemTestCase
       })()
     JS
 
-    assert_in_delta before_height, metrics['mainHeight'], 1
-    assert_operator metrics['menuTop'], :<, metrics['mainBottom']
+    assert_operator metrics['mainHeight'], :<, before_height
+    assert_in_delta metrics['mainBottom'], metrics['menuTop'], 1
   end
 end

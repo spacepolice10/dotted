@@ -5,7 +5,6 @@ export default class extends Controller {
   static targets = [
     "list",
     "menu",
-    "card",
     "checkbox",
     "idList",
     "amount",
@@ -52,13 +51,38 @@ export default class extends Controller {
   }
 
   idListValueChanged() {
+    this.#resizeTimeline(() => this.#updateMenu());
+  }
+
+  // Keep the same content against the usable bottom edge while the menu
+  // replaces the composer or changes height. Measure before changing layout
+  // so the browser cannot clamp the old scroll offset during expansion.
+  #resizeTimeline(update) {
+    const anchors = this.listTargets.map((list) => {
+      const rows = list.querySelectorAll(".bullet");
+      const row = rows[rows.length - 1] || list.lastElementChild;
+      if (!row) return null;
+      const clearance = parseFloat(getComputedStyle(list).scrollPaddingBottom) || 0;
+      return { list, row, offset: row.getBoundingClientRect().bottom -
+        list.getBoundingClientRect().bottom + clearance };
+    }).filter(Boolean);
+
+    update();
+
+    for (const { list, row, offset } of anchors) {
+      const clearance = parseFloat(getComputedStyle(list).scrollPaddingBottom) || 0;
+      const nextOffset = row.getBoundingClientRect().bottom -
+        list.getBoundingClientRect().bottom + clearance;
+      list.scrollTop += nextOffset - offset;
+    }
+  }
+
+  #updateMenu() {
     const csv = this.idListValue.join(",");
 
     this.idListTargets.forEach((input) => {
       input.value = csv;
     });
-
-    const wasHidden = this.hasMenuTarget ? this.menuTarget.hidden : true;
 
     if (this.hasMenuTarget) {
       this.menuTarget.hidden = this.idListValue.length == 0;
@@ -73,8 +97,6 @@ export default class extends Controller {
 
     if (this.hasMenuTarget && this.idListValue.length > 0) {
       this.menuTarget.focus({ preventScroll: true });
-      // Keep a manually collapsed menu compact while selecting more bullets.
-      if (wasHidden && this.hasCardTarget) this.cardTarget.open = true;
     }
 
     this.selectModeValue = this.idListValue.length > 0;

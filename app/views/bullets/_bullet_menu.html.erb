@@ -5,11 +5,11 @@
   tabindex="0"
   hidden
 >
-  <details class="bullet-menu--card" data-bullet-menu-target="card">
-  <summary>
+  <div class="bullet-menu--card">
+  <div class="bullet-menu--heading">
     <span>Bulk edit</span>
     <span data-bullet-menu-target="amount">0 selected</span>
-  </summary>
+  </div>
 
   <div class="bullet-menu--actions">
     <%= form_with url: completion_path, method: :post,
@@ -154,7 +154,7 @@
     >
       <p>Clear selection</p>
     </button>
-  </details>
+  </div>
 </div>
 
 <%= render "bullets/bullet_picker_dialog",

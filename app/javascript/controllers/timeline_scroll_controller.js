@@ -83,6 +83,18 @@ export default class extends Controller {
 
     pauseInertiaScroll(this.element)
     keepScroll(this.element, () => {
+      // A page can split a date. Merge its older rows into the existing section.
+      for (const section of template.content.querySelectorAll(".timeline--section")) {
+        const existing = this.element.querySelector(`#${CSS.escape(section.id)}`)
+        if (!existing) continue
+
+        const header = existing.querySelector(".timeline--section-header")
+        header.replaceWith(section.querySelector(".timeline--section-header"))
+        const rows = [...section.children]
+        existing.querySelector(".timeline--section-header").after(...rows)
+        section.remove()
+      }
+
       // The trigger is the scroller's first child (it owns the pinning auto
       // margin), so older rows slot in right after it.
       if (this.hasTriggerTarget) {
