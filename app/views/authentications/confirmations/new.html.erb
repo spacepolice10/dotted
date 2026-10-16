@@ -12,7 +12,7 @@
       </header>
 
       <main>
-        <%= form_with url: authentication_confirmation_path, data: { controller: "auto-submit", auto_submit_length_value: 6 } do |form| %>
+        <%= form_with url: authentication_confirmation_path do |form| %>
           <label>
             <small>We sent a 6-character code to <strong><%= @email %></strong>. Enter the code to sign in or create an account.</small>
 
@@ -23,11 +23,10 @@
         inputmode: "text",
         maxlength: 6,
         placeholder: "······",
-        aria: { label: "6-character login code" },
-        data: { action: "input->auto-submit#submit" } %>
+        aria: { label: "6-character login code" } %>
           </label>
 
-          <%= form.button type: "submit", data: { intent: "primary", radius: "full", size: "lg" } do %>
+          <%= form.button type: "submit", data: { turbo_submits_with: "Verifying…", intent: "primary", radius: "full", size: "lg" } do %>
             Verify code
           <% end %>
         <% end %>
