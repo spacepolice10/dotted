@@ -8,6 +8,32 @@ class CollectionsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
   end
 
+  test 'favorite toggle persists and can be removed' do
+    collection = create_collection!(@user, name: 'Reading')
+    assert_not collection.favorite?
+
+    get collection_path(collection)
+    assert_select 'button[aria-label="Add to favorites"][aria-pressed=false]'
+
+    patch collection_path(collection), params: { collection: { favorite: true } }
+    assert_redirected_to collection_path(collection)
+    assert collection.reload.favorite?
+    follow_redirect!
+    assert_select 'button[aria-label="Remove from favorites"][aria-pressed=true]'
+
+    patch collection_path(collection), params: { collection: { favorite: false } }, as: :json
+    assert_response :success
+    assert_equal false, response.parsed_body['favorite']
+    assert_not collection.reload.favorite?
+  end
+
+  test 'favorite changes cannot target another users collection' do
+    collection = create_collection!(users(:two), name: 'Private')
+    patch collection_path(collection), params: { collection: { favorite: true } }
+    assert_response :not_found
+    assert_not collection.reload.favorite?
+  end
+
   test 'create saves the collection and redirects to the index' do
     assert_difference -> { Collection.count }, 1 do
       post collections_path, params: {

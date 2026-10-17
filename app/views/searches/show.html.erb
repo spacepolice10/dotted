@@ -51,7 +51,16 @@
       </ul>
     </article>
 
-    <ul id="search_collections" data-layout="grid"></ul>
+    <ul id="search_collections" data-layout="grid" aria-label="Favorite collections">
+      <% @collections.each do |collection| %>
+        <li>
+          <%= link_to collection_path(collection), class: "collection-chip", data: { turbo_frame: "_top" } do %>
+            <%= icon(collection.icon_name, style: ("color: #{colour(collection.colour)};" if collection.colour.present?)) %>
+            <span><%= collection.name %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
   </section>
 
   <footer class="utilities--mx-auto">

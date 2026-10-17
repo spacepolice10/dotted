@@ -83,7 +83,7 @@ class BulletMenuPickerSystemTest < ApplicationSystemTestCase
 
     find_button('Tag').click
 
-    assert_selector 'dialog#collects_dialog[open]'
+    wait_for_dialog 'dialog#collects_dialog[open]'
     assert_selector 'dialog#collects_dialog h2', text: 'To collection'
     assert_selector 'dialog#collects_dialog #collects-collections-list', text: 'reading'
 
@@ -97,7 +97,7 @@ class BulletMenuPickerSystemTest < ApplicationSystemTestCase
     visit bullets_path
     select_bullet
     find_button('Tag').click
-    assert_selector 'dialog#collects_dialog[open]'
+    wait_for_dialog 'dialog#collects_dialog[open]'
 
     find('dialog#collects_dialog #collects-collections-list form button',
          match: :first).click
@@ -146,6 +146,14 @@ class BulletMenuPickerSystemTest < ApplicationSystemTestCase
     assert_selector '.bullet-menu', visible: true
     page.document.synchronize do
       running = page.evaluate_script("document.querySelector('.bullet-menu').getAnimations().some(animation => animation.playState == 'running')")
+      raise Capybara::ExpectationNotMet if running
+    end
+  end
+
+  def wait_for_dialog(selector)
+    assert_selector selector
+    page.document.synchronize do
+      running = page.evaluate_script("document.querySelector(arguments[0]).getAnimations().some(animation => animation.playState == 'running')", selector)
       raise Capybara::ExpectationNotMet if running
     end
   end

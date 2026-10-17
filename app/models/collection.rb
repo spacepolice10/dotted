@@ -11,5 +11,7 @@ class Collection < ApplicationRecord
 
   normalizes :name, with: ->(name) { name.strip.downcase }
 
+  scope :favorites, -> { where(favorite: true) }
+
   def colour_variable = Colourable.colour_variable_of(colour)
 end

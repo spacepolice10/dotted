@@ -63,7 +63,7 @@
     <% if bullet.with_note? %>
       <%= render "notes/preview", note: bullet.note, url: bullet_path(bullet) %>
     <% end %>
-    <% if bullet.status.present? %>
+    <% if bullet.status.in?(%w[postponed published]) %>
       <span
         class="bullet--status bullet--status--<%= bullet.status %>"
         style="<%= "color: #{bullet.collection.colour_variable}" if bullet.collection&.colour_variable %>"
@@ -74,8 +74,6 @@
             Postponed <%= pluralize(bullet.postponements_number, "time") %>
           <% elsif bullet.status == "published" %>
             It is published
-          <% elsif bullet.status == "done" %>
-            It is completed
           <% end %>
         </span>
       </span>

@@ -1,4 +1,4 @@
-<%# Global command palette: preloaded on every page, opened with Ctrl/Cmd+K. %>
+<%# Preloaded search: open with Ctrl/Cmd+K or by typing a letter outside an editor. %>
 <button
   type="button"
   class="utilities--sr-only"
@@ -15,6 +15,8 @@
       name: "Search",
       id: "search_picker_dialog",
       standalone: true,
+      controllers: ["dialog", "type-to-search"],
+      actions: ["keydown@window->type-to-search#open"],
       size: "lg" do %>
   <%= render "searches/picker", q: "", entries: Search::Selection.in_menu(Current.user).filter_map(&:searchable) %>
 <% end %>

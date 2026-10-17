@@ -29,6 +29,12 @@ accepts `before` for paging and the existing `collection`, `completed`,
 errors return HTTP 422 with arrays of messages keyed by attribute. Missing
 records return 404. Unauthenticated JSON requests return 401.
 
+## Favorite collections
+
+Collection JSON includes a `favorite` boolean. Set it with
+`PATCH /collections/:id` and `{ "collection": { "favorite": true } }`, or send
+`false` to remove the favorite. Favorite collections appear on the Index page.
+
 ## Webhook notes
 
 `POST /webhooks/:code` accepts top-level `body`, optional `author_name`, and

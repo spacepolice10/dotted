@@ -10,6 +10,26 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
 
   # --- /search : navigation only ---
 
+  test 'show lists only the current users favorite collections alphabetically' do
+    zebra = @user.collections.create!(name: 'Zebra', favorite: true)
+    alpha = @user.collections.create!(name: 'Alpha', favorite: true)
+    ordinary = create_collection!(@user, name: 'Ordinary')
+    private_collection = users(:two).collections.create!(name: 'Private', favorite: true)
+
+    get search_path
+
+    assert_response :success
+    assert_select '#search_collections a.collection-chip' do |links|
+      assert_equal [collection_path(alpha), collection_path(zebra)], links.map { |link| link['href'] }
+    end
+    assert_select '#search_collections a[href=?]', collection_path(ordinary), count: 0
+    assert_select '#search_collections a[href=?]', collection_path(private_collection), count: 0
+
+    alpha.update!(favorite: false)
+    get search_path
+    assert_select '#search_collections a[href=?]', collection_path(alpha), count: 0
+  end
+
   test 'show renders search-navigation' do
     get search_path
 

@@ -6,7 +6,7 @@ import { navigateCombobox } from "helpers/combobox"
 const DEFAULT_DEBOUNCE_MS = 80
 
 export default class extends Controller {
-  static targets = ["searchForm", "searchField", "item"]
+  static targets = ["searchForm", "textfield", "item"]
 
   static values = {
     path: String,
@@ -29,16 +29,16 @@ export default class extends Controller {
 
   search() {
     if (!this.hasPathValue) return
-    if (!this.hasSearchFieldTarget) return
+    if (!this.hasTextfieldTarget) return
     this.#cancelPendingSearch()
     this.#abort = new AbortController()
-    this.#debouncedSearch(this.searchFieldTarget)
+    this.#debouncedSearch(this.textfieldTarget)
   }
 
   commit() {
-    if (!this.hasSearchFieldTarget) return
-    if (this.searchFieldTarget.value.trim()) return
-    this.searchFieldTarget.blur()
+    if (!this.hasTextfieldTarget) return
+    if (this.textfieldTarget.value.trim()) return
+    this.textfieldTarget.blur()
   }
 
   navigate(event) {
@@ -50,22 +50,22 @@ export default class extends Controller {
       this._move("up")
     } else if (event.key == "Enter") {
       this._activate(event)
-    } else if (event.key == " " && (!this.hasSearchFieldTarget || event.target != this.searchFieldTarget)) {
+    } else if (event.key == " " && (!this.hasTextfieldTarget || event.target != this.textfieldTarget)) {
       this._activate(event)
     } else if (event.key == "Escape") {
       // Empty field: let the event through so an enclosing dialog closes natively.
-      if (this.hasSearchFieldTarget && !this.searchFieldTarget.value.trim()) return
+      if (this.hasTextfieldTarget && !this.textfieldTarget.value.trim()) return
 
       event.preventDefault()
       event.stopPropagation()
       this.currentPosition = -1
       this._updateItems()
-      if (!this.hasSearchFieldTarget || !this.hasPathValue) return
+      if (!this.hasTextfieldTarget || !this.hasPathValue) return
 
-      this.searchFieldTarget.value = ""
+      this.textfieldTarget.value = ""
       this.#cancelPendingSearch()
       this.#abort = new AbortController()
-      this.#performSearch(this.searchFieldTarget)
+      this.#performSearch(this.textfieldTarget)
     }
   }
 

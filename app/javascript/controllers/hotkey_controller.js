@@ -21,6 +21,7 @@ export default class extends Controller {
   }
 
   get #isClickable() {
-    return getComputedStyle(this.element).pointerEvents !== "none";
+    return this.element.getClientRects().length > 0 &&
+      getComputedStyle(this.element).pointerEvents !== "none";
   }
 }

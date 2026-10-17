@@ -81,7 +81,7 @@ class CollectionsController < ApplicationController
   end
 
   def collection_params
-    params.require(:collection).permit(:name, :colour, :icon, :description)
+    params.require(:collection).permit(:name, :colour, :icon, :description, :favorite)
   end
 
   def prepare_collect_context

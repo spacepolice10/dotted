@@ -72,7 +72,7 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
 
     get bullets_path(completed: true)
 
-    assert_select "#bullet_#{completed.id} .bullet--status--done[role=img][aria-label=Done][style='color: var(--model-color-1)']", count: 1
+    assert_select "#bullet_#{completed.id} .bullet--status", count: 0
   end
 
   test 'bullet menu gates complete and publish by selection status' do
