@@ -212,21 +212,11 @@
 
   :is(.bullet--select-checkbox, .bullet--select-square)::before {
     content: "";
-    width: 1.025rem;
-    height: 1.025rem;
+    width: 1rem !important;
+    height: 1rem !important;
     box-sizing: border-box;
-    border: 1px solid var(--color-invert-4);
-    border-radius: 0.3rem;
-  }
-
-  .bullet--select-checkbox::after {
-    content: "";
-    position: absolute;
-    inset-block-start: calc(50% + 0.5625rem);
-    inset-block-end: 0;
-    width: 1px;
-    background: var(--color-invert-4);
-    pointer-events: none;
+    border: var(--border-strong);
+    border-radius: var(--radius-subtle);
   }
 
   .bullet:has(> input:checked) .bullet--select-checkbox::after {
