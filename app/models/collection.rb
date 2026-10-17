@@ -13,5 +13,13 @@ class Collection < ApplicationRecord
 
   scope :favorites, -> { where(favorite: true) }
 
+  def save_and_collect!(bullets: Bullet.none)
+    transaction do
+      save!
+      bullets.lock.find_each { |bullet| bullet.collect!(collection_id: id) }
+    end
+    self
+  end
+
   def colour_variable = Colourable.colour_variable_of(colour)
 end

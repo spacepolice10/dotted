@@ -78,6 +78,27 @@ class CollectionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal collection, second.reload.collection
   end
 
+  test 'create rolls back the collection and earlier moves if any bullet cannot be collected' do
+    original = create_collection!(@user, name: 'Original')
+    first = create_bullet!(@user, body: 'First', collection: original)
+    second = create_bullet!(@user, body: 'Invalid existing bullet')
+    second.update_column(:author_name, 'x' * 256)
+
+    assert_no_difference ['Collection.count', 'Search::Record.count'] do
+      post collections_path,
+           params: {
+             collection: { name: 'Must roll back' },
+             bullet_ids: "#{first.id},#{second.id}"
+           }, as: :json
+    end
+
+    assert_response :unprocessable_entity
+    assert response.parsed_body.key?('author_name')
+    assert_equal original, first.reload.collection
+    assert_nil second.reload.collection
+    assert_not @user.collections.exists?(name: 'must roll back')
+  end
+
   test 'create with bullet_ids redirects back to return_to' do
     card = create_bullet!(@user, body: 'Move me')
 

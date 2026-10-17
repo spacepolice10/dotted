@@ -17,34 +17,28 @@ class CollectionsController < ApplicationController
 
   def create
     @collection = Current.user.collections.build(collection_params)
+    @collection.save_and_collect!(bullets: @bullets || Bullet.none)
 
-    if @collection.save
-      if @bullet_ids.present?
-        collect_bullets_into_collection!
-        respond_to do |format|
-          format.html { redirect_to collect_return_path, notice: 'Collection created' }
-          format.json { render :show, status: :created, location: @collection }
-        end
-      else
-        respond_to do |format|
-          format.html { redirect_to collections_path, notice: 'Collection created' }
-          format.json { render :show, status: :created, location: @collection }
-        end
-      end
-    else
+    destination = @bullet_ids.present? ? collect_return_path : collections_path
+    respond_to do |format|
+      format.html { redirect_to destination, notice: 'Collection created' }
+      format.json { render :show, status: :created, location: @collection }
+    end
+  rescue ActiveRecord::RecordInvalid => e
+    if e.record == @collection
       respond_to do |format|
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @collection.errors.to_hash, status: :unprocessable_entity }
       end
-    end
-  rescue ActiveRecord::RecordInvalid => e
-    @failed_bullet = e.record
-    respond_to do |format|
-      format.turbo_stream { render 'bullets/collects/create', status: :unprocessable_entity }
-      format.html do
-        redirect_back fallback_location: search_path, alert: e.record.errors.full_messages.to_sentence
+    else
+      @failed_bullet = e.record
+      respond_to do |format|
+        format.turbo_stream { render 'bullets/collects/create', status: :unprocessable_entity }
+        format.html do
+          redirect_back fallback_location: search_path, alert: e.record.errors.full_messages.to_sentence
+        end
+        format.json { render json: e.record.errors.to_hash, status: :unprocessable_entity }
       end
-      format.json { render json: e.record.errors.to_hash, status: :unprocessable_entity }
     end
   end
 
@@ -89,13 +83,6 @@ class CollectionsController < ApplicationController
     return if @bullet_ids.blank?
 
     @bullets = prepare_bullets_from(@bullet_ids)
-  end
-
-  def collect_bullets_into_collection!
-    Bullet.transaction do
-      @bullets.lock.find_each { |bullet| bullet.collect!(collection_id: @collection.id) }
-    end
-    @bullets.each(&:reload)
   end
 
   def collect_return_path
