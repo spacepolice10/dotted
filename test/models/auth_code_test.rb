@@ -88,6 +88,36 @@ class AuthCodeTest < ActiveSupport::TestCase
     assert_empty @user.auth_codes.reload
   end
 
+  test 'consume! rejects a code that has already been used' do
+    _record, code = AuthCode.create_for(@user)
+
+    assert_equal @user, AuthCode.consume!(email: @user.email_address, code: code)
+    assert_nil AuthCode.consume!(email: @user.email_address, code: code)
+  end
+
+  test 'only one consumer succeeds when both have already read the same code' do
+    _record, code = AuthCode.create_for(@user)
+    interleaved = false
+    second_result = nil
+
+    # The first SELECT has read the code, but its caller has not received the
+    # rows yet. Let a second request consume it before the first resumes.
+    subscriber = lambda do |*, payload|
+      next if interleaved || !payload[:sql].match?(/\ASELECT .*FROM "auth_codes"/)
+
+      interleaved = true
+      second_result = AuthCode.consume!(email: @user.email_address, code: code)
+    end
+
+    first_result = ActiveSupport::Notifications.subscribed(subscriber, 'sql.active_record') do
+      AuthCode.consume!(email: @user.email_address, code: code)
+    end
+
+    assert interleaved, 'expected both consumers to read the code'
+    assert_equal @user, second_result
+    assert_nil first_result
+  end
+
   test 'consume! returns nil for wrong code' do
     AuthCode.create_for(@user)
 

@@ -44,8 +44,14 @@ class AuthCode < ApplicationRecord
     auth_code = user.auth_codes.find { |ac| !ac.expired? && ac.code_matches?(code) }
     return unless auth_code
 
-    auth_code.destroy
-    user.auth_codes.delete_all
-    user
+    transaction do
+      # Verification may have raced with another request. Only the request
+      # that deletes the still-valid code is allowed to authenticate.
+      consumed = where(id: auth_code.id, expires_at: Time.current..).delete_all
+      next unless consumed == 1
+
+      user.auth_codes.delete_all
+      user
+    end
   end
 end
