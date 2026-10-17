@@ -30,6 +30,43 @@ class WebhookIntakesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'GitHub', bullet.author_name
   end
 
+  test 'create keeps rich note content separate from the bullet body' do
+    detail = "<h2>Build report</h2><p>#{'Detailed output ' * 1000}</p>"
+
+    assert_difference -> { @user.bullets.count }, 1 do
+      assert_difference 'Note.count', 1 do
+        post webhook_intake_path(@code),
+             params: { author_name: 'CI', body: 'Build finished', note: detail },
+             as: :json
+      end
+    end
+
+    assert_response :created
+    assert_equal 'Build finished', response.parsed_body['body']
+    bullet = @user.bullets.find(response.parsed_body['id'])
+    assert_equal bullet, bullet.note.notable
+    assert_includes bullet.note.content.body.to_html, '<h2>Build report</h2>'
+    assert_includes bullet.note.content.to_plain_text, 'Detailed output ' * 1000
+    assert_equal bullet_url(bullet), response.headers['Location']
+  end
+
+  test 'omitted and blank notes do not create note records' do
+    assert_no_difference 'Note.count' do
+      [nil, '', '   '].each do |note|
+        post webhook_intake_path(@code), params: { body: 'Short summary', note: note }, as: :json
+        assert_response :created
+      end
+    end
+  end
+
+  test 'note content does not replace the required bullet body' do
+    assert_no_difference ['Bullet.count', 'Note.count'] do
+      post webhook_intake_path(@code), params: { body: '', note: 'Details only' }, as: :json
+    end
+
+    assert_response :unprocessable_entity
+  end
+
   test 'create ignores a retired bulletable_type' do
     assert_difference -> { @user.bullets.count }, 1 do
       post webhook_intake_path(@code),

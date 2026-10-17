@@ -10,7 +10,7 @@ class BulletsController < ApplicationController
     if params[:before].present?
       load_prev_page
     else
-      relation = @timeline.filtered.preload(:collection)
+      relation = @timeline.filtered.preload(:collection, note: :rich_text_content)
       @bullets = @filter.single_date? ? relation.by_date.to_a : relation.last_page
       @more_bullets = !@filter.single_date? && @timeline.filtered.previous_page?(@bullets.first)
     end
@@ -37,13 +37,7 @@ class BulletsController < ApplicationController
   end
 
   def show
-    return render :show, formats: :json if request.format.json?
-
-    @timeline = Timeline.new(Current.user)
-    @bullets = @timeline.on(@bullet.pops_on).to_a
-    # A completed or not-yet-due bullet has no active siblings on its day, and
-    # an empty rail would leave the page with nothing to look at.
-    @bullets = [@bullet] if @bullets.empty?
+    render :show, formats: :json if request.format.json?
   end
 
   def update
@@ -77,7 +71,7 @@ class BulletsController < ApplicationController
     cursor = @timeline.filtered.find_by(id: params[:before])
     return head :no_content unless cursor
 
-    @bullets = @timeline.filtered.preload(:collection).prev_page(cursor)
+    @bullets = @timeline.filtered.preload(:collection, note: :rich_text_content).prev_page(cursor)
     return head :no_content if @bullets.empty?
 
     respond_to do |format|

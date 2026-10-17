@@ -1,0 +1,4 @@
+<%# locals: (bullet:) %>
+<section id="<%= dom_id(bullet, :note) %>" class="bullet-note" aria-label="Note">
+  <%= bullet.note&.content %>
+</section>

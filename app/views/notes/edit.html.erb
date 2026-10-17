@@ -1,0 +1,10 @@
+<turbo-frame id="note_editor">
+  <%= form_with model: @note, url: bullet_note_path(@notable), method: :patch, class: "bullet-note--form", data: { turbo_stream: true } do |form| %>
+    <% if @note.errors.any? %>
+      <p role="alert"><%= @note.errors.full_messages.to_sentence %></p>
+    <% end %>
+    <%= form.label :content, "Note", class: "utilities--sr-only" %>
+    <%= form.rich_text_area :content, preset: "note", autofocus: true, placeholder: "Elaborate on this bullet…" %>
+    <%= form.submit "Save note", data: { intent: "primary", radius: "base", size: "sm" } %>
+  <% end %>
+</turbo-frame>

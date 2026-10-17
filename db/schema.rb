@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_16_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_17_120000) do
   create_table "access_codes", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "code_digest", null: false
@@ -124,6 +124,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_120000) do
     t.datetime "updated_at", null: false
     t.index ["user_id", "name"], name: "index_collections_on_user_id_and_name", unique: true
     t.index ["user_id"], name: "index_collections_on_user_id"
+  end
+
+  create_table "notes", force: :cascade do |t|
+    t.string "notable_type", null: false
+    t.integer "notable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["notable_type", "notable_id"], name: "index_notes_on_notable", unique: true
   end
 
   create_table "published_entities", force: :cascade do |t|

@@ -1,0 +1,6 @@
+<%# locals: (note:, url:) %>
+<% excerpt = note.excerpt %>
+<%= link_to url, class: "note-preview", data: { turbo_frame: "_top" }, aria: { label: "Open note: #{excerpt}" } do %>
+  <%= icon("memo") %>
+  <span><%= excerpt %></span>
+<% end %>

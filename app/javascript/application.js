@@ -16,8 +16,12 @@ if ("serviceWorker" in navigator) {
 import * as Lexxy from "lexxy";
 
 Lexxy.configure({
-  default: {
-    toolbar: false,
+  note: {
+    attachments: false,
+    toolbar: true,
+    multiLine: true,
+    richText: true,
+    markdown: true,
   },
   simple: {
     attachments: false,

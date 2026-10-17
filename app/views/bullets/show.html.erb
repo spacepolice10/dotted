@@ -2,37 +2,18 @@
 
 <%= render "shared/back_tabbar" %>
 
-<main class="timeline--window timeline--window--focus" data-size="md">
-  <header>
-    <% if @bullet.published? %>
-      <input <%# herb:disable html-input-require-autocomplete %>
-        type="text"
-        value="<%= published_url(@bullet.public_code) %>"
-        readonly
-        onclick="this.select()"
-        class="bullet--published-link"
-      >
-    <% end %>
-  </header>
-
-  <div
-    id="timeline"
-    class="timeline--scroller"
-    data-bullet-menu-target="list"
-    data-controller="timeline-scroll"
-    data-timeline-scroll-current-value="true"
-  >
-    <div id="timeline_section_<%= @timeline.section_of(@bullet.pops_on).id %>" class="timeline--section">
-      <div class="timeline--section-header">
-        <h2 class="pill"><%= @bullet.pops_on.strftime("%A, %b %-d") %></h2>
-      </div>
-      <% @bullets.each do |bullet| %>
-        <% if bullet == @bullet %>
-          <%= render "bullets/current_bullet", bullet: bullet %>
-        <% else %>
-          <%= render "bullets/bullet", bullet: bullet %>
-        <% end %>
-      <% end %>
-    </div>
+<main class="bullet-page" data-size="md">
+  <% if @bullet.published? %>
+    <input <%# herb:disable html-input-require-autocomplete %>
+      type="text"
+      value="<%= published_url(@bullet.public_code) %>"
+      readonly
+      onclick="this.select()"
+      class="bullet--published-link"
+    >
+  <% end %>
+  <div data-bullet-menu-target="list">
+    <%= render "bullets/current_bullet", bullet: @bullet %>
   </div>
+  <%= render "bullets/note", bullet: @bullet %>
 </main>

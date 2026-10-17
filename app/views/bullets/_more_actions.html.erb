@@ -1,0 +1,25 @@
+<div class="bullet-menu--more-actions" data-bullet-menu-target="pickerElement">
+  <%= form_with url: publish_path, method: :post,
+        class: "utilities--contents",
+        data: { turbo_stream: true, bullet_menu_target: "publish" },
+        html: { hidden: true } do %>
+    <%= hidden_field_tag :bullet_ids, "", data: { bullet_menu_target: "idList" } %>
+    <%= button_tag type: :submit, class: "bullet-menu--action-button", data: { intent: "secondary", radius: "base", size: "sm" } do %>
+      <%= icon("link", style: "color: var(--color-accent-2)") %> Publish
+    <% end %>
+  <% end %>
+
+  <%= form_with url: publish_path, method: :delete,
+        class: "utilities--contents",
+        data: { turbo_stream: true, bullet_menu_target: "unpublish" },
+        html: { hidden: true } do %>
+    <%= hidden_field_tag :bullet_ids, "", data: { bullet_menu_target: "idList" } %>
+    <%= button_tag type: :submit, class: "bullet-menu--action-button", data: { intent: "secondary", radius: "base", size: "sm" } do %>
+      <%= icon("link", style: "color: var(--color-accent-2)") %> Unpublish
+    <% end %>
+  <% end %>
+
+  <button type="button" class="bullet-menu--action-button" data-bullet-menu-target="copyLink" data-action="bullet-menu#copyLink" data-intent="secondary" data-radius="base" data-size="sm" hidden>
+    <%= icon("link", style: "color: var(--color-accent-2)") %> Copy publish link
+  </button>
+</div>

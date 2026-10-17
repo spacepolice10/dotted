@@ -29,6 +29,27 @@ accepts `before` for paging and the existing `collection`, `completed`,
 errors return HTTP 422 with arrays of messages keyed by attribute. Missing
 records return 404. Unauthenticated JSON requests return 401.
 
+## Webhook notes
+
+`POST /webhooks/:code` accepts top-level `body`, optional `author_name`, and
+optional `note` strings. Keep `body` as the short bullet summary and put longer
+plain text or rich HTML in `note`. The bullet and its note are saved together;
+omitting `note` or sending an empty string creates only the bullet. A nonempty
+bullet body is still required. The webhook code authorizes the request without
+a separate login.
+
+```json
+{
+  "author_name": "CI",
+  "body": "Build finished",
+  "note": "<h2>Build report</h2><p>All checks passed. Full details go here.</p>"
+}
+```
+
+The response remains the created bullet object with HTTP 201 and a `Location`
+header pointing to its page. The note preview appears below the bullet, and the
+full note is shown on that page.
+
 ## Routes that remain HTML or browser-focused
 
 | Routes | Reason / CLI path |

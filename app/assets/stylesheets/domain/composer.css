@@ -1,6 +1,6 @@
 /* Override Lexxy editor styling */
 
-lexxy-editor {
+.composer lexxy-editor {
     --lexxy-editor-rows: 0lh;
     --lexxy-editor-padding: var(--space-v-half) !important;
     min-block-size: var(--space-h-2);
@@ -202,7 +202,7 @@ lexxy-editor {
 
 @media (prefers-reduced-motion: reduce) {
 
-    lexxy-editor:focus-within,
+    .composer lexxy-editor:focus-within,
     .bullet:has(input:checked) .bullet--body {
         animation: none;
     }
@@ -223,12 +223,12 @@ lexxy-editor {
   }
 }
 
-lexxy-editor .link-chip {
+.composer lexxy-editor .link-chip {
   pointer-events: none;
   cursor: text;
 }
 
-lexxy-editor action-text-attachment[content-type="application/vnd.dotted.link-chip"].node--selected {
+.composer lexxy-editor action-text-attachment[content-type="application/vnd.dotted.link-chip"].node--selected {
   background: var(--color-accent-1-subtle);
   border-radius: var(--radius-subtle);
 }
@@ -237,7 +237,7 @@ lexxy-editor action-text-attachment[content-type="application/vnd.dotted.link-ch
   text-decoration: underline;
 }
 
-lexxy-editor lexxy-attachment-toolbar[data-presentation="inline"] {
+.composer lexxy-editor lexxy-attachment-toolbar[data-presentation="inline"] {
   font-size: var(--font-size-base-type);
   line-height: var(--line-height-paragraph);
   --button-size: 1lh;

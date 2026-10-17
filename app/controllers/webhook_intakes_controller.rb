@@ -13,7 +13,8 @@ class WebhookIntakesController < ApplicationController
 
     @bullet = webhook.create_bullet!(
       author_name: intake_params[:author_name],
-      body: intake_params[:body]
+      body: intake_params[:body],
+      note: intake_params[:note]
     )
 
     response.set_header('Location', bullet_url(@bullet))
@@ -25,6 +26,6 @@ class WebhookIntakesController < ApplicationController
   private
 
   def intake_params
-    params.permit(:author_name, :body)
+    params.permit(:author_name, :body, :note)
   end
 end

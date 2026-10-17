@@ -1,34 +1,51 @@
 @layer components {
-  body:has(.bullet-menu:not([hidden])) {
-    .composer--dock {
-      display: none;
-    }
-
-    .timeline--window {
-      --timeline-dock-clearance: var(--space-v-2);
-    }
-  }
-
   .bullet-menu {
-    position: relative;
-    z-index: 2;
-    flex: 0 0 auto;
-    width: 100%;
-    min-height: 0;
-    margin: 0;
-    padding: var(--space-v-half) var(--space-h-half);
-    padding-bottom: calc(var(--space-v-half) + var(--tabbar-clearance));
+    position: absolute;
+    inset-block-end: var(--tabbar-bottom);
+    inset-inline: var(--space-h-half);
+    z-index: var(--z-dropdown);
+    width: calc(100% - var(--space-h));
+    max-width: 800px;
+    margin-inline: auto;
     border: 0;
-    background: var(--background-canvas-colour);
+    background: transparent;
+    --bullet-menu-exit-transform: translateY(calc(100% + var(--tabbar-bottom) + var(--space-v-5)));
+    transform: translateY(0);
+    opacity: 1;
+    transition: transform 140ms ease-out, opacity 140ms ease-out, display 140ms allow-discrete;
 
     &[hidden] {
       display: none;
+      transform: var(--bullet-menu-exit-transform);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @starting-style {
+      transform: var(--bullet-menu-exit-transform);
+      opacity: 0;
     }
 
     &:focus-visible {
       outline: none;
       box-shadow: none;
     }
+  }
+
+  .bullet-menu--count {
+    position: absolute;
+    inset-block-end: calc(100% + var(--space-v-half));
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
+    padding: var(--space-v-half) var(--space-h);
+    border: var(--border-subtle);
+    border-radius: 999px;
+    background: var(--background-canvas-colour);
+    box-shadow: var(--shadow-base);
+    color: var(--color-invert-2);
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-xs);
+    white-space: nowrap;
   }
 
   .bullet-menu--card {
@@ -49,44 +66,36 @@
     box-shadow: var(--shadow-base);
   }
 
-  .bullet-menu--heading {
-    display: grid;
-    grid-template-columns: auto auto;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-h-half);
-    min-height: 44px;
-    padding-inline: var(--space-h);
-    color: var(--color-invert-2);
-    font-family: var(--font-family-sans);
-    font-size: 0.875rem;
-    font-weight: var(--font-weight-medium);
-
-    [data-bullet-menu-target="amount"] {
-      color: var(--color-invert-4);
-      font-size: var(--font-size-xs);
-    }
-  }
-
   .bullet-menu--actions {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: stretch;
     gap: var(--space-h-half);
     padding: var(--space-v-half) var(--space-h-half);
+  }
 
-    @container layout (width >=600px) {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  .bullet-menu--actions .bullet-menu--action-button {
+    min-width: 0;
+    gap: calc(var(--space-h-half) / 2);
+    font-size: 0.875rem;
+
+    &.hotkey-hint::after {
+      display: none;
     }
   }
 
+  .bullet-menu--more-actions {
+    display: grid;
+    gap: var(--space-v-half);
+  }
 
   .bullet-menu--action-button {
     padding: var(--space-v-half) var(--space-h-half);
     width: 100%;
     height: var(--space-v-5);
     min-height: var(--space-v-3);
-    padding-inline: var(--space-h);
+    padding-inline: var(--space-h-half);
     gap: var(--space-h-half);
     font-size: var(--font-size-base-read);
     text-align: left;
@@ -100,5 +109,32 @@
     &::after {
       margin-left: auto;
     }
+  }
+}
+
+@layer components {
+  @media (width >= 768px) {
+    .bullet-menu {
+      --bullet-menu-exit-transform: translateX(calc(100% + max(0px, (100vw - 1280px) / 2) + var(--space-h)));
+      position: absolute;
+      inset-block: var(--space-v-4) auto;
+      inset-inline: auto var(--space-h);
+      margin: 0;
+      width: min(320px, 40vw);
+      padding: 0;
+      background: transparent;
+    }
+
+    .bullet-menu--card {
+      max-height: calc(100dvh - var(--space-v-4) * 2);
+    }
+
+    .bullet-menu--actions {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bullet-menu { transition: none; }
   }
 }

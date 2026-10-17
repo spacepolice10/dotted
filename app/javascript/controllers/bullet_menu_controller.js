@@ -13,6 +13,7 @@ export default class extends Controller {
     "publish",
     "unpublish",
     "copyLink",
+    "note",
     "pickerElement",
   ];
 
@@ -50,34 +51,11 @@ export default class extends Controller {
     }
   }
 
-  idListValueChanged() {
-    this.#resizeTimeline(() => this.#updateMenu());
+  idListValueChanged(ids, previousIds = []) {
+    this.#updateMenu(ids.length > 0 && previousIds.length == 0);
   }
 
-  // Keep the same content against the usable bottom edge while the menu
-  // replaces the composer or changes height. Measure before changing layout
-  // so the browser cannot clamp the old scroll offset during expansion.
-  #resizeTimeline(update) {
-    const anchors = this.listTargets.map((list) => {
-      const rows = list.querySelectorAll(".bullet");
-      const row = rows[rows.length - 1] || list.lastElementChild;
-      if (!row) return null;
-      const clearance = parseFloat(getComputedStyle(list).scrollPaddingBottom) || 0;
-      return { list, row, offset: row.getBoundingClientRect().bottom -
-        list.getBoundingClientRect().bottom + clearance };
-    }).filter(Boolean);
-
-    update();
-
-    for (const { list, row, offset } of anchors) {
-      const clearance = parseFloat(getComputedStyle(list).scrollPaddingBottom) || 0;
-      const nextOffset = row.getBoundingClientRect().bottom -
-        list.getBoundingClientRect().bottom + clearance;
-      list.scrollTop += nextOffset - offset;
-    }
-  }
-
-  #updateMenu() {
+  #updateMenu(opening) {
     const csv = this.idListValue.join(",");
 
     this.idListTargets.forEach((input) => {
@@ -95,7 +73,7 @@ export default class extends Controller {
       });
     }
 
-    if (this.hasMenuTarget && this.idListValue.length > 0) {
+    if (this.hasMenuTarget && opening) {
       this.menuTarget.focus({ preventScroll: true });
     }
 
@@ -122,17 +100,26 @@ export default class extends Controller {
     input.value = this.idListValue.join(",");
   }
 
+  openNote() {
+    if (this.idListValue.length != 1) return;
+    const checkbox = this.checkboxTargets.find((checkbox) => checkbox.checked);
+    if (!checkbox) return;
+    this.openPicker({ params: { dialog: "note_dialog", url: checkbox.dataset.noteUrl } });
+  }
+
   openPicker(event) {
     if (this.idListValue.length == 0) return;
 
     const { dialog: dialogId, url: path } = event.params;
     const picker = this.pickerElementTargets.find((target) => target.closest("dialog")?.id == dialogId);
-    if (!picker || !path) return;
+    if (!picker) return;
     const dialog = picker.closest("dialog");
 
-    const url = new URL(path, window.location.origin);
-    url.searchParams.set("bullet_ids", this.idListValue.join(","));
-    picker.src = url.pathname + url.search;
+    if (path) {
+      const url = new URL(path, window.location.origin);
+      url.searchParams.set("bullet_ids", this.idListValue.join(","));
+      picker.src = url.pathname + url.search;
+    }
 
     if (dialog.open) return;
 
@@ -144,10 +131,6 @@ export default class extends Controller {
       dialog.close();
       dialog.showModal();
     }
-  }
-
-  clear() {
-    this.#restore();
   }
 
   async copyLink() {
@@ -218,21 +201,22 @@ export default class extends Controller {
   }
 
   // =====================================================================
-  // Status actions (complete / publish)
+  // Status actions
   // =====================================================================
 
   #syncStatusActions() {
     const checked = this.checkboxTargets.filter((checkbox) => checkbox.checked);
+    if (this.hasNoteTarget) {
+      this.noteTarget.hidden = checked.length != 1;
+    }
     const done = this.#sharedDataset(checked, "bulkDone");
-    const published = this.#sharedDataset(checked, "bulkPublished");
 
     if (this.hasCompleteTarget) this.completeTarget.hidden = done != "false";
     if (this.hasUncompleteTarget) this.uncompleteTarget.hidden = done != "true";
-    if (this.hasPublishTarget) this.publishTarget.hidden = published != "false";
-    if (this.hasUnpublishTarget) this.unpublishTarget.hidden = published != "true";
+    if (this.hasPublishTarget) this.publishTarget.hidden = !checked.some((checkbox) => checkbox.dataset.bulkPublished == "false");
+    if (this.hasUnpublishTarget) this.unpublishTarget.hidden = !checked.some((checkbox) => checkbox.dataset.bulkPublished == "true");
     if (this.hasCopyLinkTarget) {
-      const singlePublished = checked.length == 1 && checked[0].dataset.bulkPublished == "true";
-      this.copyLinkTarget.hidden = !singlePublished;
+      this.copyLinkTarget.hidden = checked.length != 1 || checked[0].dataset.bulkPublished != "true";
     }
   }
 

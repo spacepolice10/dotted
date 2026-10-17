@@ -39,81 +39,34 @@ class BulletMenuMobileSystemTest < ApplicationSystemTestCase
     assert_selector '.bullet-menu', visible: true
   end
 
-  test 'opening and closing the menu keeps the newest bullet above the dock' do
-    18.times { |i| create_bullet!(@user, body: "Older line #{i}", created_at: (18 - i).minutes.ago) }
+  test 'the floating menu never scrolls or resizes the timeline' do
+    25.times { |i| create_bullet!(@user, body: "Older line #{i}", created_at: (i + 1).minutes.ago) }
     visit bullets_path
-    assert_selector '.bullet--body', text: 'Selectable line'
-
-    before = page.evaluate_script("document.querySelector('.timeline--scroller').scrollTop")
-    page.execute_script("document.querySelector('.timeline--scroller .bullet:last-of-type input').click()")
-    assert_selector '.bullet-menu'
-
-    metrics = page.evaluate_script(<<~JS)
+    metrics = <<~JS
       (() => {
         const list = document.querySelector('.timeline--scroller')
-        const rows = list.querySelectorAll('.bullet')
-        return { rowBottom: rows[rows.length - 1].getBoundingClientRect().bottom,
-                 listBottom: list.getBoundingClientRect().bottom,
-                 scrollTop: list.scrollTop }
+        const rect = list.getBoundingClientRect()
+        return [list.scrollTop, list.scrollHeight, rect.top, rect.height,
+          document.querySelector('.timeline--scroller .bullet').getBoundingClientRect().top]
       })()
     JS
-    assert_operator metrics['rowBottom'], :<=, metrics['listBottom']
-    assert_operator metrics['scrollTop'], :>, before
+    before = page.evaluate_script(metrics)
 
-    find('button[aria-label="Clear selection"]').click
+    page.execute_script("document.querySelector('.timeline--scroller .bullet input').click()")
+    assert_selector '.bullet-menu--count', text: '1 selected'
+    assert_no_selector '.bullet-menu--heading', visible: :all
+    assert_no_selector 'button[aria-label="Clear selection"]', visible: :all
+    assert_equal before, page.evaluate_script(metrics)
+
+    page.execute_script("document.querySelectorAll('.timeline--scroller .bullet input')[1].click()")
+    assert_selector '.bullet-menu--count', text: '2 selected'
+    assert_equal before, page.evaluate_script(metrics)
+
+    find('.bullet-menu').send_keys(:escape)
     assert_no_selector '.bullet-menu'
-    assert_in_delta before, page.evaluate_script(
-      "document.querySelector('.timeline--scroller').scrollTop"
-    ), 1
+    assert_equal before, page.evaluate_script(metrics)
   end
 
-  test 'on mobile the menu sits below and shrinks the timeline' do
-    visit bullets_path
-
-    before = page.evaluate_script(<<~JS)
-      (() => {
-        const main = document.querySelector('body > main').getBoundingClientRect()
-        const tabbar = document.querySelector('.tabbar--navigation')
-        const composer = document.querySelector('.composer--dock')
-        return {
-          mainHeight: main.height,
-          tabbarHeight: tabbar ? tabbar.getBoundingClientRect().height : null,
-          composerHeight: composer ? composer.getBoundingClientRect().height : null
-        }
-      })()
-    JS
-
-    page.execute_script("document.querySelector('[data-bullet-menu-target=checkbox]').click()")
-    assert_selector '.bullet-menu'
-
-    after = page.evaluate_script(<<~JS)
-      (() => {
-        const main = document.querySelector('body > main').getBoundingClientRect()
-        const menu = document.querySelector('.bullet-menu').getBoundingClientRect()
-        const tabbar = document.querySelector('.tabbar--navigation')
-        const composer = document.querySelector('.composer--dock')
-        return {
-          mainHeight: main.height,
-          mainBottom: main.bottom,
-          menuTop: menu.top,
-          tabbarHeight: tabbar ? tabbar.getBoundingClientRect().height : null,
-          composerHeight: composer ? composer.getBoundingClientRect().height : null
-        }
-      })()
-    JS
-
-    assert_operator after['mainHeight'], :<, before['mainHeight']
-    assert_in_delta before['tabbarHeight'], after['tabbarHeight'], 1
-    assert_equal 0, after['composerHeight']
-    assert_no_selector '.composer--dock'
-
-    find('button[aria-label="Clear selection"]').click
-    assert_selector '.composer--dock'
-    assert_in_delta before['mainHeight'], page.evaluate_script(
-      "document.querySelector('body > main').getBoundingClientRect().height"
-    ), 1
-    assert_in_delta after['mainBottom'], after['menuTop'], 1
-  end
 end
 
 class BulletMenuDesktopSystemTest < ApplicationSystemTestCase
@@ -123,29 +76,36 @@ class BulletMenuDesktopSystemTest < ApplicationSystemTestCase
     create_bullet!(@user, body: 'Selectable line', created_at: Time.current)
   end
 
-  test 'on desktop the menu sits below and shrinks the timeline' do
-    visit bullets_path
+  test 'on desktop the menu floats on the right without resizing the timeline' do
+    [[1400, 1400], [768, 1024], [1024, 768]].each do |width, height|
+      page.driver.browser.manage.window.resize_to(width, height)
+      visit bullets_path
 
-    before_height = page.evaluate_script(
-      "document.querySelector('body > main').getBoundingClientRect().height"
-    )
+      before_height = page.evaluate_script(
+        "document.querySelector('body > main').getBoundingClientRect().height"
+      )
 
-    page.execute_script("document.querySelector('[data-bullet-menu-target=checkbox]').click()")
-    assert_selector '.bullet-menu'
+      page.execute_script("document.querySelector('[data-bullet-menu-target=checkbox]').click()")
+      assert_selector '.bullet-menu'
 
-    metrics = page.evaluate_script(<<~JS)
-      (() => {
-        const main = document.querySelector('body > main').getBoundingClientRect()
-        const menu = document.querySelector('.bullet-menu').getBoundingClientRect()
-        return {
-          mainHeight: main.height,
-          mainBottom: main.bottom,
-          menuTop: menu.top
-        }
-      })()
-    JS
+      metrics = page.evaluate_script(<<~JS)
+        (() => {
+          const main = document.querySelector('body > main').getBoundingClientRect()
+          const menu = document.querySelector('.bullet-menu').getBoundingClientRect()
+          return {
+            mainHeight: main.height,
+            mainBottom: main.bottom,
+            menuTop: menu.top,
+            menuRight: menu.right,
+            position: getComputedStyle(document.querySelector('.bullet-menu')).position
+          }
+        })()
+      JS
 
-    assert_operator metrics['mainHeight'], :<, before_height
-    assert_in_delta metrics['mainBottom'], metrics['menuTop'], 1
+      assert_in_delta before_height, metrics['mainHeight'], 1
+      assert_equal 'absolute', metrics['position']
+      assert_operator metrics['menuRight'], :>, page.evaluate_script('innerWidth / 2')
+      assert_selector '.composer--dock'
+    end
   end
 end

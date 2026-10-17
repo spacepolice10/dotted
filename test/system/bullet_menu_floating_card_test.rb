@@ -19,7 +19,7 @@ class BulletMenuFloatingCardSystemTest < ApplicationSystemTestCase
     8.times { |i| create_bullet!(@user, body: "Selectable line #{i}", created_at: Time.current) }
   end
 
-  test "docked menu stays expanded while selecting more bullets" do
+  test "floating menu stays expanded while selecting more bullets" do
     visit bullets_path
     page.execute_script("document.querySelector('[data-bullet-menu-target=checkbox]').click()")
     assert_selector ".bullet-menu--card"
@@ -30,14 +30,23 @@ class BulletMenuFloatingCardSystemTest < ApplicationSystemTestCase
     assert_equal "auto", page.evaluate_script(
       "getComputedStyle(document.querySelector('.bullet-menu--card')).pointerEvents"
     )
-    center_offset = page.evaluate_script(<<~JS)
+    page.document.synchronize do
+      running = page.evaluate_script("document.querySelector('.bullet-menu').getAnimations().some(animation => animation.playState == 'running')")
+      raise Capybara::ExpectationNotMet if running
+    end
+    pill = page.evaluate_script(<<~JS)
       (() => {
         const card = document.querySelector('.bullet-menu--card').getBoundingClientRect();
-        const button = document.querySelector('.bullet-menu--card button[aria-label="Clear selection"]').getBoundingClientRect();
-        return Math.abs((card.left + card.right - button.left - button.right) / 2);
+        const count = document.querySelector('.bullet-menu--count').getBoundingClientRect();
+        return { offset: Math.abs((card.left + card.right - count.left - count.right) / 2),
+                 bottom: count.bottom, cardTop: card.top, top: count.top };
       })()
     JS
-    assert_operator center_offset, :<=, 2, "Clear selection should be centered in the card"
+    assert_operator pill['offset'], :<=, 2
+    assert_operator pill['bottom'], :<, pill['cardTop']
+    assert_operator pill['top'], :>=, 0
+    assert_no_selector '.bullet-menu--heading', visible: :all
+    assert_no_selector 'button[aria-label="Clear selection"]', visible: :all
 
     clicked_bullet = page.evaluate_script(<<~JS)
       (() => {
@@ -58,10 +67,10 @@ class BulletMenuFloatingCardSystemTest < ApplicationSystemTestCase
     assert_selector '[data-bullet-menu-target=checkbox]:checked', count: 2, visible: :all
 
     assert_selector '.bullet-menu--actions', visible: true
-    assert_selector '.bullet-menu--heading', text: '2 selected'
+    assert_selector '.bullet-menu--count', text: '2 selected'
 
     page.execute_script("document.querySelectorAll('[data-bullet-menu-target=checkbox]')[2].click()")
-    assert_selector '.bullet-menu--heading', text: '3 selected'
+    assert_selector '.bullet-menu--count', text: '3 selected'
     assert_selector '.bullet-menu--actions', visible: true
     assert_no_selector '.bullet-menu details, .bullet-menu summary', visible: :all
   end

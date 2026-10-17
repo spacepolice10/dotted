@@ -6,7 +6,7 @@ module Bullet::Searchable
 
   # Runs after ::Searchable's included block, so the class_attribute exists.
   included do
-    self.search_preload = %i[collection rich_text_body published_entity]
+    self.search_preload = [:collection, :rich_text_body, :published_entity, { note: :rich_text_content }]
   end
 
   def searchable?

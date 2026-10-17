@@ -128,13 +128,13 @@ class BulletMenuPickerSystemTest < ApplicationSystemTestCase
     visit bullets_path
     select_bullet
 
-    find_button('Complete').click
+    find_button('Done', exact: true).click
 
     assert_no_selector '.bullet-menu', visible: true
     assert_selector "#bullet_#{@bullet.id}[data-bullet-done=true]"
 
     select_bullet
-    find_button('Uncomplete').click
+    find_button('Undo', exact: true).click
 
     assert_selector "#bullet_#{@bullet.id}[data-bullet-done=false]"
   end
@@ -144,6 +144,10 @@ class BulletMenuPickerSystemTest < ApplicationSystemTestCase
   def select_bullet
     page.execute_script("document.querySelector('[data-bullet-menu-target=checkbox]').click()")
     assert_selector '.bullet-menu', visible: true
+    page.document.synchronize do
+      running = page.evaluate_script("document.querySelector('.bullet-menu').getAnimations().some(animation => animation.playState == 'running')")
+      raise Capybara::ExpectationNotMet if running
+    end
   end
 
   def focused_option_label

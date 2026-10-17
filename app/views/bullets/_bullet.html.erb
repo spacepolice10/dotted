@@ -11,6 +11,8 @@
     data-bulk-done="<%= bullet.done? %>"
     data-bulk-published="<%= bullet.published? %>"
     data-public-url="<%= published_url(bullet.public_code) if bullet.published? %>"
+    data-note-url="<%= edit_bullet_note_path(bullet) %>"
+    data-with-note="<%= bullet.with_note? %>"
     data-bullet-menu-target="checkbox"
     data-action="bullet-menu#toggle"
     class="utilities--sr-only"
@@ -58,6 +60,9 @@
         <%= bullet.body %>
       <% end %>
     </div>
+    <% if bullet.with_note? %>
+      <%= render "notes/preview", note: bullet.note, url: bullet_path(bullet) %>
+    <% end %>
     <% if bullet.status.present? %>
       <span
         class="bullet--status bullet--status--<%= bullet.status %>"
@@ -66,7 +71,7 @@
         <%= icon(bullet.marker_icon) %>
         <span>
           <% if bullet.status == "postponed" %>
-            It was postponed at <%= time_tag bullet.last_postponed_at, bullet.last_postponed_at.strftime("%H:%M on %b %-d, %Y") %>
+            Postponed <%= pluralize(bullet.postponements_number, "time") %>
           <% elsif bullet.status == "published" %>
             It is published
           <% elsif bullet.status == "done" %>

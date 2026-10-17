@@ -1,0 +1,6 @@
+<%= turbo_stream.replace_all @notable do %>
+  <%= render "bullets/bullet", bullet: @notable %>
+<% end %>
+<%= turbo_stream.replace dom_id(@notable, :note) do %>
+  <%= render "bullets/note", bullet: @notable %>
+<% end %>

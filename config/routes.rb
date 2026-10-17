@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   end
 
   resources :bullets, except: %i[new edit] do
+    resource :note, only: %i[edit update]
     collection do
       get :export, to: 'bullets/exports#show'
     end

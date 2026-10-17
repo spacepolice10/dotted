@@ -29,11 +29,15 @@ class Webhook < ApplicationRecord
     active.find_by(code_digest: digest(code))
   end
 
-  def create_bullet!(author_name:, body:)
-    user.bullets.create!(
-      author_name: author_name.to_s.strip.presence,
-      body: body
-    )
+  def create_bullet!(author_name:, body:, note: nil)
+    user.bullets.transaction do
+      bullet = user.bullets.create!(
+        author_name: author_name.to_s.strip.presence,
+        body: body
+      )
+      bullet.create_note!(content: note) if note.present?
+      bullet
+    end
   end
 
   private
