@@ -27,6 +27,11 @@
   
       color: var(--color-invert-2);
       cursor: pointer;
+
+      &:disabled {
+        opacity: var(--opacity-half);
+        cursor: not-allowed;
+      }
       appearance: none;
 
       @media (pointer: coarse) {
@@ -34,7 +39,7 @@
       }
   
       @media (hover: hover) {
-        &:hover {
+        &:hover:not(:disabled) {
           background: var(--color-2);
           color: var(--color-invert-2);
         }
@@ -43,7 +48,8 @@
       &:focus-visible {
         background: var(--color-2);
         color: var(--color-invert-2);
-        outline: none;
+        outline: 2px solid var(--color-focus);
+        outline-offset: -2px;
       }
   
       &[aria-selected="true"]:focus-visible,

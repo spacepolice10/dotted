@@ -23,7 +23,7 @@ class SearchSystemTest < ApplicationSystemTestCase
   test 'activating the field stand-in opens the search dialog' do
     visit search_path
 
-    find('#search_dock button[aria-label=Search]').click
+    find('#search button[aria-label=Search]').click
 
     assert_current_path search_path
     assert_selector 'dialog#search_picker_dialog[open]'
@@ -35,7 +35,7 @@ class SearchSystemTest < ApplicationSystemTestCase
     match = create_bullet!(@user, body: 'Buy milk today')
 
     visit search_path
-    find('#search_dock button[aria-label=Search]').click
+    find('#search button[aria-label=Search]').click
     find('dialog#search_picker_dialog input[name=search_term]').set('milk')
 
     assert_selector "dialog#search_picker_dialog a.combobox--item[href='#{bullet_path(match)}'] mark.search--term",
@@ -76,7 +76,7 @@ class SearchSystemTest < ApplicationSystemTestCase
 
   test 'escape with an empty field closes the dialog' do
     visit search_path
-    find('#search_dock button[aria-label=Search]').click
+    find('#search button[aria-label=Search]').click
     assert_selector 'dialog#search_picker_dialog[open]'
 
     find('dialog#search_picker_dialog input[name=search_term]').send_keys(:escape)
@@ -88,7 +88,7 @@ class SearchSystemTest < ApplicationSystemTestCase
     match = create_bullet!(@user, body: 'Buy milk today')
 
     visit search_path
-    find('#search_dock button[aria-label=Search]').click
+    find('#search button[aria-label=Search]').click
     field = find('dialog#search_picker_dialog input[name=search_term]')
     field.set('milk')
     assert_selector "dialog#search_picker_dialog a.combobox--item[href='#{bullet_path(match)}']"
@@ -132,7 +132,8 @@ class SearchSystemTest < ApplicationSystemTestCase
     find('dialog#search_picker_dialog input[name=search_term]').set('milk')
     find("dialog#search_picker_dialog a.combobox--item[href='#{bullet_path(bullet)}']").click
 
-    assert_selector 'main.timeline--window--focus'
+    assert_selector 'main.bullet-page'
+    assert_current_path bullet_path(bullet)
 
     selection = nil
     10.times do
@@ -241,7 +242,7 @@ class SearchSystemTest < ApplicationSystemTestCase
     create_bullet!(@user, body: 'Buy milk tomorrow')
 
     visit search_path
-    find('#search_dock button[commandfor="search_picker_dialog"]').click
+    find('#search button[commandfor="search_picker_dialog"]').click
     field = find('dialog#search_picker_dialog input[name=search_term]')
     field.set('milk')
 

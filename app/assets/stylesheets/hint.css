@@ -24,7 +24,7 @@
     /* 1px hairline — no stroke-width token in the design system */
     border: 1px solid var(--color-invert-2);
     border-radius: var(--radius-base);
-    box-shadow: var(--shadow-base);
+    box-shadow: var(--shadow-medium);
     font-weight: 400;
     pointer-events: none;
     position-area: block-start center;

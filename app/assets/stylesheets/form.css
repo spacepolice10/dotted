@@ -26,7 +26,7 @@
 
     & small {
       display: block;
-      font-size: var(--font-size-base-ready);
+      font-size: var(--font-size-base-read);
       color: var(--color-invert-2);
       margin-bottom: var(--space-v);
       margin-left: 2px;
@@ -49,8 +49,8 @@
     color: var(--color-invert-2);
 
     &::placeholder {
-      color: var(--color-invert-4);
-      opacity: var(--opacity-half);
+      color: var(--color-invert-3);
+      opacity: 1;
       font-size: var(--font-size-base-read);
     }
 
@@ -58,6 +58,14 @@
       opacity: var(--opacity-half);
       cursor: not-allowed;
     }
+  }
+
+  /* Keep rich-text ink and canvas legible in both application themes. */
+  lexxy-editor {
+    --lexxy-color-ink: var(--color-invert-1);
+    --lexxy-color-ink-medium: var(--color-invert-3);
+    --lexxy-color-canvas: var(--color-1);
+    --lexxy-focus-ring-color: var(--color-focus);
   }
 
   /* ── Checkbox & Radios ─────────────────────────────── */
@@ -98,6 +106,11 @@
 
     &:hover {
       background: var(--color-2);
+    }
+
+    &:has(input:focus-visible) {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
     }
 
     &:has(input:checked) {

@@ -11,6 +11,15 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   include ActiveJob::TestHelper
 
+  teardown do
+    # CDP overrides survive Capybara's session reset and otherwise leak between
+    # mobile, desktop, theme and reduced-motion tests.
+    browser = page.driver.browser
+    browser.execute_cdp('Emulation.clearDeviceMetricsOverride')
+    browser.execute_cdp('Emulation.setTouchEmulationEnabled', enabled: false)
+    browser.execute_cdp('Emulation.setEmulatedMedia', features: [])
+  end
+
   def sign_in_as(user)
     visit new_authentication_path
 

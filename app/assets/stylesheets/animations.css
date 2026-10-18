@@ -89,3 +89,30 @@
     animation: side-back 0.2s ease-out;
   }
 }
+
+/* Keep state changes immediate when motion is reduced. Toast dismissal retains
+   its own timer/animation event; it is handled in toasts.css. */
+@layer animations {
+  @media (prefers-reduced-motion: reduce) {
+    .animations--spin,
+    .animations--popout,
+    .animations--fall-in,
+    .animations--side-in:not([popover]),
+    .animations--side-back:not([popover]),
+    label:has(input:checked)::after,
+    .bullet:has(input:checked) .bullet--body {
+      animation: none;
+    }
+
+    dialog,
+    dialog::backdrop,
+    [popover],
+    .select--trigger::picker(select),
+    .hotkey-hint::after,
+    .bullet-menu,
+    .composer--control,
+    .composer--control .icon-wrap {
+      transition: none;
+    }
+  }
+}

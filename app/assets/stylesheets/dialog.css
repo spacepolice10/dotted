@@ -11,7 +11,7 @@
     border-top-right-radius: var(--radius-strong);
     background: var(--background-canvas-colour);
     box-shadow:
-      var(--shadow-base),
+      var(--shadow-medium),
       0 0 0 1px color-mix(in oklch, var(--color-2) 35%, transparent);
     color: var(--color-invert-2);
     width: 100%;

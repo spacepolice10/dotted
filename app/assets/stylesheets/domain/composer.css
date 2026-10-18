@@ -8,6 +8,7 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    min-inline-size: 0;
     height: fit-content;
     font-size: var(--font-size-base-type);
     background: var(--color-1);
@@ -101,6 +102,8 @@
     }
 
     .composer--control {
+        /* Contain icons throughout the width transition, including mid-expansion. */
+        overflow: hidden;
         display: grid;
         place-items: center;
         flex-shrink: 0;
@@ -135,7 +138,7 @@
         opacity: 0;
         scale: 0.5;
         visibility: hidden;
-        overflow: clip;
+        overflow: hidden;
         pointer-events: none;
         transition:
             width 0.18s cubic-bezier(0.22, 1, 0.36, 1),
@@ -201,6 +204,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
+    .composer lexxy-editor {
+        transition: none;
+    }
 
     .composer lexxy-editor:focus-within,
     .bullet:has(input:checked) .bullet--body {

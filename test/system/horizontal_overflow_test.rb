@@ -5,7 +5,7 @@ require 'application_system_test_case'
 class HorizontalOverflowSystemTest < ApplicationSystemTestCase
   driven_by :selenium, using: :headless_chrome, screen_size: [390, 844]
 
-  test 'status badges do not widen the timeline without a composer' do
+  test 'completed bullets and status badges fit narrow pages without a composer' do
     user = users(:one)
     done = create_bullet!(user, body: 'Done')
     done.complete!
@@ -14,9 +14,14 @@ class HorizontalOverflowSystemTest < ApplicationSystemTestCase
     published.publish!
     sign_in_as(user)
 
-    [bullets_path(completed: true), bullet_path(postponed), bullet_path(published)].each do |path|
+    [[bullets_path(completed: true), done], [bullet_path(postponed), postponed], [bullet_path(published), published]].each do |path, bullet|
       visit path
-      assert_selector '.bullet--status'
+      assert_selector "#bullet_#{bullet.id}"
+      if bullet.done?
+        assert_selector "#bullet_#{bullet.id}[data-bullet-done=true]"
+      else
+        assert_selector "#bullet_#{bullet.id} .bullet--status--#{bullet.status}"
+      end
       assert_no_selector '.composer'
 
       [320, 390].each do |width|
@@ -25,8 +30,8 @@ class HorizontalOverflowSystemTest < ApplicationSystemTestCase
           (() => ({
             viewport: document.documentElement.clientWidth,
             page: document.documentElement.scrollWidth,
-            scrollerWidth: document.querySelector('.timeline--scroller').clientWidth,
-            scrollerScrollWidth: document.querySelector('.timeline--scroller').scrollWidth
+            scrollerWidth: (document.querySelector('.timeline--scroller') || document.querySelector('.bullet-page')).clientWidth,
+            scrollerScrollWidth: (document.querySelector('.timeline--scroller') || document.querySelector('.bullet-page')).scrollWidth
           }))()
         JS
         assert_operator metrics['scrollerScrollWidth'], :<=, metrics['scrollerWidth'], "#{path} at #{width}px: #{metrics.inspect}"
@@ -50,7 +55,6 @@ class HorizontalOverflowSystemTest < ApplicationSystemTestCase
       editor = find('#bullet_composer lexxy-editor .lexxy-editor__content')
       editor.send_keys('A thought')
       assert_selector 'lexxy-editor:not(.lexxy-editor--empty)'
-      sleep 0.25
       assert_no_horizontal_overflow
 
       editor.send_keys([:command, 'a'], :backspace)
@@ -61,19 +65,27 @@ class HorizontalOverflowSystemTest < ApplicationSystemTestCase
   private
 
   def assert_no_horizontal_overflow
-    metrics = page.evaluate_script(<<~JS)
-      (() => {
-        const composer = document.querySelector('.composer')
-        const root = document.documentElement
-        return {
-          composerWidth: composer.clientWidth,
-          composerScrollWidth: composer.scrollWidth,
-          viewportWidth: root.clientWidth,
-          pageScrollWidth: root.scrollWidth
-        }
-      })()
-    JS
+    # Control widths animate when content appears/disappears; wait for the
+    # observable layout condition rather than a fixed delay.
+    metrics = nil
+    page.document.synchronize(Capybara.default_max_wait_time, errors: [Capybara::ExpectationNotMet]) do
+      metrics = page.evaluate_script(<<~JS)
+        (() => {
+          const composer = document.querySelector('.composer')
+          const root = document.documentElement
+          return {
+            composerWidth: composer.clientWidth,
+            composerScrollWidth: composer.scrollWidth,
+            viewportWidth: root.clientWidth,
+            pageScrollWidth: root.scrollWidth
+          }
+        })()
+      JS
 
+      unless metrics['composerScrollWidth'] <= metrics['composerWidth'] && metrics['pageScrollWidth'] <= metrics['viewportWidth']
+        raise Capybara::ExpectationNotMet, metrics.inspect
+      end
+    end
     assert_operator metrics['composerScrollWidth'], :<=, metrics['composerWidth'], metrics.inspect
     assert_operator metrics['pageScrollWidth'], :<=, metrics['viewportWidth'], metrics.inspect
   end

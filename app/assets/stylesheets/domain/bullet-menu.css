@@ -27,7 +27,8 @@
     }
 
     &:focus-visible {
-      outline: none;
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
       box-shadow: none;
     }
   }
@@ -41,7 +42,7 @@
     border: var(--border-subtle);
     border-radius: 999px;
     background: var(--background-canvas-colour);
-    box-shadow: var(--shadow-base);
+    box-shadow: var(--shadow-medium);
     color: var(--color-invert-2);
     font-family: var(--font-family-sans);
     font-size: var(--font-size-xs);
@@ -63,7 +64,7 @@
     background: var(--background-canvas-colour);
     border: var(--border-subtle);
     border-radius: var(--radius-strong);
-    box-shadow: var(--shadow-base);
+    box-shadow: var(--shadow-medium);
   }
 
   .bullet-menu--actions {

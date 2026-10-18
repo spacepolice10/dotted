@@ -83,7 +83,7 @@
   }
 
   .attachment--file small {
-    color: var(--color-invert-4);
+    color: var(--color-invert-3);
     font-size: var(--font-size-xs);
   }
 

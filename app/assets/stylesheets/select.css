@@ -9,6 +9,12 @@
     }
 
     .select--wrapper[data-fallback="true"] {
+        &:has(.select--trigger:focus-visible) .select--fallback-trigger {
+            outline: 2px solid var(--color-focus);
+            outline-offset: 2px;
+            border-radius: var(--radius-full);
+        }
+
         .select--trigger {
             position: absolute;
             inset: 0;
@@ -61,9 +67,9 @@
             overflow: auto;
 
             background: var(--color-1);
-            border: var(--border-base);
+            border: var(--border-subtle);
             border-radius: var(--radius-strong);
-            box-shadow: var(--shadow-base);
+            box-shadow: var(--shadow-medium);
 
             opacity: 0;
             transform: translateY(calc(var(--space-v-half) * -1));

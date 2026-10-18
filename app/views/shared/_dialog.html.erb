@@ -8,6 +8,7 @@
 %>
 <dialog
   id="<%= id %>"
+  aria-labelledby="<%= id %>_title"
   class="dialog<%= " #{class_name}" if class_name.present? %>"
   data-size="<%= size %>"
   closedby="any"
@@ -16,13 +17,12 @@
   data-action="<%= action_list.join(" ") %>"
 >
   <header>
-    <h2> <%= name %></h2>
+    <h2 id="<%= id %>_title"><%= name %></h2>
     <button
       type="button"
       class="dialog--hide button dropdown--element-hide"
       data-intent="primary"
       data-radius="full"
-      data-size="xs"
       data-content="icon"
       commandfor="<%= id %>"
       command="close"

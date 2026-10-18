@@ -22,7 +22,7 @@
     border: 1px solid var(--color-invert-4);
     border-radius: var(--radius-base);
     background: var(--color-2);
-    color: var(--color-invert-4);
+    color: var(--color-invert-3);
     font: inherit;
   }
 
@@ -124,6 +124,11 @@
 
   .bullet--status--published {
     color: var(--model-color-2);
+  }
+
+  /* Keep the badge hue on its frame/icon; its small label needs text contrast. */
+  .bullet--status > span:not(.icon-wrap) {
+    color: var(--color-invert-2);
   }
 
   .bullet--status .icon-wrap {
@@ -230,14 +235,12 @@
   }
 
   .bullet:has(> input:focus-visible) :is(.bullet--select-checkbox, .bullet--select-square)::before {
-    outline: 2px solid var(--color-accent-1);
+    outline: 2px solid var(--color-focus);
     outline-offset: 3px;
   }
 
   .bullet:has(> input:focus-visible) .bullet--body {
-    outline: 1px solid color-mix(in oklch,
-        var(--color-accent-1) 80%,
-        transparent);
+    outline: 2px solid var(--color-focus);
   }
 
   .bullet[data-bullet-done="true"] {

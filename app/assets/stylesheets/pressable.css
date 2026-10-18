@@ -17,6 +17,11 @@
     transition: background-color .08s ease, color .08s ease, border-color .08s ease, box-shadow .08s ease;
   }
 
+  :is(button, a, :where(.button))[data-intent][data-radius="base"],
+  [role="button"][data-radius="base"] {
+    border-radius: var(--radius-base);
+  }
+
   :is(button, a, :where(.button))[data-intent]:disabled,
   [role="button"]:disabled {
     opacity: var(--opacity-half);
@@ -25,7 +30,7 @@
 
   :is(button, a, :where(.button))[data-intent]:focus-visible,
   [role="button"]:focus-visible {
-    outline: 2px solid var(--color-accent-1);
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
   }
 
@@ -115,8 +120,10 @@
 
   :is(button, a, :where(.button))[data-intent="accent"]:focus-visible,
   [role="button"][data-intent="accent"]:focus-visible {
-    outline: 3px solid var(--model-color-2);
+    outline: 3px solid var(--color-focus);
     outline-offset: 7px;
+    clip-path: none;
+    animation: none;
   }
 
   :is(button, a, :where(.button))[data-intent],

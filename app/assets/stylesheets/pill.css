@@ -7,7 +7,7 @@
     border-radius: var(--radius-full);
     border: var(--border-subtle);
     background: var(--color-1);
-    color: var(--color-invert-4);
+    color: var(--color-invert-3);
     font-family: var(--font-family-mono);
     font-size: var(--font-size-xs);
     line-height: 1;
@@ -26,7 +26,7 @@
   .pill--notify {
     border: 1px solid var(--model-color-2);
     background: var(--model-color-2-bg);
-    color: var(--model-color-2);
+    color: var(--color-invert-2);
   }
   .pill--accent {
     border: 1px solid var(--color-accent-1);

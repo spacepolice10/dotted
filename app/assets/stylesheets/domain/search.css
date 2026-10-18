@@ -36,7 +36,7 @@
   .search--result-type {
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-medium);
-    color: var(--color-invert-4);
+    color: var(--color-invert-3);
   }
 
   .search--result-body {

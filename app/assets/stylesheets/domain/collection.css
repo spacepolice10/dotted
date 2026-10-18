@@ -25,7 +25,7 @@
     border: var(--border-subtle);
     border-radius: var(--radius-full);
     background: var(--color-1);
-    box-shadow: var(--shadow-base);
+    box-shadow: var(--shadow-medium);
 
     h1 {
       min-width: 0;

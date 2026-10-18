@@ -71,7 +71,7 @@ body:has(.tabbar--navigation) {
     border-radius: inherit;
     background-color: var(--color-1);
     border: var(--border-subtle);
-    box-shadow: var(--shadow-base);
+    box-shadow: var(--shadow-medium);
   }
 }
 
@@ -148,7 +148,7 @@ body:has(.tabbar--navigation) {
   border-radius: inherit;
   background: var(--model-color-2-bg);
   border: 2px solid var(--model-color-2);
-  box-shadow: var(--shadow-base);
+  box-shadow: var(--shadow-medium);
 }
 
 .tabbar--item-active .tabbar--item-name {

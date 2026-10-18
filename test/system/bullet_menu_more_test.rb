@@ -4,6 +4,7 @@ require 'application_system_test_case'
 
 class BulletMenuMoreSystemTest < ApplicationSystemTestCase
   setup do
+    page.current_window.resize_to(1400, 1400)
     @user = users(:one)
     sign_in_as(@user)
     @bullet = create_bullet!(@user, body: 'Additional actions')

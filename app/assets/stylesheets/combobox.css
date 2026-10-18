@@ -18,11 +18,17 @@
         border: 1px solid transparent;
         border-radius: var(--radius-base);
 
-        &:focus-visible {
-            outline: 1px solid var(--model-color-2);
+        &:disabled {
+            opacity: var(--opacity-half);
+            cursor: not-allowed;
         }
 
-        &:hover {
+        &:focus-visible {
+            outline: 2px solid var(--color-focus);
+            outline-offset: -2px;
+        }
+
+        &:hover:not(:disabled) {
             background: var(--color-3);
         }
 

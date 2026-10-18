@@ -14,6 +14,9 @@
                 --color-accent-2: light-dark(oklch(0.775 0.154 56), oklch(0.84 0.14 56));
                 --color-accent-2-subtle: light-dark(oklch(0.92 0.08 56), oklch(0.35 0.10 56));
 
+                /* Focus needs a stronger light-theme contrast than decorative accents. */
+                --color-focus: light-dark(oklch(0.50 0.12 241), oklch(0.82 0.11 241));
+
                 /* status  */
                 --color-positive: light-dark(oklch(86.68% 0.29129 142.889), oklch(0.25 0.05 142.889));
                 --color-negative: light-dark(oklch(74.23% 0.13291 35.316), oklch(0.40 0.1 35));
@@ -78,8 +81,8 @@
                 --font-size-2xl: clamp(2.2rem, 4vw + 1rem, 3.4rem);
                 --font-size-xl: clamp(1.2rem, 1.4vw + 0.24rem, 2rem);
                 --font-size-base-type: clamp(1rem, 1vw + 0.2rem, 1.2rem);
-                --font-size-base-read: clamp(0.85rem, 1.2vw + 0.12rem, 1rem);
-                --font-size-xs: clamp(0.66rem, 0.6vw + 0.48rem, 0.8rem);
+                --font-size-base-read: clamp(0.9375rem, 1.2vw + 0.12rem, 1rem);
+                --font-size-xs: clamp(0.8125rem, 0.6vw + 0.48rem, 0.875rem);
                 --font-size-2xs: clamp(0.46rem, 0.4vw + 0.38rem, 0.66rem);
 
                 /* font weights */
@@ -89,6 +92,7 @@
                 /* opacity */
                 --opacity-full: 1;
                 --opacity-half: 0.5;
+                --opacity-quarter: 0.25;
 
                 /* border */
                 --border-subtle: 1px solid color-mix(in oklch, var(--color-invert-4) 18%, transparent);

@@ -237,8 +237,8 @@
   }
 
   :focus-visible {
-    outline: 1px solid
-      color-mix(in oklch, var(--color-accent-1) 80%, transparent);
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
     box-shadow: none;
     transition: none;
   }

@@ -40,7 +40,7 @@
     background: var(--color-negative);
     /* 1px hairline — no stroke-width token in the design system */
     border: 1px solid var(--color-invert-negative);
-    box-shadow: var(--shadow-base);
+    box-shadow: var(--shadow-medium);
     color: var(--color-invert-negative);
   }
 
@@ -48,7 +48,7 @@
     background: var(--color-positive);
     /* 1px hairline — no stroke-width token in the design system */
     border: 1px solid var(--color-invert-positive);
-    box-shadow: var(--shadow-base);
+    box-shadow: var(--shadow-medium);
     color: var(--color-invert-positive);
   }
 
@@ -73,6 +73,17 @@
     }
     100% {
       opacity: 0;
+    }
+  }
+}
+
+
+@layer components {
+  @media (prefers-reduced-motion: reduce) {
+    .toasts--message {
+      /* Preserve dismissal and its animationend event without shaking/fading. */
+      animation: toasts--fade-away 1ms linear 3s forwards;
+      transition: none;
     }
   }
 }
