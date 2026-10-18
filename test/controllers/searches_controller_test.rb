@@ -47,24 +47,24 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
     assert_select 'button[commandfor=search_picker_dialog][command=show-modal][aria-label=Search]'
     assert_select 'dialog#search_picker_dialog'
     assert_select 'dialog#search_picker_dialog form[action=?][method=get]', search_results_path
-    assert_select 'dialog#search_picker_dialog input[type=search][name=q]'
+    assert_select 'dialog#search_picker_dialog input[type=search][name=search_term]'
   end
 
   test 'dialog picker autofocuses on desktop but not on mobile' do
     get search_path
-    assert_select 'dialog#search_picker_dialog input[name=q][autofocus]', count: 1
+    assert_select 'dialog#search_picker_dialog input[name=search_term][autofocus]', count: 1
 
     get search_path, headers: { 'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)' }
 
     assert_response :success
-    assert_select 'dialog#search_picker_dialog input[name=q]', count: 1
-    assert_select 'dialog#search_picker_dialog input[name=q][autofocus]', count: 0
+    assert_select 'dialog#search_picker_dialog input[name=search_term]', count: 1
+    assert_select 'dialog#search_picker_dialog input[name=search_term][autofocus]', count: 0
   end
 
-  test 'show preloads the dialog empty, even with a query' do
+  test 'show preloads the dialog empty, even with a search term' do
     create_bullet!(@user, body: 'Buy milk today')
 
-    get search_path, params: { q: 'milk' }
+    get search_path, params: { search_term: 'milk' }
 
     assert_response :success
     assert_select 'a.combobox--item', count: 0
@@ -111,7 +111,7 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
     assert_select 'main.search--window[data-controller=search]'
     assert_select 'main.search--window[data-search-path-value=?]', search_results_path
     assert_select 'form[action=?][method=get]', search_results_path
-    assert_select 'input.search--textform[type=search][name=q]'
+    assert_select 'input.search--textform[type=search][name=search_term]'
     assert_select 'button.search--cleanup[aria-label=?]', 'Clear search'
     assert_select '.search--navigation', count: 0
   end
@@ -122,13 +122,13 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select 'button[commandfor=search_picker_dialog][command=show-modal][aria-label=?]', 'Open search'
     assert_select 'dialog#search_picker_dialog form[action=?][method=get]', search_results_path
-    assert_select 'dialog#search_picker_dialog input[type=search][name=q]'
+    assert_select 'dialog#search_picker_dialog input[type=search][name=search_term]'
   end
   test 'results excludes completed bullets' do
     matching = create_bullet!(@user, body: 'Buy milk today')
     matching.complete!
 
-    get search_results_path, params: { q: 'milk' }
+    get search_results_path, params: { search_term: 'milk' }
 
     assert_response :success
     assert_empty @controller.instance_variable_get(:@entries)
@@ -137,11 +137,10 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
   test 'results answers turbo-stream for the dialog picker' do
     matching = create_bullet!(@user, body: 'Buy milk today')
 
-    get search_results_path, params: { q: 'milk' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
+    get search_results_path, params: { search_term: 'milk' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
 
     assert_response :success
-    assert_select 'turbo-stream[action=update][target=search_section] a.combobox--item[href=?]',
-                  bullet_path(matching)
+    assert_select 'turbo-stream', count: 1
     assert_select 'turbo-stream[action=update][target=search_dialog_results] a.combobox--item[href=?]',
                   bullet_path(matching)
   end
@@ -158,29 +157,31 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
     matching = create_bullet!(@user, body: 'Buy milk today')
     create_bullet!(@user, body: 'Call mom tonight')
 
-    get search_results_path, params: { q: 'milk' }
+    get search_results_path, params: { search_term: 'milk' }
 
     assert_response :success
     controller = @controller
-    assert_equal 'milk', controller.instance_variable_get(:@q)
+    assert_equal 'milk', controller.instance_variable_get(:@search_term)
     assert_includes controller.instance_variable_get(:@entries).map(&:id), matching.id
     assert_select 'turbo-frame#search_section ul[role=listbox] a.combobox--item'
     assert_select 'article.search--navigation', count: 0
   end
 
-  test 'results caps query results at ten' do
-    12.times { |i| create_collection!(@user, name: "indexed collection #{i}") }
+  test 'results respects the global search limit' do
+    (Search::GlobalRequest::LIMITS + 2).times do |i|
+      create_collection!(@user, name: "indexed collection #{i}")
+    end
 
-    get search_results_path, params: { q: 'indexed collection' }
+    get search_results_path, params: { search_term: 'indexed collection' }
 
     assert_response :success
-    assert_equal 10, @controller.instance_variable_get(:@entries).size
+    assert_equal Search::GlobalRequest::LIMITS, @controller.instance_variable_get(:@entries).size
   end
 
   test 'results marks the matching term inside the bullet body' do
     create_bullet!(@user, body: 'Buy milk today')
 
-    get search_results_path, params: { q: 'milk' }
+    get search_results_path, params: { search_term: 'milk' }
 
     assert_response :success
     assert_select 'turbo-frame#search_section mark.search--term', text: 'milk'
@@ -189,7 +190,7 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
   test 'results keeps formatting tags around the marked term' do
     create_bullet!(@user, body: 'Buy <strong>milk</strong> today')
 
-    get search_results_path, params: { q: 'milk' }
+    get search_results_path, params: { search_term: 'milk' }
 
     assert_response :success
     assert_select 'turbo-frame#search_section strong > mark.search--term', text: 'milk'
@@ -198,7 +199,7 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
   test 'results marks a term that only appears below the first line' do
     create_bullet!(@user, body: 'Buy milk<p>and fresh bread</p>')
 
-    get search_results_path, params: { q: 'bread' }
+    get search_results_path, params: { search_term: 'bread' }
 
     assert_response :success
     assert_select 'turbo-frame#search_section mark.search--term', text: 'bread'
@@ -208,7 +209,7 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
     bullet = create_bullet!(@user, body: 'Buy milk today')
     collection = create_collection!(@user, name: 'milk')
 
-    get search_results_path, params: { q: 'milk' }
+    get search_results_path, params: { search_term: 'milk' }
 
     assert_response :success
     assert_select 'turbo-frame#search_section a.combobox--item[href=?]', bullet_path(bullet)
@@ -218,7 +219,7 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
   test 'results links a collection result and marks its name' do
     collection = create_collection!(@user, name: 'milk')
 
-    get search_results_path, params: { q: 'milk' }
+    get search_results_path, params: { search_term: 'milk' }
 
     assert_response :success
     assert_select 'turbo-frame#search_section a.combobox--item[href=?]', collection_path(collection)
@@ -229,26 +230,26 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
   test 'results does not nest links inside a bullet body' do
     create_bullet!(@user, body: 'See <a href="https://example.com">milk</a> today')
 
-    get search_results_path, params: { q: 'milk' }
+    get search_results_path, params: { search_term: 'milk' }
 
     assert_response :success
     assert_select 'turbo-frame#search_section a.combobox--item a', count: 0
     assert_select 'turbo-frame#search_section mark.search--term', text: 'milk'
   end
 
-  test 'results reports no results for a blank query' do
-    get search_results_path, params: { q: '   ' }
+  test 'results reports no results for a blank search term' do
+    get search_results_path, params: { search_term: '   ' }
 
     assert_response :success
-    assert_equal '', @controller.instance_variable_get(:@q)
+    assert_equal '', @controller.instance_variable_get(:@search_term)
     assert_empty @controller.instance_variable_get(:@entries)
     assert_select 'turbo-frame#search_section .empty-state h2', text: 'No results'
   end
 
-  test 'results frame request returns the section frame for the query' do
+  test 'results frame request returns the section frame for the search term' do
     matching = create_bullet!(@user, body: 'Buy milk today')
 
-    get search_results_path, params: { q: 'milk' }, headers: { 'Turbo-Frame' => 'search_section' }
+    get search_results_path, params: { search_term: 'milk' }, headers: { 'Turbo-Frame' => 'search_section' }
 
     assert_response :success
     assert_select 'turbo-frame#search_section ul[role=listbox]'
@@ -262,7 +263,7 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
     assert_select 'nav.tabbar--navigation a[href=?]', search_path, count: 0
   end
 
-  test 'results shows recent selections for a blank query' do
+  test 'results shows recent selections for a blank search term' do
     collection = create_collection!(@user, name: 'recent alpha')
     Search::Selection.record!(user: @user, searchable: collection)
 
@@ -285,15 +286,14 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/&lt;p&gt;Buy/, response.body)
   end
 
-  test 'results turbo-stream shows recent selections for a blank query' do
+  test 'results turbo-stream shows recent selections for a blank search term' do
     collection = create_collection!(@user, name: 'recent alpha')
     Search::Selection.record!(user: @user, searchable: collection)
 
     get search_results_path, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
 
     assert_response :success
-    assert_select 'turbo-stream[action=update][target=search_section] a.combobox--item[href=?]',
-                  collection_path(collection)
+    assert_select 'turbo-stream', count: 1
     assert_select 'turbo-stream[action=update][target=search_dialog_results] a.combobox--item[href=?]',
                   collection_path(collection)
   end
@@ -301,7 +301,7 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
   test 'results link records the search via the recent-search controller' do
     bullet = create_bullet!(@user, body: 'Buy milk today')
 
-    get search_results_path, params: { q: 'milk' }
+    get search_results_path, params: { search_term: 'milk' }
 
     assert_response :success
     assert_select 'turbo-frame#search_section a.combobox--item[href=?][data-controller=?][data-action=?]',

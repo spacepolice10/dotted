@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Maintains searchable content in the same transaction as its source record.
 module Searchable
   extend ActiveSupport::Concern
 
@@ -28,18 +29,16 @@ module Searchable
 
     Searchable.register(self)
 
-    after_create_commit :create_in_search_index
-    after_update_commit :update_in_search_index
-    after_destroy_commit :remove_from_search_index
+    after_save :write_search_index!
+    after_touch :write_search_index!
+    after_destroy :remove_from_search_index
+    after_destroy :forget_search_selections!
   end
 
   def reindex
-    update_in_search_index
-  end
-
-  def destroy
-    forget_search_selections!
-    super
+    # Locking reloads stale instances and keeps concurrent saves from being
+    # overwritten by a manual rebuild of older contents.
+    with_lock { write_search_index! }
   end
 
   def forget_search_selections!
@@ -48,11 +47,7 @@ module Searchable
 
   private
 
-  def create_in_search_index
-    Search::Record.upsert!(search_record_attributes) if searchable?
-  end
-
-  def update_in_search_index
+  def write_search_index!
     if searchable?
       Search::Record.upsert!(search_record_attributes)
     else
@@ -61,10 +56,10 @@ module Searchable
   end
 
   def remove_from_search_index
-    Search::Record.find_by(
+    Search::Record.where(
       searchable_type: self.class.name,
       searchable_id: id
-    )&.destroy
+    ).delete_all
   end
 
   def search_record_attributes

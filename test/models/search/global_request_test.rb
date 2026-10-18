@@ -7,10 +7,10 @@ class Search::GlobalRequestTest < ActiveSupport::TestCase
     @user = users(:one)
   end
 
-  test "returns empty entries for blank query" do
+  test "returns empty entries for blank search term" do
     create_collection!(@user, name: "alpha")
 
-    entries = Search::GlobalRequest.call(user: @user, query: "")
+    entries = Search::GlobalRequest.call(user: @user, search_term: "")
 
     assert_empty entries
   end
@@ -20,7 +20,7 @@ class Search::GlobalRequestTest < ActiveSupport::TestCase
     create_collection!(@user, name: "mine")
     create_collection!(other_user, name: "mine")
 
-    entries = Search::GlobalRequest.call(user: @user, query: "mine")
+    entries = Search::GlobalRequest.call(user: @user, search_term: "mine")
 
     assert_equal 1, entries.size
     assert_equal "Collection", entries.first.class.name
@@ -30,7 +30,7 @@ class Search::GlobalRequestTest < ActiveSupport::TestCase
   test "finds collections by name" do
     create_collection!(@user, name: "alex")
 
-    entries = Search::GlobalRequest.call(user: @user, query: "alex")
+    entries = Search::GlobalRequest.call(user: @user, search_term: "alex")
 
     assert_equal 1, entries.size
     assert_equal "Collection", entries.first.class.name
@@ -40,7 +40,7 @@ class Search::GlobalRequestTest < ActiveSupport::TestCase
   test "applies fuzzy fallback for near matches" do
     create_collection!(@user, name: "alpha")
 
-    entries = Search::GlobalRequest.call(user: @user, query: "alpa")
+    entries = Search::GlobalRequest.call(user: @user, search_term: "alpa")
 
     assert_equal 1, entries.size
     assert_equal "alpha", entries.first.name
@@ -50,7 +50,7 @@ class Search::GlobalRequestTest < ActiveSupport::TestCase
     create_collection!(@user, name: "alpha reading")
     create_bullet!(@user, body: "alpha task")
 
-    entries = Search::GlobalRequest.call(user: @user, query: "alpha")
+    entries = Search::GlobalRequest.call(user: @user, search_term: "alpha")
 
     assert_equal 2, entries.size
     assert_includes entries.map { |entry| entry.class.name }, "Collection"

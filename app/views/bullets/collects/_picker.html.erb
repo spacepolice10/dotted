@@ -1,4 +1,4 @@
-<%# locals: (bullet_ids:, return_to:, collects_q:, collections:, collected_ids: []) %>
+<%# locals: (bullet_ids:, return_to:, collects_search_term:, collections:, collected_ids: []) %>
 
   <header>
     <h2 class="utilities--sr-only">To collection</h2>
@@ -14,9 +14,9 @@
           data: { combobox_target: "searchForm" } do %>
       <%= hidden_field_tag :bullet_ids, bullet_ids, data: { bullet_menu_target: "idList" } %>
       <%= hidden_field_tag :return_to, return_to if return_to.present? %>
-      <%= label_tag :q, "Search collections", class: "utilities--sr-only" %>
+      <%= label_tag :search_term, "Search collections", class: "utilities--sr-only" %>
 
-      <%= search_field_tag :q, collects_q,
+      <%= search_field_tag :search_term, collects_search_term,
             placeholder: "Search collections",
             autofocus: !mobile_variant?,
             class: "utilities--sticky",

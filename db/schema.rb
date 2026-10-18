@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_17_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_17_190000) do
   create_table "access_codes", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "code_digest", null: false
@@ -229,4 +229,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_130000) do
   # Virtual tables defined in this database.
   # Note that virtual tables may not work with other database engines. Be careful if changing database.
   create_virtual_table "search_records_fts5", "fts5", ["search_name", "search_body", "content='search_records'", "content_rowid='id'", "tokenize='unicode61 remove_diacritics 2'", "prefix='2 3 4 5'"]
+  create_virtual_table "search_vocabulary", "fts5vocab", ["search_records_fts5", "row"]
 end

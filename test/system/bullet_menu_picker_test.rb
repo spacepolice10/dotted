@@ -111,7 +111,7 @@ class BulletMenuPickerSystemTest < ApplicationSystemTestCase
     visit bullets_path
     select_bullet
     find_button('Tag').click
-    field = find('dialog#collects_dialog input[name=q]')
+    field = find('dialog#collects_dialog input[name=search_term]')
     field.set('read')
     assert_selector 'dialog#collects_dialog #collects-collections-list button.combobox--item', text: 'reading'
     assert_no_selector 'dialog#collects_dialog #collects-collections-list button.combobox--item', text: 'ideas'

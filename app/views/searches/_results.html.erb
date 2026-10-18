@@ -1,9 +1,9 @@
-<%# locals: (entries:, q:) %>
+<%# locals: (entries:, search_term:) %>
 
 <br>
 <ul role="listbox" class="combobox">
   <% entries.each do |entry| %>
-    <%= render "searches/search_result", entry: entry, query: q %>
+    <%= render "searches/search_result", entry: entry, search_term: search_term %>
   <% end %>
 
 </ul>

@@ -29,7 +29,7 @@ export default class extends Controller {
   // The frame wraps only the results list, so replacing its src never re-renders
   // the input and the caret survives typing.
   #replaceSection() {
-    this.#load(this.inputTarget.value.trim() ? { q: this.inputTarget.value.trim() } : {})
+    this.#load(this.inputTarget.value.trim() ? { search_term: this.inputTarget.value.trim() } : {})
   }
 
   #load(params) {

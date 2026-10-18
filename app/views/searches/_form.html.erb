@@ -1,12 +1,12 @@
-<%# locals: (q:) %>
+<%# locals: (search_term:) %>
 <div class="search">
   <%= form_with url: search_results_path, method: :get, class: "utilities--contents" do %>
     <input
       type="search"
-      name="q"
+      name="search_term"
       class="search--textform hotkey-hint"
       placeholder="Search…"
-      value="<%= q.to_s %>"
+      value="<%= search_term.to_s %>"
       autocomplete="off"
       data-search-target="input"
       data-controller="hotkey"

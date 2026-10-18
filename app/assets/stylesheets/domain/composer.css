@@ -251,7 +251,7 @@
   margin: 0;
   vertical-align: sub;
   object-fit: contain;
-  border: var(--border-subtle);
+  border: var(--border-strong);
   border-radius: var(--radius-subtle);
 }
 

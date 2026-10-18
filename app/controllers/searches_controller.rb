@@ -11,13 +11,11 @@ class SearchesController < ApplicationController
   end
 
   def results
-    @q = params[:q].to_s.strip
+    @search_term = params[:search_term].to_s.strip
 
-    # A blank query is the empty state, not an error: the card shows at most
-    # ten rows. Search::GlobalRequest::LIMIT stays the global cap, so there is
-    # no turbo_stream format to negotiate here.
-    @entries = if @q.present?
-                 Search::GlobalRequest.call(user: Current.user, query: @q, limit: 10)
+    # HTML serves the page and its results frame; Turbo Streams update the dialog.
+    @entries = if @search_term.present?
+                 Search::GlobalRequest.call(user: Current.user, search_term: @search_term)
                else
                  Search::Selection.in_menu(Current.user).filter_map(&:searchable)
                end

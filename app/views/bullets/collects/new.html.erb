@@ -2,7 +2,7 @@
   <%= render "picker",
         bullet_ids: params[:bullet_ids].to_s,
         return_to: @return_to,
-        collects_q: @collects_q,
+        collects_search_term: @collects_search_term,
         collections: @collections,
         collected_ids: @collected_collection_ids %>
 </turbo-frame>

@@ -8,9 +8,9 @@ module Bullets
     return_to_from :param, :referer, only: :new
 
     def new
-      @collects_q = params[:q].to_s.strip.presence
+      @collects_search_term = params[:search_term].to_s.strip.presence
       @collections = Current.user.collections
-                            .matching_name(params[:q])
+                            .matching_name(params[:search_term])
                             .order(:name)
                             .limit(10)
       @collected_collection_ids = collected_collection_ids

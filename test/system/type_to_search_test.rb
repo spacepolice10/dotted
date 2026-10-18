@@ -8,12 +8,12 @@ class TypeToSearchSystemTest < ApplicationSystemTestCase
     sign_in_as(@user)
   end
 
-  test 'a letter opens search and subsequent typing continues the query' do
+  test 'a letter opens search and subsequent typing continues the search term' do
     bullet = create_bullet!(@user, body: 'Fly a kite')
     visit search_path
 
     find('body').send_keys('k')
-    field = find('#search_picker_dialog[open] input[name=q]:focus')
+    field = find('#search_picker_dialog[open] input[name=search_term]:focus')
     assert_equal 'k', field.value
     field.send_keys('ite')
 
@@ -22,18 +22,18 @@ class TypeToSearchSystemTest < ApplicationSystemTestCase
     assert_current_path search_path
   end
 
-  test 'hidden bullet shortcuts do not swallow letters and a new search replaces the old query' do
+  test 'hidden bullet shortcuts do not swallow letters and a new search replaces the old search term' do
     visit bullets_path
 
     %w[c l s K].each do |letter|
       find('body').send_keys(letter)
-      assert_equal letter, find('#search_picker_dialog[open] input[name=q]:focus').value
+      assert_equal letter, find('#search_picker_dialog[open] input[name=search_term]:focus').value
       page.execute_script("document.querySelector('#search_picker_dialog').close()")
     end
 
     # ChromeDriver sends an empty key for accented text through send_keys.
     page.execute_script("document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'é', bubbles: true, cancelable: true }))")
-    assert_equal 'é', find('#search_picker_dialog[open] input[name=q]:focus').value
+    assert_equal 'é', find('#search_picker_dialog[open] input[name=search_term]:focus').value
   end
 
   test 'digits punctuation modifiers and composition do not open search' do
@@ -60,7 +60,7 @@ class TypeToSearchSystemTest < ApplicationSystemTestCase
 
   test 'typing in a regular input stays in the input' do
     visit search_results_path
-    field = find('#search_dock input[name=q]')
+    field = find('#search_dock input[name=search_term]')
     field.send_keys('keep')
 
     assert_equal 'keep', field.value
@@ -86,7 +86,7 @@ class TypeToSearchSystemTest < ApplicationSystemTestCase
     visit search_path
     find('body').send_keys([:control, 'k'])
 
-    assert_selector '#search_picker_dialog[open] input[name=q]'
-    assert_equal '', find('#search_picker_dialog input[name=q]').value
+    assert_selector '#search_picker_dialog[open] input[name=search_term]'
+    assert_equal '', find('#search_picker_dialog input[name=search_term]').value
   end
 end

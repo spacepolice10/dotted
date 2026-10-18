@@ -13,7 +13,7 @@ class ButtonFocusSystemTest < ApplicationSystemTestCase
 
     # Real typing puts the page in keyboard modality, so a subsequent
     # programmatic focus matches :focus-visible the way Tab would.
-    find('dialog#search_picker_dialog input[name=q]').set('m')
+    find('dialog#search_picker_dialog input[name=search_term]').set('m')
 
     close = 'dialog#search_picker_dialog .dialog--hide'
     page.execute_script("document.querySelector('#{close}').focus()")

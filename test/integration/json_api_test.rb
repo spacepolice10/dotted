@@ -60,7 +60,7 @@ class JsonApiTest < ActionDispatch::IntegrationTest
     bullet = create_bullet!(@user, body: 'Unique silver comet')
     create_bullet!(users(:two), body: 'Unique silver comet private')
 
-    get search_results_path(q: 'silver comet'), as: :json
+    get search_results_path(search_term: 'silver comet'), as: :json
     assert_response :success
     assert_includes response.parsed_body.map { |entry| entry['id'] }, bullet.id
     assert response.parsed_body.all? { |entry| entry['url'].present? }

@@ -6,7 +6,7 @@ class SearchSystemTest < ApplicationSystemTestCase
   setup do
     @user = users(:one)
     sign_in_as(@user)
-    @field = 'input.search--textform[name=q]'
+    @field = 'input.search--textform[name=search_term]'
   end
 
   # --- the navigation page opens the search dialog ---
@@ -27,7 +27,7 @@ class SearchSystemTest < ApplicationSystemTestCase
 
     assert_current_path search_path
     assert_selector 'dialog#search_picker_dialog[open]'
-    assert_selector 'dialog#search_picker_dialog input[name=q]'
+    assert_selector 'dialog#search_picker_dialog input[name=search_term]'
   end
 
   test 'typing in the dialog filters results without leaving the page' do
@@ -36,12 +36,24 @@ class SearchSystemTest < ApplicationSystemTestCase
 
     visit search_path
     find('#search_dock button[aria-label=Search]').click
-    find('dialog#search_picker_dialog input[name=q]').set('milk')
+    find('dialog#search_picker_dialog input[name=search_term]').set('milk')
 
     assert_selector "dialog#search_picker_dialog a.combobox--item[href='#{bullet_path(match)}'] mark.search--term",
                     text: 'milk'
     assert_no_selector "dialog#search_picker_dialog a.combobox--item[href='#{bullet_path(recent)}']"
     assert_current_path search_path
+  end
+
+  test 'typing a small typo in the dialog finds a bullet by its body' do
+    bullet = create_bullet!(@user, body: 'Buy groceries tomorrow')
+    visit bullets_path
+
+    page.execute_script("document.querySelector('button[commandfor=search_picker_dialog]').click()")
+    find('dialog#search_picker_dialog input[name=search_term]').set('groceris')
+
+    assert_selector "dialog#search_picker_dialog a.combobox--item[href='#{bullet_path(bullet)}']",
+                    text: 'Buy groceries tomorrow'
+    assert_current_path bullets_path
   end
 
   test 'the palette trigger is preloaded on other pages' do
@@ -55,7 +67,7 @@ class SearchSystemTest < ApplicationSystemTestCase
     page.execute_script("document.querySelector('button[commandfor=search_picker_dialog]').click()")
 
     assert_selector 'dialog#search_picker_dialog[open]'
-    find('dialog#search_picker_dialog input[name=q]').set('milk')
+    find('dialog#search_picker_dialog input[name=search_term]').set('milk')
 
     assert_selector "dialog#search_picker_dialog a.combobox--item[href='#{bullet_path(match)}'] mark.search--term",
                     text: 'milk'
@@ -67,7 +79,7 @@ class SearchSystemTest < ApplicationSystemTestCase
     find('#search_dock button[aria-label=Search]').click
     assert_selector 'dialog#search_picker_dialog[open]'
 
-    find('dialog#search_picker_dialog input[name=q]').send_keys(:escape)
+    find('dialog#search_picker_dialog input[name=search_term]').send_keys(:escape)
 
     assert_no_selector 'dialog#search_picker_dialog[open]'
   end
@@ -77,7 +89,7 @@ class SearchSystemTest < ApplicationSystemTestCase
 
     visit search_path
     find('#search_dock button[aria-label=Search]').click
-    field = find('dialog#search_picker_dialog input[name=q]')
+    field = find('dialog#search_picker_dialog input[name=search_term]')
     field.set('milk')
     assert_selector "dialog#search_picker_dialog a.combobox--item[href='#{bullet_path(match)}']"
 
@@ -95,7 +107,7 @@ class SearchSystemTest < ApplicationSystemTestCase
   test 'the results route is visitable on its own' do
     matching = create_bullet!(@user, body: 'Buy milk today')
 
-    visit search_results_path(q: 'milk')
+    visit search_results_path(search_term: 'milk')
 
     assert_selector "#search_section a.combobox--item[href='#{bullet_path(matching)}'] mark.search--term", text: 'milk'
     assert_equal 'milk', find(@field).value
@@ -104,7 +116,7 @@ class SearchSystemTest < ApplicationSystemTestCase
   test 'the results route ignores navigation params and lands on the empty state' do
     create_bullet!(@user, body: 'Buy milk today')
 
-    visit search_path(q: 'milk')
+    visit search_path(search_term: 'milk')
 
     assert_selector '#search_navigation'
     assert_no_selector 'a.combobox--item'
@@ -117,7 +129,7 @@ class SearchSystemTest < ApplicationSystemTestCase
     page.execute_script("document.querySelector('button[commandfor=search_picker_dialog]').click()")
     assert_selector 'dialog#search_picker_dialog[open]'
 
-    find('dialog#search_picker_dialog input[name=q]').set('milk')
+    find('dialog#search_picker_dialog input[name=search_term]').set('milk')
     find("dialog#search_picker_dialog a.combobox--item[href='#{bullet_path(bullet)}']").click
 
     assert_selector 'main.timeline--window--focus'
@@ -141,7 +153,7 @@ class SearchSystemTest < ApplicationSystemTestCase
     page.execute_script("document.querySelector('button[commandfor=search_picker_dialog]').click()")
     assert_selector 'dialog#search_picker_dialog[open]'
 
-    field = find('dialog#search_picker_dialog input[name=q]')
+    field = find('dialog#search_picker_dialog input[name=search_term]')
     field.set('milk')
     assert_selector 'dialog#search_picker_dialog a.combobox--item', count: 2
 
@@ -164,6 +176,28 @@ class SearchSystemTest < ApplicationSystemTestCase
     assert_no_selector "#search_section a.combobox--item[href='#{bullet_path(recent)}']"
   end
 
+  test 'searching in the dialog preserves the underlying page results' do
+    milk = create_bullet!(@user, body: 'Buy milk today')
+    bread = create_bullet!(@user, body: 'Bake bread tomorrow')
+
+    visit search_results_path(search_term: 'milk')
+    assert_selector "#search_section a[href='#{bullet_path(milk)}']"
+
+    page.execute_script("document.querySelector('button[commandfor=search_picker_dialog]').click()")
+    field = find('dialog#search_picker_dialog input[name=search_term]')
+    field.set('bread')
+    assert_selector "dialog#search_picker_dialog a[href='#{bullet_path(bread)}']"
+
+    field.send_keys(:escape)
+    assert_equal '', field.value
+    field.send_keys(:escape)
+    assert_no_selector 'dialog#search_picker_dialog[open]'
+
+    assert_equal 'milk', find(@field).value
+    assert_selector "#search_section a[href='#{bullet_path(milk)}']"
+    assert_no_selector "#search_section a[href='#{bullet_path(bread)}']"
+  end
+
   test 'the input keeps focus and caret across a frame update' do
     create_bullet!(@user, body: 'Buy milk today')
 
@@ -174,14 +208,14 @@ class SearchSystemTest < ApplicationSystemTestCase
     # The frame wraps only the list, so re-rendering must not steal focus or
     # reset the value out from under the caret.
     assert_equal 'milk', find(@field).value
-    assert page.evaluate_script("document.activeElement === document.querySelector('input.search--textform[name=q]')"),
+    assert page.evaluate_script("document.activeElement === document.querySelector('input.search--textform[name=search_term]')"),
            'expected the input to still hold focus after the frame updated'
   end
 
-  test 'clearing the query returns to the empty state' do
+  test 'clearing the search term returns to the empty state' do
     create_bullet!(@user, body: 'Buy milk today')
 
-    visit search_results_path(q: 'milk')
+    visit search_results_path(search_term: 'milk')
     assert_selector '#search_section a.combobox--item'
 
     find('.search--cleanup').click
@@ -208,7 +242,7 @@ class SearchSystemTest < ApplicationSystemTestCase
 
     visit search_path
     find('#search_dock button[commandfor="search_picker_dialog"]').click
-    field = find('dialog#search_picker_dialog input[name=q]')
+    field = find('dialog#search_picker_dialog input[name=search_term]')
     field.set('milk')
 
     first = 'dialog#search_picker_dialog ul[role=listbox] a.combobox--item:nth-of-type(1)'
@@ -229,7 +263,7 @@ class SearchSystemTest < ApplicationSystemTestCase
 
     visit bullets_path
     page.execute_script("document.querySelector('button[commandfor=search_picker_dialog]').click()")
-    field = find('dialog#search_picker_dialog input[name=q]')
+    field = find('dialog#search_picker_dialog input[name=search_term]')
     field.set('milk')
     assert_selector 'dialog#search_picker_dialog a.combobox--item', count: 2
 

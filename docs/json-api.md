@@ -15,7 +15,7 @@ from a CLI do not need a CSRF token.
 | Bullets | `GET/POST /bullets`, `GET/PATCH/DELETE /bullets/:id` | Bullet objects or 204 |
 | Bulk bullet changes | `POST/DELETE /bullets/completion`, `POST /bullets/collect`, `POST /bullets/postpone`, `POST/DELETE /bullets/publish` | Array of changed bullets |
 | Collections | `GET/POST /collections`, `GET/PATCH/DELETE /collections/:id` | Collection objects or 204 |
-| Search | `GET /search/results?q=...` | Array of `{ id, type, name, url }` |
+| Search | `GET /search/results?search_term=...` | Array of `{ id, type, name, url }` |
 | Published bullets | `GET /published` | Array of bullet objects with `public_url` |
 | Attachments | `GET /attachments`, `GET /attachments/:id` | File bullet ID, metadata, and download URL |
 | Webhooks | `GET/POST /webhooks`, `DELETE /webhooks/:id` | List, one-time secret, or 204 |

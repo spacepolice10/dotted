@@ -2,11 +2,11 @@
 
 class Search::Highlight
   class << self
-    def call(html, query)
-      words = Search::TermBuilder.terms(query)
-      return html if words.empty?
+    def call(html, search_term)
+      term_list = Search::TermBuilder.term_list(search_term)
+      return html if term_list.empty?
 
-      pattern = pattern_of(words)
+      pattern = pattern_of(term_list)
       fragment = Loofah.html5_fragment(html.to_s)
       changed = false
 
@@ -24,8 +24,8 @@ class Search::Highlight
 
     private
 
-    def pattern_of(words)
-      alternation = words.sort_by { |word| -word.length }.map { |word| Regexp.escape(word) }.join('|')
+    def pattern_of(term_list)
+      alternation = term_list.sort_by { |term| -term.length }.map { |term| Regexp.escape(term) }.join('|')
       /(?<![\p{L}\p{N}])(?:#{alternation})[\p{L}\p{N}]*/i
     end
 

@@ -1,4 +1,4 @@
-<%# locals: (q:, entries:) %>
+<%# locals: (search_term:, entries:) %>
 
 <header>
   <h2 class="utilities--sr-only">Search</h2>
@@ -12,9 +12,9 @@
         method: :get,
         class: "utilities--contents",
         data: { combobox_target: "searchForm", turbo_frame: "_top" } do %>
-    <%= label_tag :q, "Search", class: "utilities--sr-only" %>
+    <%= label_tag :search_term, "Search", class: "utilities--sr-only" %>
 
-    <%= search_field_tag :q, q,
+    <%= search_field_tag :search_term, search_term,
           placeholder: "Type to find a bullet or collection",
           autofocus: !mobile_variant?,
           autocomplete: "off",
@@ -28,6 +28,6 @@
   <% end %>
 
   <div id="search_dialog_results" aria-label="Results">
-    <%= render "searches/results", entries: entries, q: q %>
+    <%= render "searches/results", entries: entries, search_term: search_term %>
   </div>
 </main>

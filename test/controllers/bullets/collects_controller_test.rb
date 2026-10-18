@@ -39,15 +39,15 @@ module Bullets
       get new_collect_path, params: { bullet_ids: card.id.to_s }
 
       assert_response :success
-      assert_select 'turbo-frame#collects_picker input[name=q][autofocus]', count: 1
+      assert_select 'turbo-frame#collects_picker input[name=search_term][autofocus]', count: 1
 
       get new_collect_path,
           params: { bullet_ids: card.id.to_s },
           headers: { 'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)' }
 
       assert_response :success
-      assert_select 'turbo-frame#collects_picker input[name=q]', count: 1
-      assert_select 'turbo-frame#collects_picker input[name=q][autofocus]', count: 0
+      assert_select 'turbo-frame#collects_picker input[name=search_term]', count: 1
+      assert_select 'turbo-frame#collects_picker input[name=search_term][autofocus]', count: 0
     end
 
     test 'new renders picker content inside turbo frame request' do
@@ -64,12 +64,12 @@ module Bullets
       assert_match collection.name, response.body
     end
 
-    test 'new filters collections by search query' do
+    test 'new filters collections by search search term' do
       create_collection!(@user, name: 'alpha')
       create_collection!(@user, name: 'beta')
       card = create_bullet!(@user, body: 'Move me')
 
-      get new_collect_path, params: { bullet_ids: card.id.to_s, q: 'alp' }
+      get new_collect_path, params: { bullet_ids: card.id.to_s, search_term: 'alp' }
 
       assert_response :success
       assert_match 'alpha', response.body
@@ -93,7 +93,7 @@ module Bullets
       card = create_bullet!(@user, body: 'Move me')
 
       get new_collect_path,
-          params: { bullet_ids: card.id.to_s, q: 'alp' },
+          params: { bullet_ids: card.id.to_s, search_term: 'alp' },
           headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
 
       assert_response :success

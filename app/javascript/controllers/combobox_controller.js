@@ -116,14 +116,14 @@ export default class extends Controller {
     const otherFields = {}
     if (this.hasSearchFormTarget) {
       for (const [key, value] of new FormData(this.searchFormTarget)) {
-        if (key == "q" || key == input.name) continue
+        if (key == input.name) continue
         otherFields[key] = value
       }
     }
 
     try {
       await get(this.pathValue, {
-        query: { ...otherFields, q: input.value.trim() },
+        query: { ...otherFields, search_term: input.value.trim() },
         signal: this.#abort.signal,
         responseKind: "turbo-stream",
       })

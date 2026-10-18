@@ -1,4 +1,4 @@
-<%# locals: (entry:, query:) %>
+<%# locals: (entry:, search_term:) %>
 <%= link_to polymorphic_path(entry),
       class: "combobox--item",
       tabindex: "-1",
@@ -16,6 +16,6 @@
   </span>
   <span class="search--result-content">
     <span class="search--result-type"><%= entry.search_result_type %></span>
-    <span class="search--result-body"><%= highlight_search_result(entry.search_result_body, query) %></span>
+    <span class="search--result-body"><%= highlight_search_result(entry.search_result_body, search_term) %></span>
   </span>
 <% end %>

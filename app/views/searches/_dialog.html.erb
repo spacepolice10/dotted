@@ -18,5 +18,5 @@
       controllers: ["dialog", "type-to-search"],
       actions: ["keydown@window->type-to-search#open"],
       size: "lg" do %>
-  <%= render "searches/picker", q: "", entries: Search::Selection.in_menu(Current.user).filter_map(&:searchable) %>
+  <%= render "searches/picker", search_term: "", entries: Search::Selection.in_menu(Current.user).filter_map(&:searchable) %>
 <% end %>

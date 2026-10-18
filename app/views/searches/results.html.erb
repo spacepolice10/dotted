@@ -9,10 +9,10 @@
   data-search-path-value="<%= search_results_path %>"
 >
   <%= turbo_frame_tag "search_section", class: "search--section", data: { search_target: "section" } do %>
-    <%= render "searches/results", entries: @entries, q: @q %>
+    <%= render "searches/results", entries: @entries, search_term: @search_term %>
   <% end %>
 
   <div id="search_dock" class="search--dock">
-    <%= render "searches/form", q: @q %>
+    <%= render "searches/form", search_term: @search_term %>
   </div>
 </main>

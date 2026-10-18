@@ -27,8 +27,8 @@ module ApplicationHelper
 
   # A search result row is itself one big link, so anchors inside a rich-text
   # body would nest and break the row. Unwrap them, keeping their text.
-  def highlight_search_result(html, query)
-    highlighted = Search::Highlight.call(sanitize(html), query)
+  def highlight_search_result(html, search_term)
+    highlighted = Search::Highlight.call(sanitize(html), search_term)
     return highlighted unless highlighted.include?('<a')
 
     fragment = Loofah.html5_fragment(highlighted)
