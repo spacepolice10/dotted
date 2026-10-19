@@ -12,6 +12,13 @@
     <article>
       <ul data-layout="column" data-divider="single">
         <li>
+          <%= link_to user_visuals_path, data: { turbo_frame: "_top" } do %>
+            <%= icon("art") %>
+            <p>Visuals</p>
+          <% end %>
+        </li>
+
+        <li>
           <%= link_to access_codes_path, data: { turbo_frame: "_top" } do %>
             <%= icon("code") %>
 

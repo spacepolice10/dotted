@@ -1,0 +1,44 @@
+<% content_for(:title, "Visuals") %>
+<% content_for(:head) { tag.meta(name: "turbo-cache-control", content: "no-cache") } %>
+
+<%= render "shared/back_tabbar", url: user_path, aria_label: "Back to Account" %>
+
+<main id="visuals" data-size="sm">
+  <header>
+    <h1>Visuals</h1>
+    <p>Make Dotted feel like your own space.</p>
+  </header>
+
+  <article class="appearance-settings">
+    <header>
+      <h2>Theme</h2>
+    </header>
+    <main>
+      <% appearance = Current.user.settings!.appearance %>
+      <% themes = [
+        ["Dotted", "default", "A familiar, evenly spaced dot grid."],
+        ["Kazakstans Skyview", "kazakstans_skyview", "A quiet sky of scattered dots, with a lighter daytime sky."],
+        ["Refurbished", "refurbished", "Colourful flecks on a gray canvas, inspired by recycled materials."],
+        ["Tetradka", "tetradka", "A subtle squared notebook grid."]
+      ] %>
+      <% themes << [appearance.humanize, appearance, "Your current background."] unless themes.any? { |_, value, _| value == appearance } %>
+      <%= form_with url: user_visuals_path, method: :patch do %>
+        <div class="appearance-choices" role="group" aria-label="Theme" aria-describedby="appearance-description">
+          <% themes.each do |name, value, _| %>
+            <%= button_tag type: :submit, name: :appearance, value: value,
+                  class: "appearance-swatch", title: name,
+                  aria: { label: name, pressed: appearance == value } do %>
+              <span class="appearance-swatch--preview" data-theme="<%= value %>" aria-hidden="true"></span>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+      <% selected_theme = themes.find { |_, value, _| value == appearance } %>
+      <p class="appearance-name"><%= selected_theme.first %></p>
+      <p id="appearance-description"><%= selected_theme.last %> Day and night follow your device’s appearance.</p>
+      <% if @appearance_error.present? %>
+        <p role="alert"><%= @appearance_error %></p>
+      <% end %>
+    </main>
+  </article>
+</main>

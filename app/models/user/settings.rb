@@ -3,7 +3,7 @@
 # Per-user settings. One row per user, created automatically.
 #
 class User::Settings < ApplicationRecord
-  APPEARANCES = %w[default warm cool nature cheese].freeze
+  APPEARANCES = %w[default warm cool nature cheese kazakstans_skyview refurbished tetradka].freeze
 
   belongs_to :user
 

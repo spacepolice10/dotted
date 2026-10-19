@@ -1,0 +1,119 @@
+@layer base {
+  :root:has(body[data-appearance="kazakstans_skyview"]) {
+    --skyview-pattern: url("kazakstans-skyview.svg");
+    --background-canvas-colour: light-dark(oklch(0.97 0.012 245), oklch(0.18 0.032 260));
+    --background-grid: var(--skyview-pattern) 0 0 / 1600px 1200px repeat, var(--background-canvas-colour);
+
+    --color-1: light-dark(oklch(0.99 0.004 245), oklch(0.24 0.022 255));
+    --color-2: light-dark(oklch(0.96 0.009 245), oklch(0.29 0.025 255));
+    --color-3: light-dark(oklch(0.92 0.012 245), oklch(0.35 0.026 255));
+    --color-4: light-dark(oklch(0.88 0.015 245), oklch(0.40 0.028 255));
+  }
+
+  :root:has(body[data-appearance="refurbished"]) {
+    --refurbished-pattern: url("refurbished.svg");
+    --background-canvas-colour: light-dark(oklch(0.97 0 0), oklch(0.24 0 0));
+    --background-grid: var(--refurbished-pattern) 0 0 / 1600px 1200px repeat, var(--background-canvas-colour);
+  }
+
+  :root:has(body[data-appearance="tetradka"]) {
+    --notebook-line: light-dark(oklch(0.55 0.045 245 / 0.16), oklch(0.72 0.035 245 / 0.13));
+    --background-canvas-colour: light-dark(oklch(0.97 0 0), oklch(0.24 0 0));
+    --background-grid:
+      linear-gradient(90deg, var(--notebook-line) 1px, transparent 1px) 0 0 / 26px 26px,
+      linear-gradient(var(--notebook-line) 1px, transparent 1px) 0 0 / 26px 26px,
+      var(--background-canvas-colour);
+  }
+}
+
+@layer components {
+  .appearance-settings {
+    flex-shrink: 0;
+  }
+
+  .appearance-settings > main {
+    display: grid;
+    gap: var(--space-v);
+  }
+
+  .appearance-settings h2 {
+    font-size: var(--font-size-xl);
+  }
+
+  .appearance-settings .appearance-swatch {
+    border: 2px solid transparent;
+    color: var(--color-focus);
+
+    display: inline-flex;
+    width: clamp(var(--space-h-2), 2.5ch, var(--space-h-3));
+    height: clamp(var(--space-h-2), 2.5ch, var(--space-h-3));
+    margin: 0;
+    padding: 0;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    background: var(--color-2);
+
+    &[aria-pressed="true"] {
+      border-color: var(--color-focus);
+    }
+
+    &:focus-visible {
+      outline-offset: 4px;
+    }
+  }
+
+  .appearance-swatch--preview {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: radial-gradient(circle, light-dark(#aeb0b4, #74767b) 0.7px, transparent 1px) 0 0 / 10px 10px,
+      light-dark(#f5f5f5, #202020);
+  }
+
+  .appearance-swatch--preview[data-theme="kazakstans_skyview"] {
+    --preview-star: light-dark(#71889c, #d9e7f4);
+    background:
+      radial-gradient(circle at 19% 26%, var(--preview-star) 0.6px, transparent 1px),
+      radial-gradient(circle at 76% 19%, var(--preview-star) 0.8px, transparent 1px),
+      radial-gradient(circle at 43% 58%, var(--preview-star) 0.4px, transparent 0.8px),
+      radial-gradient(circle at 82% 76%, var(--preview-star) 0.5px, transparent 0.9px),
+      radial-gradient(circle at 29% 83%, var(--preview-star) 0.7px, transparent 1px),
+      light-dark(#edf3f8, #091322);
+  }
+
+  .appearance-swatch--preview[data-theme="refurbished"] {
+    background:
+      radial-gradient(circle at 23% 22%, #b56860 1px, transparent 1.5px),
+      radial-gradient(circle at 71% 17%, #6380a8 0.8px, transparent 1.2px),
+      radial-gradient(circle at 48% 43%, #b09a4b 1.3px, transparent 1.7px),
+      radial-gradient(circle at 82% 61%, #588d80 1px, transparent 1.4px),
+      radial-gradient(circle at 22% 77%, #9a7eac 0.8px, transparent 1.2px),
+      radial-gradient(circle at 65% 86%, #b56860 0.6px, transparent 1px),
+      light-dark(#f5f5f5, #202020);
+  }
+
+  .appearance-swatch--preview[data-theme="tetradka"] {
+    --preview-line: light-dark(#cad3db, #424a52);
+    background:
+      linear-gradient(90deg, var(--preview-line) 1px, transparent 1px) 0 0 / 9px 9px,
+      linear-gradient(var(--preview-line) 1px, transparent 1px) 0 0 / 9px 9px,
+      light-dark(#f5f5f5, #202020);
+  }
+
+  .appearance-settings .appearance-name {
+    color: var(--color-invert-1);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .appearance-settings p {
+    color: var(--color-invert-3);
+    font-size: var(--font-size-base-read);
+  }
+
+  .appearance-choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-v-half);
+  }
+}

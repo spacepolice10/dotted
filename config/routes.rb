@@ -39,12 +39,14 @@ Rails.application.routes.draw do
   resource :search, only: :show, controller: 'searches' do
     scope module: :searches do
       resource :selection, only: :create
-      resource :appearance, only: :update
-      post 'appearance', to: 'appearances#update'
     end
   end
 
-  resource :user, only: :show
+  resource :user, only: :show do
+    scope module: :users do
+      resource :visuals, only: %i[show update]
+    end
+  end
 
   resources :access_codes, only: %i[index new create destroy]
   resources :webhooks, only: %i[index new create destroy]

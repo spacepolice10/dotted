@@ -3,11 +3,7 @@
 class SearchesController < ApplicationController
   # Navigation only. Searching lives on the results route.
   def show
-    @collections = Current.user.collections.favorites.order(:name)
-    @attachments_count = Current.user.bullets.with_attachment.count
-    @completed_count = Current.user.bullets.completed.count
-    @collections_count = Current.user.collections.count
-    @upcoming_count = Current.user.bullets.upcoming.count
+    @favorite_collections = Current.user.collections.favorites.order(:name)
   end
 
   def results

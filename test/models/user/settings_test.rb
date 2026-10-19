@@ -14,12 +14,12 @@ class User::SettingsTest < ActiveSupport::TestCase
     assert_equal @user, @settings.user
   end
 
-  test 'APPEARANCES lists allowed background tints' do
-    assert_equal %w[default warm cool nature cheese], User::Settings::APPEARANCES
+  test 'APPEARANCES lists allowed backgrounds' do
+    assert_equal %w[default warm cool nature cheese kazakstans_skyview refurbished tetradka], User::Settings::APPEARANCES
   end
 
   test 'appearance must be a known preset' do
-    @settings.appearance = 'warm'
+    @settings.appearance = 'kazakstans_skyview'
     assert_predicate @settings, :valid?
 
     @settings.appearance = 'unknown'

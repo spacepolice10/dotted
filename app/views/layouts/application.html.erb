@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 
-<html
-  data-controller="hotkey-hint"
-  <% if Current.user %>
-    data-appearance="<%= Current.user.settings!.appearance %>"
-  <% end %>
->
+<html data-controller="hotkey-hint">
   <head>
     <title><%= content_for(:title) || "Dotted" %></title>
 
@@ -55,6 +50,7 @@
 
   <body
     data-controller="dialog timezone-cookie bullet-menu"
+    <% if Current.user %>data-appearance="<%= Current.user.settings!.appearance %>"<% end %>
   >
     <%= render "shared/toasts_host" %>
 

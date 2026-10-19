@@ -54,7 +54,7 @@ class UiAccessibilitySystemTest < ApplicationSystemTestCase
     page.execute_script("document.querySelector('#bullet_#{bullet.id} input').click()")
     assert_selector '.bullet-menu:focus-visible'
     assert_equal 'solid', computed('.bullet-menu', 'outlineStyle')
-    find('.bullet-menu').send_keys('l')
+    find_button('Later').send_keys(:enter)
     option = find('#postpone_dialog .picker--item:focus')
     option.send_keys(:arrow_down)
     assert_selector '#postpone_dialog .picker--item:focus-visible'
