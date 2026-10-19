@@ -38,6 +38,30 @@ class PublishedControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test 'show omits the private collection without querying it' do
+    collection = @user.collections.create!(name: 'Private collection')
+    bullet = create_bullet!(@user, body: 'Shared content', collection: collection)
+    bullet.publish!
+    code = bullet.public_code
+    sign_out
+
+    collection_queries = []
+    subscriber = lambda do |event|
+      sql = event.payload[:sql]
+      collection_queries << sql if sql.match?(/\bFROM\s+"collections"/i)
+    end
+    ActiveSupport::Notifications.subscribed(subscriber, 'sql.active_record') do
+      get published_path(code)
+    end
+
+    assert_response :success
+    assert_match 'Shared content', response.body
+    assert_select '.bullet--collection', count: 0
+    assert_no_match collection.name, response.body
+    assert_empty collection_queries
+    assert_equal collection.id, bullet.reload.collection_id
+  end
+
   test 'show returns not found after unpublish' do
     bullet = create_bullet!(@user, body: 'Was public')
     bullet.publish!

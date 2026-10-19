@@ -1,0 +1,25 @@
+<%# locals: (file: nil, selection_id: nil) %>
+<% picture = file&.variable? %>
+<span class="attachment--preview">
+  <% if file %>
+    <%= link_to rails_blob_path(file, disposition: picture ? "inline" : "attachment"),
+          class: class_names("attachment--preview-media", "attachment--preview-picture" => picture),
+          data: { turbo: false }, aria: { label: "#{picture ? 'Zoom' : 'Download'} #{file.filename}" } do %>
+      <% if picture %>
+        <% width, height = file.blob.metadata.values_at("width", "height") %>
+        <%= image_tag file.variant(:preview), alt: file.filename.to_s,
+              style: (width.present? && height.present? ? "aspect-ratio: #{width} / #{height}" : nil) %>
+      <% else %>
+        <span class="attachment--preview-icon"><%= icon("file") %></span>
+      <% end %>
+    <% end %>
+  <% else %>
+    <span class="attachment--preview-media">
+      <span class="attachment--preview-icon"><%= icon("file") %></span>
+    </span>
+  <% end %>
+  <%= tag.label class: "pill attachment--preview-name", for: selection_id, title: file&.filename do %>
+    <%= tag.span file&.filename, class: "attachment--preview-filename",
+          data: (file ? {} : { pending_filename: true }) %>
+  <% end %>
+</span>

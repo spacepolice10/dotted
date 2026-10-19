@@ -19,7 +19,7 @@
   >
 
   <div class="bullet--content">
-    <% if bullet.file.attached? && bullet.file.variable? %>
+    <% if bullet.file.attached? %>
       <label
         class="bullet--select-checkbox"
         for="<%= dom_id(bullet, :select_checkbox) %>"
@@ -27,7 +27,7 @@
       ></label>
     <% end %>
     <div class="bullet--body">
-      <% unless bullet.file.attached? && bullet.file.variable? %>
+      <% unless bullet.file.attached? %>
         <label
           class="bullet--select-square"
           for="<%= dom_id(bullet, :select_checkbox) %>"
@@ -35,48 +35,38 @@
         ></label>
       <% end %>
       <% if bullet.file.attached? %>
-        <% file = bullet.file %>
-        <% if file.variable? %>
-          <% width, height = file.blob.metadata.values_at("width", "height") %>
-          <span class="attachment--preview">
-            <%= link_to rails_blob_path(file), class: "attachment--preview-picture",
-                    data: { turbo: false }, aria: { label: "Zoom #{file.filename}" } do %>
-              <%= image_tag file.variant(:preview),
-                    alt: file.filename.to_s,
-                    style: (width.present? && height.present? ? "aspect-ratio: #{width} / #{height}" : nil) %>
-            <% end %>
-            <label class="pill attachment--preview-name" for="<%= dom_id(bullet, :select_checkbox) %>" title="<%= file.filename %>">
-              <span class="attachment--preview-filename"><%= file.filename %></span>
-            </label>
-          </span>
-        <% else %>
-          <%= link_to rails_blob_path(file, disposition: "attachment"), class: "attachment--file", data: { turbo: false } do %>
-            <%= icon("paperclip") %>
-            <span class="attachment--file-name utilities--line-clamp-1"><%= file.filename %></span>
-            <small><%= number_to_human_size(file.byte_size) %></small>
-          <% end %>
-        <% end %>
+        <%= render "bullets/attachment", file: bullet.file, selection_id: dom_id(bullet, :select_checkbox) %>
       <% else %>
         <%= bullet.body %>
       <% end %>
+      <% if bullet.collection.present? || bullet.status.in?(%w[postponed published]) %>
+        <div class="bullet--metadata">
+          <% if (collection = bullet.collection) %>
+            <span class="collection-chip bullet--collection"
+                  style="--chip-colour: <%= colour(collection.colour) || 'var(--color-invert-3)' %>;">
+              <%= icon("hash") %>
+              <span><%= collection.name %></span>
+            </span>
+          <% end %>
+          <% if bullet.status.in?(%w[postponed published]) %>
+            <span
+              class="collection-chip bullet--status bullet--status--<%= bullet.status %>"
+            >
+              <%= icon(bullet.marker_icon) %>
+              <span>
+                <% if bullet.status == "postponed" %>
+                  Postponed <%= pluralize(bullet.postponements_number, "time") %>
+                <% elsif bullet.status == "published" %>
+                  It is published
+                <% end %>
+              </span>
+            </span>
+          <% end %>
+        </div>
+      <% end %>
     </div>
     <% if bullet.with_note? %>
-      <%= render "notes/preview", note: bullet.note, url: bullet_path(bullet) %>
-    <% end %>
-    <% if bullet.status.in?(%w[postponed published]) %>
-      <span
-        class="bullet--status bullet--status--<%= bullet.status %>"
-        style="<%= "color: #{bullet.collection.colour_variable}" if bullet.collection&.colour_variable %>"
-      >
-        <%= icon(bullet.marker_icon) %>
-        <span>
-          <% if bullet.status == "postponed" %>
-            Postponed <%= pluralize(bullet.postponements_number, "time") %>
-          <% elsif bullet.status == "published" %>
-            It is published
-          <% end %>
-        </span>
-      </span>
+      <%= render "notes/preview", note: bullet.note %>
     <% end %>
   </div>
 

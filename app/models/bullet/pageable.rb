@@ -3,7 +3,7 @@
 module Bullet::Pageable
   extend ActiveSupport::Concern
 
-  PAGE_SIZE = 50
+  PAGE_SIZE = 20
 
   included do
     scope :by_date, -> { order(pops_on: :asc, created_at: :asc, id: :asc) }

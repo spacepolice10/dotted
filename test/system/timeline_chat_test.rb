@@ -8,7 +8,14 @@ class TimelineChatSystemTest < ApplicationSystemTestCase
   setup do
     @user = users(:one)
     sign_in_as(@user)
+    # Keep a 20-row page outside the older-page prefetch range until we scroll.
+    @original_window_size = page.current_window.size
+    page.current_window.resize_to(1400, 800)
     @list = '#timeline'
+  end
+
+  teardown do
+    page.current_window.resize_to(*@original_window_size) if @original_window_size
   end
 
   test 'the timeline opens at the newest bullet with older ones left off screen' do
@@ -49,13 +56,13 @@ class TimelineChatSystemTest < ApplicationSystemTestCase
   end
 
   test 'pages within one date merge into a single section' do
-    create_lines(70)
+    create_lines(PAGE + 5)
     visit bullets_path
     assert_selector "#{@list} .bullet", count: PAGE
 
     scroll_to_top
 
-    assert_selector "#{@list} .bullet", count: 70
+    assert_selector "#{@list} .bullet", count: PAGE + 5
     assert_selector '#timeline_section_current_date', count: 1
     assert_no_selector '[data-timeline-count]'
     assert_selector '.timeline--section-header a', text: 'Press to show all the bullets'
@@ -150,16 +157,6 @@ class TimelineChatSystemTest < ApplicationSystemTestCase
 
     scroll_to_top
 
-    page.execute_script(<<~JS)
-      const scroller = document.querySelector('.timeline--scroller')
-      scroller.pendingScrollCalls = 0
-      const originalScrollTo = scroller.scrollTo.bind(scroller)
-      scroller.scrollTo = (...args) => {
-        scroller.pendingScrollCalls += 1
-        return originalScrollTo(...args)
-      }
-    JS
-
     editor = find('#bullet_composer lexxy-editor .lexxy-editor__content')
     editor.click
     editor.send_keys('Fresh line from above')
@@ -167,7 +164,6 @@ class TimelineChatSystemTest < ApplicationSystemTestCase
 
     assert_selector '#timeline .bullet:not(.bullet--pending)', text: 'Fresh line from above'
     assert_pinned_to_bottom
-    assert_equal 1, page.evaluate_script("document.querySelector('.timeline--scroller').pendingScrollCalls")
     gap = page.evaluate_script(<<~JS)
       (() => {
         const scroller = document.querySelector('.timeline--scroller')
@@ -178,6 +174,137 @@ class TimelineChatSystemTest < ApplicationSystemTestCase
       })()
     JS
     assert_in_delta 0, gap, 2
+  end
+
+  test 'sending scrolls once for pending and preserves rich text layout through replacement' do
+    create_lines(PAGE)
+    visit bullets_path
+    hold_pending_replacement
+    track_timeline_scroll_calls
+
+    body = (1..8).map { |index| "<p>Paragraph #{index} with <strong>formatted text</strong>.</p>" }.join
+    page.execute_script("document.querySelector('#bullet_composer lexxy-editor').value = #{body.to_json}")
+    find('#bullet_composer .composer--submit-button').click
+
+    assert_selector '#timeline .bullet--pending .lexxy-content p', count: 8
+    assert_pinned_to_bottom
+    pending = newest_row_metrics
+    assert_equal 1, timeline_scroll_calls
+
+    release_pending_replacement
+    assert_selector '#timeline .bullet:not(.bullet--pending) .lexxy-content p', text: 'Paragraph 8'
+    wait_for_animation_frames
+
+    saved = newest_row_metrics
+    assert_equal 1, timeline_scroll_calls
+    assert_in_delta pending['height'], saved['height'], 1
+    assert_in_delta pending['top'], saved['top'], 1
+    assert_in_delta pending['scrollTop'], saved['scrollTop'], 1
+    assert_pinned_to_bottom
+  end
+
+  test 'pending replacement and later layout changes never pull the reader back down' do
+    create_lines(PAGE)
+    visit bullets_path
+    hold_pending_replacement
+    track_timeline_scroll_calls
+    editor = find('#bullet_composer lexxy-editor .lexxy-editor__content')
+    editor.send_keys('Read while saving')
+    find('#bullet_composer .composer--submit-button').click
+    assert_selector '#timeline .bullet--pending'
+    assert_pinned_to_bottom
+
+    # No touch/wheel event is needed to "release" anything: there is no anchor.
+    page.execute_script("document.querySelector('.timeline--scroller').scrollTop -= 200")
+    wait_for_animation_frames
+    top = newest_row_metrics['scrollTop']
+    assert_operator distance_from_bottom, :>, 100
+
+    release_pending_replacement
+    assert_selector '#timeline .bullet:not(.bullet--pending)', text: 'Read while saving'
+    wait_for_animation_frames
+    assert_in_delta top, newest_row_metrics['scrollTop'], 1
+
+    page.execute_script(<<~JS)
+      const scroller = document.querySelector('.timeline--scroller')
+      scroller.querySelector('.timeline--section:last-of-type > .bullet:last-child').style.minHeight = '300px'
+      scroller.style.maxHeight = '400px'
+      window.visualViewport?.dispatchEvent(new Event('resize'))
+    JS
+    wait_for_animation_frames
+    assert_in_delta top, newest_row_metrics['scrollTop'], 1
+    assert_equal 1, timeline_scroll_calls
+  end
+
+  test 'a picture pending row reserves its saved layout without another scroll' do
+    create_lines(PAGE)
+    visit bullets_path
+    hold_pending_replacement
+    track_timeline_scroll_calls
+    path = Rails.root.join("tmp/scroll-image-#{SecureRandom.hex(4)}.png")
+    File.binwrite(path, Base64.decode64(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+    ))
+
+    attach_file('bullet[file]', path, make_visible: true)
+    assert_selector '#timeline .bullet--pending .attachment--preview-icon'
+    assert_no_selector '#timeline .bullet--pending img'
+    pending = newest_row_metrics
+    assert_equal 1, timeline_scroll_calls
+
+    release_pending_replacement
+    assert_selector '#timeline .bullet:not(.bullet--pending) .attachment--preview img'
+    wait_for_animation_frames
+    saved = newest_row_metrics
+    assert_equal 1, timeline_scroll_calls
+    assert_in_delta pending['height'], saved['height'], 1
+    assert_in_delta pending['top'], saved['top'], 1
+    assert_in_delta pending['scrollTop'], saved['scrollTop'], 1
+  ensure
+    File.delete(path) if path && File.exist?(path)
+  end
+
+  test 'a non-picture attachment keeps its icon card and position through saving' do
+    create_lines(PAGE)
+    visit bullets_path
+    hold_pending_replacement
+    track_timeline_scroll_calls
+    path = Rails.root.join("tmp/reference-#{SecureRandom.hex(4)}.txt")
+    File.write(path, 'Reference material')
+
+    attach_file('bullet[file]', path, make_visible: true)
+    assert_selector '#timeline .bullet--pending .attachment--preview-icon .icon[style*="--icon-file"]'
+    assert_selector '#timeline .bullet--pending .bullet--select-checkbox'
+    assert_no_selector '#timeline .bullet--pending img'
+    pending = newest_row_metrics
+
+    release_pending_replacement
+    saved_row = '#timeline .bullet:not(.bullet--pending):last-child'
+    assert_selector "#{saved_row} .attachment--preview-icon"
+    assert_selector "#{saved_row} .attachment--preview-name", text: File.basename(path)
+    wait_for_animation_frames
+    saved = newest_row_metrics
+    assert_in_delta pending['height'], saved['height'], 1
+    assert_in_delta pending['top'], saved['top'], 1
+    assert_in_delta pending['scrollTop'], saved['scrollTop'], 1
+    assert_equal 1, timeline_scroll_calls
+
+    assert_operator page.evaluate_script("document.querySelector('#{saved_row} .attachment--preview-icon .icon-wrap').getBoundingClientRect().width"), :>=, 40
+    page.driver.browser.execute_cdp('Emulation.setDeviceMetricsOverride', width: 320, height: 844, deviceScaleFactor: 1, mobile: true)
+    %w[light dark].each do |theme|
+      page.driver.browser.execute_cdp('Emulation.setEmulatedMedia', features: [{ name: 'prefers-color-scheme', value: theme }])
+      wait_for_animation_frames
+      assert_operator page.evaluate_script('document.documentElement.scrollWidth'), :<=,
+                      page.evaluate_script('document.documentElement.clientWidth')
+    end
+
+    download = find("#{saved_row} a[aria-label='Download #{File.basename(path)}']")
+    assert_equal 'false', download['data-turbo']
+    assert_includes URI.decode_www_form(URI.parse(download[:href]).query.to_s), %w[disposition attachment]
+    find("#{saved_row} .attachment--preview-name").click
+    assert_selector "#{saved_row} [data-bullet-menu-target=checkbox]:checked", visible: :all
+  ensure
+    File.delete(path) if path && File.exist?(path)
   end
 
   test 'show all opens a timeline containing the full date' do
@@ -206,6 +333,61 @@ class TimelineChatSystemTest < ApplicationSystemTestCase
   end
 
   private
+
+  def track_timeline_scroll_calls
+    page.execute_script(<<~JS)
+      const scroller = document.querySelector('.timeline--scroller')
+      scroller.style.maxHeight = '500px'
+      scroller.pendingScrollCalls = 0
+      const originalScrollTo = scroller.scrollTo.bind(scroller)
+      scroller.scrollTo = (...args) => {
+        scroller.pendingScrollCalls += 1
+        return originalScrollTo(...args)
+      }
+    JS
+  end
+
+  def timeline_scroll_calls
+    page.evaluate_script("document.querySelector('.timeline--scroller').pendingScrollCalls")
+  end
+
+  def newest_row_metrics
+    page.evaluate_script(<<~JS)
+      (() => {
+        const scroller = document.querySelector('.timeline--scroller')
+        const last = scroller.querySelector('.timeline--section:last-of-type > .bullet:last-child')
+        const rect = last.getBoundingClientRect()
+        return { height: rect.height, top: rect.top, scrollTop: scroller.scrollTop }
+      })()
+    JS
+  end
+
+  def wait_for_animation_frames
+    page.driver.browser.execute_async_script('requestAnimationFrame(() => requestAnimationFrame(arguments[0]))')
+  end
+
+  def hold_pending_replacement
+    page.execute_script(<<~JS)
+      window.releasePendingReplacement = null
+      document.addEventListener('turbo:before-stream-render', (event) => {
+        if (!event.target.getAttribute('target')?.startsWith('bullet_client_')) return
+        const render = event.detail.render
+        event.detail.render = async (stream) => {
+          await new Promise((resolve) => { window.releasePendingReplacement = resolve })
+          await render(stream)
+        }
+      }, { once: true })
+    JS
+  end
+
+  def release_pending_replacement
+    deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + Capybara.default_max_wait_time
+    until page.evaluate_script('typeof window.releasePendingReplacement === "function"')
+      flunk 'pending replacement never arrived' if Process.clock_gettime(Process::CLOCK_MONOTONIC) >= deadline
+      sleep 0.05
+    end
+    page.execute_script('window.releasePendingReplacement()')
+  end
 
   def assert_pinned_to_bottom
     deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + Capybara.default_max_wait_time

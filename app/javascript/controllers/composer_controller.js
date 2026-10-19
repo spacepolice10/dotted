@@ -24,10 +24,11 @@ export default class extends Controller {
       body.delete("bullet[file]")
       const id = clientId()
 
-      this.#insertTextPending(id, container)
-      body.set("bullet[client_id]", id)
-
+      const preview = this.editorTarget.value
+      // Reset Lexxy's content and selection before the one pending-row scroll.
       this.restore()
+      this.#insertTextPending(id, container, preview)
+      body.set("bullet[client_id]", id)
 
       try {
         const response = await post(action, { body, responseKind: "turbo-stream" })
@@ -58,11 +59,12 @@ export default class extends Controller {
     this.editorTarget.focus()
   }
 
-  #insertTextPending(id, container) {
-    const preview = this.element.querySelector(".lexxy-editor__content")?.innerText?.trim() || ""
+  #insertTextPending(id, container, preview) {
     insertPending(this.pendingTextTemplateTarget, container, id, (node) => {
       node.querySelectorAll("[data-pending-body]").forEach((el) => {
-        el.textContent = preview
+        // Lexxy's serialized value is sanitized HTML, as submitted in the form.
+        // Use the saved row's rich-text layout instead of a clamped text preview.
+        el.innerHTML = preview
       })
     })
   }

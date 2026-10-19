@@ -80,8 +80,14 @@
     min-width: 0;
     gap: calc(var(--space-h-half) / 2);
     font-size: 0.875rem;
+  }
 
-    &.hotkey-hint::after {
+  .bullet-menu--desktop-actions {
+    display: none;
+  }
+
+  @media (width < 768px) {
+    .bullet-menu--actions .bullet-menu--action-button.hotkey-hint::after {
       display: none;
     }
   }
@@ -132,6 +138,14 @@
 
     .bullet-menu--actions {
       grid-template-columns: 1fr;
+    }
+
+    .bullet-menu--desktop-actions {
+      display: block;
+    }
+
+    .bullet-menu--actions .bullet-menu--more-button {
+      display: none;
     }
   }
 

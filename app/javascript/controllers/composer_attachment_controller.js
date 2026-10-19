@@ -65,38 +65,6 @@ export default class extends Controller {
         el.textContent = file.name
       })
       node.querySelector("[data-pending-filename]")?.setAttribute("title", file.name)
-      if (!file.type.startsWith("image/")) return
-
-      const img = node.querySelector("[data-pending-image]")
-      const preview = node.querySelector("[data-pending-preview]")
-      if (!img || !preview) return
-
-      const url = URL.createObjectURL(file)
-      img.src = url
-      img.alt = file.name
-      preview.hidden = false
-      node.querySelectorAll(".attachment--file").forEach((el) => {
-        el.hidden = true
-      })
-      img.onload = () => URL.revokeObjectURL(url)
-      img.onerror = () => {
-        URL.revokeObjectURL(url)
-        preview.hidden = true
-        node.querySelectorAll(".attachment--file").forEach((el) => {
-          el.hidden = false
-        })
-      }
-
-      // Reserve the final box upfront: same ratio the server render uses,
-      // so submit → upload → replace swaps pixels, not layout.
-      if (globalThis.createImageBitmap) {
-        createImageBitmap(file).then((bitmap) => {
-          if (bitmap.width && bitmap.height) {
-            img.style.aspectRatio = `${bitmap.width} / ${bitmap.height}`
-          }
-          bitmap.close?.()
-        }).catch(() => {})
-      }
     })
   }
 }

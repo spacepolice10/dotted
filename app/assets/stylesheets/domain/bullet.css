@@ -2,8 +2,14 @@
   overflow-wrap: anywhere !important;
 }
 
+/* Enter creates a paragraph; keep it close to the previous line in the editor
+   and in saved content without collapsing deliberately empty paragraphs. */
+:is(.lexxy-content, .lexxy-editor__content) > p:not(:last-child) {
+  margin-block-end: 0.25em;
+}
+
 .bullet--body .lexxy-content :is(ul, ol) {
-  padding-inline-start: 1em;
+  padding-inline-start: 0em;
 }
 
 .bullet--body .lexxy-content ul > li {
@@ -77,12 +83,6 @@
     padding-inline: var(--space-h-half);
     color: var(--color-invert-1);
 
-    @media (hover: hover) {
-      &:hover .bullet--body {
-        border-color: var(--color-2);
-        box-shadow: var(--shadow-subtle);
-      }
-    }
   }
 
   .bullet--content {
@@ -101,42 +101,6 @@
     width: 100%;
   }
 
-  .bullet--status {
-    display: flex;
-    align-items: center;
-    gap: var(--space-h-half);
-    width: fit-content;
-    max-width: 100%;
-    margin-block-start: var(--space-v-half);
-    margin-inline: auto;
-    padding: var(--space-v-half) var(--space-h-half);
-    box-sizing: border-box;
-    border: 1px solid currentColor;
-    border-radius: var(--radius-full);
-    background: color-mix(in oklch, currentColor 14%, var(--color-1));
-    font-size: var(--font-size-xs);
-    overflow-wrap: anywhere;
-  }
-
-  .bullet--status--postponed {
-    color: var(--model-color-1);
-  }
-
-  .bullet--status--published {
-    color: var(--model-color-2);
-  }
-
-  /* Keep the badge hue on its frame/icon; its small label needs text contrast. */
-  .bullet--status > span:not(.icon-wrap) {
-    color: var(--color-invert-2);
-  }
-
-  .bullet--status .icon-wrap {
-    flex-shrink: 0;
-    width: 1rem;
-    height: 1rem;
-  }
-
   .bullet--body {
     position: relative;
     max-width: 100%;
@@ -148,6 +112,11 @@
     border-radius: var(--radius-base);
     box-shadow: var(--shadow-subtle);
     color: var(--color-invert-1);
+
+    @supports (corner-shape: squircle) {
+      border-radius: var(--radius-strong);
+      corner-shape: squircle;
+    }
 
     & a {
       overflow-wrap: anywhere;
@@ -170,11 +139,6 @@
         background: var(--color-accent-1-subtle);
       }
 
-      @media (hover: hover) {
-        .bullet:hover & {
-          background: var(--color-2);
-        }
-      }
 
       .bullet[data-bullet-done="true"] & {
         text-decoration: line-through;
@@ -296,12 +260,17 @@
   gap: var(--space-v);
 }
 
-.bullet-note--form input[type="submit"] {
-  align-self: flex-end;
+.bullet-note--actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-v);
+  flex-shrink: 0;
 }
 
 
 .note-preview {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: var(--space-h-half);
@@ -310,22 +279,38 @@
   color: var(--color-invert-2);
   border-radius: var(--radius-base);
   padding: var(--space-v) var(--space-h);
+  padding-inline-start: 2.75rem;
+  border: 1px solid transparent;
   font-size: var(--font-size-xs);
   line-height: 1.5;
   overflow-wrap: anywhere;
-  text-decoration: none;
 }
 
-.note-preview .icon-wrap {
-  flex-shrink: 0;
-  color: var(--model-color-4);
+.note-preview > .icon-wrap {
+  position: absolute;
+  inset-block-start: var(--space-v);
+  inset-inline-start: 0;
+  width: 2.75rem;
+  height: 1.5em;
+  color: color-mix(in oklch, var(--color-invert-2) 45%, transparent);
 }
 
-.note-preview:hover {
-  background: color-mix(in oklch, var(--model-color-4) 28%, var(--color-1));
+.bullet:has(> input:checked) .note-preview > .icon-wrap {
+  color: var(--color-accent-1);
 }
 
-/* Size the note editor within its dialog without changing Lexxy's appearance. */
+.note-preview > .icon-wrap .icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.note-preview--text {
+  flex: 1;
+  min-width: 0;
+  white-space: pre-wrap;
+}
+
+/* Keep the note editor sized and themed within its dialog. */
 #note_dialog[open] {
   display: flex;
   flex-direction: column;
@@ -342,19 +327,107 @@
 }
 
 #note_dialog lexxy-editor {
+  --lexxy-color-ink: var(--color-invert-1);
+  --lexxy-color-ink-medium: var(--color-invert-3);
+  --lexxy-color-ink-light: var(--color-invert-4);
+  --lexxy-color-ink-lighter: var(--color-4);
+  --lexxy-color-ink-lightest: var(--color-2);
+  --lexxy-color-ink-inverted: var(--color-1);
+  --lexxy-color-canvas: var(--color-1);
+  --lexxy-color-text: var(--color-invert-1);
+  --lexxy-color-text-subtle: var(--color-invert-3);
+  --lexxy-color-accent-dark: var(--color-focus);
+  --lexxy-color-accent-medium: var(--color-accent-1);
+  --lexxy-color-accent-light: var(--color-accent-1-subtle);
+  --lexxy-color-accent-lightest: var(--color-accent-1-subtle);
+  --lexxy-color-link: var(--color-focus);
+  --lexxy-color-selected: var(--color-accent-1-subtle);
+  --lexxy-color-selected-hover: var(--color-3);
+  --lexxy-color-selected-dark: var(--color-focus);
+  --lexxy-color-selected-50: color-mix(in oklch, var(--color-focus) 50%, transparent);
+  --lexxy-color-code-bg: var(--color-2);
+  --lexxy-color-table-header-bg: var(--color-2);
+  --lexxy-color-table-cell-border: var(--color-4);
+  --lexxy-color-table-cell-selected: var(--color-accent-1-subtle);
+  --lexxy-color-table-cell-selected-border: var(--color-focus);
+  --lexxy-color-table-cell-selected-bg: var(--color-accent-1-subtle);
+  --lexxy-color-table-cell-add: var(--lexxy-color-selected-50);
+  --lexxy-color-table-cell-toggle: var(--color-accent-1-subtle);
+  --lexxy-focus-ring-color: var(--color-focus);
+
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  /* Prevent Safari's focus zoom while respecting larger text settings. */
+  font-size: max(16px, var(--font-size-base-type));
 }
 
 #note_dialog lexxy-toolbar,
-#note_dialog input[type="submit"] {
+#note_dialog .bullet-note--actions {
   flex-shrink: 0;
 }
 
 #note_dialog .lexxy-editor__content {
+  font-size: inherit;
   flex: 1;
   min-block-size: 0;
   overflow-y: auto;
+}
+
+
+@layer components {
+  .bullet--metadata {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-v-half);
+    margin-block-start: var(--space-v);
+  }
+
+  .bullet--metadata > :is(.bullet--collection, .bullet--status) {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    max-inline-size: 100%;
+    gap: 0.35em;
+    padding: 0.2em 0.6em;
+    font-size: var(--font-size-xs);
+    font-weight: inherit;
+    line-height: 1.25;
+    white-space: normal;
+    text-decoration: none;
+
+    > .icon-wrap {
+      flex-shrink: 0;
+      width: 1em;
+      height: 1em;
+      color: var(--chip-colour);
+    }
+
+    > span:not(.icon-wrap) {
+      display: block;
+      -webkit-line-clamp: unset;
+      min-width: 0;
+      overflow: visible;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .bullet--status--postponed {
+    --chip-colour: var(--model-color-1);
+  }
+
+  .bullet--status--published {
+    --chip-colour: var(--model-color-2);
+  }
+
+  .bullet--metadata > :is(.bullet--collection, .bullet--status):hover {
+    background: var(--color-2);
+  }
+
+  .bullet--body:has(> .attachment--preview) > .bullet--metadata {
+    margin: var(--space-v-half);
+    margin-block-start: var(--space-v);
+  }
 }

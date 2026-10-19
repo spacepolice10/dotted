@@ -56,7 +56,7 @@ id="bullet_composer"
     <turbo-frame id="bullet_client_CLIENT_ID" class="bullet bullet--pending" data-bullet-done="false">
       <div class="bullet--content">
         <div class="bullet--body">
-          <div class="bullet--note utilities--line-clamp-3" data-pending-body></div>
+          <div class="lexxy-content rich-text-content" data-pending-body></div>
         </div>
       </div>
     </turbo-frame>
@@ -64,17 +64,11 @@ id="bullet_composer"
 
   <template data-composer-attachment-target="pendingFileTemplate">
     <turbo-frame id="bullet_client_CLIENT_ID" class="bullet bullet--pending" data-bullet-done="false">
-      <div class="bullet--body">
-        <span class="attachment--file">
-          <%= icon("paperclip") %>
-          <span class="attachment--file-name utilities--line-clamp-1" data-pending-filename></span>
-        </span>
-        <span class="attachment--preview" data-pending-preview hidden>
-          <img data-pending-image alt="">
-          <span class="pill attachment--preview-name" data-pending-filename>
-            <span class="attachment--preview-filename" data-pending-filename></span>
-          </span>
-        </span>
+      <div class="bullet--content">
+        <span class="bullet--select-checkbox" aria-hidden="true"></span>
+        <div class="bullet--body">
+          <%= render "bullets/attachment" %>
+        </div>
       </div>
     </turbo-frame>
   </template>

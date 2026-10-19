@@ -66,8 +66,8 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
 
     get bullets_path
 
-    assert_select "#bullet_#{postponed.id} .bullet--status--postponed[role=img][aria-label=Postponed][style='color: var(--model-color-1)']", count: 1
-    assert_select "#bullet_#{published.id} .bullet--status--published[role=img][aria-label=Published][style='color: var(--model-color-1)']", count: 1
+    assert_select "#bullet_#{postponed.id} .bullet--metadata .bullet--status--postponed", text: /Postponed/, count: 1
+    assert_select "#bullet_#{published.id} .bullet--metadata .bullet--status--published", text: /published/, count: 1
     assert_select "#bullet_#{completed.id} .bullet--status", count: 0
 
     get bullets_path(completed: true)
@@ -325,8 +325,8 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match %(turbo-stream action="replace" target="bullet_client_#{client_id}"), response.body
     bullet = @user.bullets.order(:created_at).last
-    assert_select 'turbo-stream[action=replace] label.attachment--preview img[alt=?][src]', 'pixel.png'
-    assert_select 'turbo-stream[action=replace] label.attachment--preview .pill', text: 'pixel.png'
+    assert_select 'turbo-stream[action=replace] .attachment--preview img[alt=?][src]', 'pixel.png'
+    assert_select 'turbo-stream[action=replace] .attachment--preview .pill', text: 'pixel.png'
     assert_equal client_id, bullet.client_id
   end
 

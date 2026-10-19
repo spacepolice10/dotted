@@ -16,5 +16,8 @@ class PublishedController < ApplicationController
     entity = PublishedEntity.find_by!(code: params[:code])
     @bullet = entity.publishable
     raise ActiveRecord::RecordNotFound unless @bullet.is_a?(Bullet)
+
+    # Public rendering omits the private collection without loading it.
+    @bullet.association(:collection).target = nil
   end
 end

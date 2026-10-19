@@ -224,6 +224,7 @@
   overflow-wrap: anywhere;
   text-decoration: none;
   white-space: normal;
+  vertical-align: text-top;
   cursor: pointer;
   & > span {
     max-width: 24ch;

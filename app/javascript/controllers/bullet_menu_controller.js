@@ -104,6 +104,7 @@ export default class extends Controller {
     if (this.idListValue.length != 1) return;
     const checkbox = this.checkboxTargets.find((checkbox) => checkbox.checked);
     if (!checkbox) return;
+    this.#closePickers();
     this.openPicker({ params: { dialog: "note_dialog", url: checkbox.dataset.noteUrl } });
   }
 
@@ -206,18 +207,22 @@ export default class extends Controller {
 
   #syncStatusActions() {
     const checked = this.checkboxTargets.filter((checkbox) => checkbox.checked);
-    if (this.hasNoteTarget) {
-      this.noteTarget.hidden = checked.length != 1;
-    }
+    this.noteTargets.forEach((target) => {
+      target.hidden = checked.length != 1;
+    });
     const done = this.#sharedDataset(checked, "bulkDone");
 
     if (this.hasCompleteTarget) this.completeTarget.hidden = done != "false";
     if (this.hasUncompleteTarget) this.uncompleteTarget.hidden = done != "true";
-    if (this.hasPublishTarget) this.publishTarget.hidden = !checked.some((checkbox) => checkbox.dataset.bulkPublished == "false");
-    if (this.hasUnpublishTarget) this.unpublishTarget.hidden = !checked.some((checkbox) => checkbox.dataset.bulkPublished == "true");
-    if (this.hasCopyLinkTarget) {
-      this.copyLinkTarget.hidden = checked.length != 1 || checked[0].dataset.bulkPublished != "true";
-    }
+    this.publishTargets.forEach((target) => {
+      target.hidden = !checked.some((checkbox) => checkbox.dataset.bulkPublished == "false");
+    });
+    this.unpublishTargets.forEach((target) => {
+      target.hidden = !checked.some((checkbox) => checkbox.dataset.bulkPublished == "true");
+    });
+    this.copyLinkTargets.forEach((target) => {
+      target.hidden = checked.length != 1 || checked[0].dataset.bulkPublished != "true";
+    });
   }
 
   #sharedDataset(checkboxes, key) {

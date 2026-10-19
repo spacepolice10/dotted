@@ -83,7 +83,7 @@ class TimelinesControllerTest < ActionDispatch::IntegrationTest
     assert_no_match 'Gone line', response.body
   end
 
-  test 'a date over 50 shows an explicit button for its remaining bullets' do
+  test 'a date over one page shows an explicit button for its remaining bullets' do
     Array.new(Bullet::Pageable::PAGE_SIZE + 1) { |i| create_bullet!(@user, body: "Line #{i}", created_at: (100 - i).minutes.ago) }
 
     get bullets_path
@@ -95,7 +95,7 @@ class TimelinesControllerTest < ActionDispatch::IntegrationTest
     assert_select '#timeline .bullet', count: Bullet::Pageable::PAGE_SIZE
   end
 
-  test 'a date with exactly 50 bullets has no show all link' do
+  test 'a date with exactly one page of bullets has no show all link' do
     Bullet::Pageable::PAGE_SIZE.times { |i| create_bullet!(@user, body: "Line #{i}") }
 
     get bullets_path
@@ -104,9 +104,10 @@ class TimelinesControllerTest < ActionDispatch::IntegrationTest
     assert_select '[data-timeline-count]', count: 0
   end
 
-  test 'a split date with fewer than 50 bullets has no show all link' do
-    30.times { |i| create_bullet!(@user, body: "Older #{i}", pops_on: Date.yesterday) }
-    30.times { |i| create_bullet!(@user, body: "Current #{i}") }
+  test 'a split date with fewer than one page of bullets has no show all link' do
+    per_date = Bullet::Pageable::PAGE_SIZE / 2 + 1
+    per_date.times { |i| create_bullet!(@user, body: "Older #{i}", pops_on: Date.yesterday) }
+    per_date.times { |i| create_bullet!(@user, body: "Current #{i}") }
 
     get bullets_path
 

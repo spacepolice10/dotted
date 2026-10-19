@@ -2,8 +2,8 @@ import { Controller } from "@hotwired/stimulus"
 import { keepScroll, pauseInertiaScroll, scrollToBottom } from "helpers/scroll_helpers"
 
 // Generic timeline list mounted directly on its scroller (scrollport + list in one),
-// opens at the newest bullet and pulls older pages from the top. The composer is a
-// sibling flex row, so this element owns all remaining space and scrolling.
+// opens at the newest bullet and pulls older pages from the top. The composer
+// overlays the scroller.
 //
 // A `current` rail (`bullets#show`) is already complete and anchored on one row:
 // it centres that row instead of resting on the newest, and has no older page

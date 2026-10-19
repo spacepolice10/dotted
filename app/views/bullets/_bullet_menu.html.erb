@@ -9,7 +9,6 @@
   <span class="bullet-menu--count" data-bullet-menu-target="amount" role="status">0 selected</span>
   <div class="bullet-menu--card">
     <div class="bullet-menu--actions">
-      <button type="button" class="bullet-menu--action-button" data-bullet-menu-target="note" data-action="bullet-menu#openNote" data-intent="secondary" data-radius="base" data-size="sm" hidden><%= icon("memo") %> Note</button>
       <%= form_with url: completion_path, method: :post,
             class: "utilities--contents",
             data: { turbo_stream: true, bullet_menu_target: "complete" },
@@ -85,7 +84,7 @@
       </button>
       <button
         type="button"
-        class="bullet-menu--action-button"
+        class="bullet-menu--action-button bullet-menu--more-button"
         data-intent="secondary"
         data-radius="base"
         data-size="sm"
@@ -94,6 +93,9 @@
       >
         <%= icon("dots") %> More
       </button>
+      <div class="bullet-menu--desktop-actions">
+        <%= render "bullets/more_actions" %>
+      </div>
     </div>
   </div>
 </div>
@@ -119,5 +121,7 @@
 <%= render "bullets/bullet_picker_dialog", name: "Note", dialog_id: "note_dialog", frame_id: "note_editor", size: "lg" %>
 
 <%= render "shared/dialog", name: "More actions", id: "more_dialog", size: "sm", standalone: true do %>
-  <%= render "bullets/more_actions" %>
+  <div data-bullet-menu-target="pickerElement">
+    <%= render "bullets/more_actions" %>
+  </div>
 <% end %>

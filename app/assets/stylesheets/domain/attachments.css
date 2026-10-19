@@ -8,7 +8,7 @@
     max-inline-size: 100%;
   }
 
-  .attachment--preview-picture {
+  .attachment--preview-media {
     position: relative;
     display: block;
     max-inline-size: 100%;
@@ -19,7 +19,7 @@
     cursor: zoom-in;
   }
 
-  .attachment--preview-picture::after {
+  .attachment--preview-media::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -29,7 +29,7 @@
     pointer-events: none;
   }
 
-  .bullet:has(> input:checked) .attachment--preview-picture::after {
+  .bullet:has(> input:checked) .attachment--preview-media::after {
     opacity: 1;
   }
 
@@ -58,8 +58,20 @@
     text-overflow: ellipsis;
   }
 
+  .attachment--preview-icon {
+    display: grid;
+    place-items: center;
+    inline-size: var(--space-h-10);
+    block-size: var(--space-h-10);
+    max-inline-size: 100%;
+    border-radius: var(--radius-base);
+    background: var(--color-1);
+    color: var(--color-invert-3);
+  }
+
   /* Lexxy's content styles are unlayered, so sizes need !important to win. */
   .bullet--body :is(.attachment--preview img) {
+    display: block;
     block-size: var(--space-h-10) !important;
     inline-size: auto !important;
     max-inline-size: 100%;
@@ -128,5 +140,12 @@
     border-radius: var(--radius-base);
     background: var(--color-1);
     color: var(--color-invert-2);
+  }
+}
+
+@layer icons {
+  .attachment--preview-icon > .icon-wrap {
+    width: var(--space-h-3);
+    height: var(--space-h-3);
   }
 }

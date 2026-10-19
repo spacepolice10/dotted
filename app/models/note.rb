@@ -6,9 +6,5 @@ class Note < ApplicationRecord
 
   has_rich_text :content
 
-  def excerpt(length: 180)
-    content.to_plain_text.squish.truncate(length)
-  end
-
   validates :notable_id, uniqueness: { scope: :notable_type }
 end
