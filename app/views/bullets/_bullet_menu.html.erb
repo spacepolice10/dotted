@@ -104,7 +104,7 @@
       name: "Later",
       dialog_id: "postpone_dialog",
       frame_id: "postpone_picker",
-      size: "sm",
+      size: "lg",
       frame_data: {
         controller: "grid-navigation",
         grid_navigation_columns_value: 1,
@@ -120,7 +120,7 @@
 
 <%= render "bullets/bullet_picker_dialog", name: "Note", dialog_id: "note_dialog", frame_id: "note_editor", size: "lg" %>
 
-<%= render "shared/dialog", name: "More actions", id: "more_dialog", size: "sm", standalone: true do %>
+<%= render "shared/dialog", name: "More actions", id: "more_dialog", size: "sm", standalone: true, close_on_submit: false do %>
   <div data-bullet-menu-target="pickerElement">
     <%= render "bullets/more_actions" %>
   </div>

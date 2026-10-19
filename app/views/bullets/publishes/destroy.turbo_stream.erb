@@ -3,6 +3,9 @@
     <%= render "shared/toasts", type: "errmsg", messages: @failed_bullet.errors.full_messages %>
   <% end %>
 <% else %>
+  <%= turbo_stream.update_all ".bullet-menu--publishing" do %>
+    <%= render "form", bullets: @bullets %>
+  <% end %>
   <% @bullets.each do |bullet| %>
     <%= turbo_stream.replace_all bullet do %>
       <%= render partial: bullet.to_partial_path, locals: { bullet: bullet } %>

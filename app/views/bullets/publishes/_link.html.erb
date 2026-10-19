@@ -1,0 +1,5 @@
+<%= link_to new_publish_path,
+      class: "bullet-menu--action-button",
+      data: { turbo_stream: true, bullet_menu_target: "publishingLink", intent: "secondary", radius: "base", size: "sm" } do %>
+  <%= icon("link", style: "color: var(--color-accent-2)") %> Publishing…
+<% end %>

@@ -75,7 +75,7 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#bullet_#{completed.id} .bullet--status", count: 0
   end
 
-  test 'bullet menu gates complete and publish by selection status' do
+  test 'bullet menu gates completion and offers the publishing form' do
     create_bullet!(@user, body: 'Selectable')
 
     get bullets_path
@@ -83,9 +83,9 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select '.bullet-menu--actions form[data-bullet-menu-target="complete"][hidden]', count: 1
     assert_select '.bullet-menu--actions form[data-bullet-menu-target="uncomplete"][hidden]', count: 1
-    assert_select '.bullet-menu--actions form[data-bullet-menu-target="publish"][hidden]', count: 1
-    assert_select '.bullet-menu--actions form[data-bullet-menu-target="unpublish"][hidden]', count: 1
-    assert_match 'Complete', response.body
+    assert_select '.bullet-menu--actions .bullet-menu--publishing a', text: 'Publishing…', count: 1
+    assert_select '.bullet-menu--actions form[action=?]', publish_path, count: 0
+    assert_match 'Done', response.body
     assert_no_match 'Archive', response.body
     assert_select '.bullet-menu--actions button', text: 'Today', count: 0
     assert_select 'input[data-bulk-done]', minimum: 1

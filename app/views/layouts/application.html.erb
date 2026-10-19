@@ -54,6 +54,8 @@
   >
     <%= render "shared/toasts_host" %>
 
+    <svg class="bullet-menu--selection-lines" data-bullet-menu-target="selectionLines" aria-hidden="true" focusable="false" hidden></svg>
+
     <%= yield %>
 
     <%= render "bullets/bullet_menu" if Current.user %>

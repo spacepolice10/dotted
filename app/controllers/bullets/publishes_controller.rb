@@ -6,6 +6,13 @@ module Bullets
 
     before_action :prepare_bullets
 
+    def new
+      respond_to do |format|
+        format.html
+        format.turbo_stream
+      end
+    end
+
     def create
       Bullet.transaction do
         @bullets.lock.find_each(&:publish!)

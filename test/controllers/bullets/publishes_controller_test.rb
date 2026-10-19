@@ -10,6 +10,36 @@ module Bullets
       @bullet = create_bullet!(@user, body: 'Publish me')
     end
 
+    test 'new explains publishing without creating a public link' do
+      get new_publish_path, params: { bullet_ids: @bullet.id.to_s },
+                            headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
+
+      assert_response :success
+      assert_select 'turbo-stream[action="update"][targets=".bullet-menu--publishing"]'
+      assert_match 'anyone with its public link', response.body
+      assert_select 'button', text: 'Publish'
+      assert_not @bullet.reload.published?
+    end
+
+    test 'new displays an existing public link' do
+      @bullet.publish!
+      get new_publish_path, params: { bullet_ids: @bullet.id.to_s },
+                            headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
+
+      assert_response :success
+      assert_select 'input[readonly][value=?]', published_url(@bullet.public_code)
+      assert_select 'button', text: 'Copy'
+      assert_select 'button', text: 'Unpublish'
+    end
+
+    test 'new rejects another users bullet' do
+      other = create_bullet!(users(:two), body: 'Private')
+      get new_publish_path, params: { bullet_ids: other.id.to_s },
+                            headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
+
+      assert_response :not_found
+    end
+
     test 'create publishes bullet and redirects to its public page' do
       post publish_path, params: { bullet_ids: @bullet.id.to_s }
 
@@ -26,6 +56,9 @@ module Bullets
       assert @bullet.reload.published?
       assert_match %(turbo-stream action="replace" targets="#bullet_#{@bullet.id}"), response.body
       assert_match 'Bullet published', response.body
+      assert_select 'input[readonly][value=?]', published_url(@bullet.public_code)
+      assert_select 'button', text: 'Copy'
+      assert_select 'button', text: 'Unpublish'
     end
 
     test 'create publishes multiple bullets' do
@@ -49,6 +82,8 @@ module Bullets
       assert_not @bullet.reload.published?
       assert_match %(turbo-stream action="replace" targets="#bullet_#{@bullet.id}"), response.body
       assert_match 'Bullet unpublished', response.body
+      assert_select 'button', text: 'Publish'
+      assert_select 'input[readonly]', count: 0
     end
 
     test 'create returns unprocessable entity when publish! is invalid' do

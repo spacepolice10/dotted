@@ -20,7 +20,7 @@ Rails.application.routes.draw do
     resource :postpone, only: %i[new create]
     resource :collect, only: %i[new create]
     resource :completion, only: %i[create destroy]
-    resource :publish, only: %i[create destroy]
+    resource :publish, only: %i[new create destroy]
   end
 
   resources :bullets, except: %i[new edit] do

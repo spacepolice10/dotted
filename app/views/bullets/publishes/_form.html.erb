@@ -1,0 +1,34 @@
+<%# locals: (bullets:) %>
+<article class="bullet-menu--publishing-form" aria-label="Publishing">
+  <main>
+    <p>Publishing makes each bullet accessible to anyone with its public link. You can unpublish at any time to disable access.</p>
+
+    <% bullets.each do |bullet| %>
+      <% if bullet.published? %>
+        <div class="bullet-menu--public-link">
+          <% if bullets.size > 1 %><p><%= bullet.name %></p><% end %>
+          <%= text_field_tag nil, published_url(bullet.public_code),
+                class: "bullet--published-link", readonly: true, autocomplete: "off", aria: { label: "Public link" } %>
+          <%= button_tag "Copy", type: :button,
+                data: { action: "bullet-menu#copyLink", bullet_menu_url_param: published_url(bullet.public_code), intent: "secondary", size: "sm" } %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <% if bullets.any? { |bullet| !bullet.published? } %>
+      <%= form_with url: publish_path, method: :post,
+            data: { turbo_stream: true, bullet_menu_preserve_selection: true } do %>
+        <%= hidden_field_tag :bullet_ids, bullets.map(&:id).join(","), id: nil %>
+        <%= button_tag "Publish", data: { intent: "primary", size: "sm" } %>
+      <% end %>
+    <% end %>
+
+    <% if bullets.any?(&:published?) %>
+      <%= form_with url: publish_path, method: :delete,
+            data: { turbo_stream: true, bullet_menu_preserve_selection: true } do %>
+        <%= hidden_field_tag :bullet_ids, bullets.map(&:id).join(","), id: nil %>
+        <%= button_tag "Unpublish", data: { intent: "secondary", size: "sm" } %>
+      <% end %>
+    <% end %>
+  </main>
+</article>
