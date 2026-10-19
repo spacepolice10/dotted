@@ -10,11 +10,15 @@ module Bullets
       today = Date.current
 
       @postpone_options = [
-        { id: :today,         icon: 'arrow-up',        name: 'Today',        pops_on: today },
-        { id: :tomorrow,      icon: 'arrow-right',     name: 'Tomorrow',     pops_on: today + 1.day },
-        { id: :next_monday,   icon: 'calendar-repeat', name: 'Next week',    pops_on: today.next_occurring(:monday) },
-        { id: :next_weekend,  icon: 'calendar-repeat', name: 'Next weekend', pops_on: today.next_occurring(:saturday) },
-        { id: :next_month,    icon: 'calendar',        name: 'Next month',   pops_on: (today + 1.month).beginning_of_month }
+        { id: :today,              icon: 'arrow-up',        name: 'Today',              pops_on: today },
+        { id: :tomorrow,           icon: 'arrow-right',     name: 'Tomorrow',           pops_on: today + 1.day },
+        { id: :day_after_tomorrow, icon: 'arrow-right',     name: 'Day after tomorrow', pops_on: today + 2.days },
+        { id: :next_monday,        icon: 'calendar-repeat', name: 'Next week',          pops_on: today.next_occurring(:monday) },
+        { id: :next_weekend,       icon: 'calendar-repeat', name: 'Next weekend',       pops_on: today.next_occurring(:saturday) },
+        { id: :in_two_weeks,       icon: 'calendar-repeat', name: 'In two weeks',       pops_on: today + 2.weeks },
+        { id: :next_month,         icon: 'calendar',        name: 'Next month',         pops_on: (today + 1.month).beginning_of_month },
+        { id: :in_a_month,         icon: 'calendar',        name: 'In a month',         pops_on: today + 1.month },
+        { id: :in_three_months,    icon: 'calendar',        name: 'In three months',    pops_on: today + 3.months }
       ]
     end
 

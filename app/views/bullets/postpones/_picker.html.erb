@@ -4,37 +4,47 @@
   <h2 class="utilities--sr-only">Schedule</h2>
 </header>
 
-<main aria-label="Schedule">
-  <% postpone_options.each do |option| %>
-    <%= form_with url: postpone_path, method: :post,
-            class: "utilities--contents",
-            data: { turbo_stream: true } do %>
-      <%= hidden_field_tag :bullet_ids, bullet_ids, data: { bullet_menu_target: "idList" } %>
-      <%= hidden_field_tag :pops_on, option[:pops_on].iso8601 %>
-
-      <%= button_tag type: :submit,
-              class: "picker--item",
-              data: {
-                grid_navigation_target: "item",
-                action: "focus->grid-navigation#syncPosition"
-              } do %>
-        <%= icon(option[:icon]) %>
-        <%= option[:name] %>
-
-        <% if option[:pops_on] %>
-          · <%= option[:pops_on].strftime("%a, %b %-d") %>
-        <% end %>
-      <% end %>
-    <% end %>
-  <% end %>
-
-  <br>
+<main aria-label="Schedule"
+      data-controller="postpone-picker"
+      data-postpone-picker-today-value="<%= Date.current.iso8601 %>"
+      data-action="keydown->postpone-picker#navigate">
   <%= form_with url: postpone_path, method: :post,
-        class: "postpone-picker--manual-date",
-        data: { turbo_stream: true } do |f| %>
-    <%= f.hidden_field :bullet_ids, value: bullet_ids, data: { bullet_menu_target: "idList" } %>
-    <%= f.date_field :pops_on, value: Date.current, required: true,
-          class: "postpone-picker--date", aria: { label: "Choose date" } %>
-    <%= f.button "Confirm", type: :submit, data: { intent: "primary", size: "sm", radius: "base" } %>
+        class: "picker--form",
+        data: { turbo_stream: true } do %>
+    <%= hidden_field_tag :bullet_ids, bullet_ids, data: { bullet_menu_target: "idList" } %>
+    <%= label_tag :postpone_query, "Choose a date", class: "utilities--sr-only" %>
+    <%= search_field_tag :postpone_query, nil,
+          placeholder: "Try Oct 2, Mon, or 14",
+          autocomplete: "off", autofocus: !mobile_variant?,
+          class: "picker--request",
+          aria: { controls: "postpone_suggestions", describedby: "postpone_hint" },
+          data: { postpone_picker_target: "textfield", action: "input->postpone-picker#search search->postpone-picker#search" } %>
+
+    <ul class="combobox" role="list" aria-label="Quick dates" data-postpone-picker-target="defaults">
+      <% postpone_options.each do |option| %>
+        <li>
+          <%= button_tag type: :submit, name: :pops_on, value: option[:pops_on].iso8601,
+                class: "combobox--item" do %>
+            <%= icon(option[:icon]) %>
+            <p><%= option[:name] %> · <%= option[:pops_on].strftime("%a, %b %-d") %></p>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+
+    <ul id="postpone_suggestions" class="combobox" role="list" aria-label="Suggested dates"
+        data-postpone-picker-target="results" aria-live="polite" hidden></ul>
+    <p id="postpone_hint" class="picker--hint" data-postpone-picker-target="hint" role="status" hidden>
+      Try a day (14), month (October), weekday (Mon), or date (Oct 2).
+    </p>
+
+    <template data-postpone-picker-target="template">
+      <li>
+        <button type="submit" name="pops_on" class="combobox--item">
+          <%= icon("calendar") %>
+          <p data-date-label></p>
+        </button>
+      </li>
+    </template>
   <% end %>
 </main>

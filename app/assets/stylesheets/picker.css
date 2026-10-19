@@ -2,6 +2,7 @@
     .picker {
       display: flex;
       flex-direction: column;
+      gap: var(--space-v);
     }
   
     .picker--item {
@@ -70,15 +71,27 @@
       min-width: 0;
     }
 
-    .postpone-picker--manual-date {
-      min-width: 0;
-      gap: var(--space-v-half);
+    .picker--form {
+      gap: var(--space-v);
+      min-inline-size: 0;
     }
 
-    .postpone-picker--date {
-      min-width: 0;
-      max-width: 100%;
-      width: 100%;
-      width: -webkit-fill-available;
+    .picker--request {
+      box-sizing: border-box;
+      min-inline-size: 0;
+      inline-size: 100%;
+      position: sticky;
+      inset-block-start: var(--space-v-5);
+      z-index: 1;
+
+      &:focus-visible {
+        outline: 2px solid var(--color-focus);
+        outline-offset: 2px;
+      }
+    }
+
+    .picker--hint {
+      color: var(--color-invert-3);
+      font-size: var(--font-size-base-read);
     }
   }

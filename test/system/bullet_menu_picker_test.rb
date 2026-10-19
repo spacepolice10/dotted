@@ -10,7 +10,7 @@ class BulletMenuPickerSystemTest < ApplicationSystemTestCase
     create_collection!(@user, name: 'Reading')
   end
 
-  test 'later opens the schedule dialog and focuses its first option' do
+  test 'later opens the schedule dialog and focuses its date query' do
     visit bullets_path
     select_bullet
 
@@ -18,9 +18,8 @@ class BulletMenuPickerSystemTest < ApplicationSystemTestCase
 
     assert_selector 'dialog#postpone_dialog[open]'
     assert_selector 'dialog#postpone_dialog h2', text: 'Schedule'
-    assert_selector 'dialog#postpone_dialog button[data-grid-navigation-target="item"]', minimum: 1
-    assert_selector 'dialog#postpone_dialog button[data-grid-navigation-target="item"]:focus'
-    assert_equal 'Today', focused_option_label
+    assert_selector 'dialog#postpone_dialog button[name="pops_on"]', minimum: 1
+    assert_selector 'dialog#postpone_dialog input[name="postpone_query"]:focus'
   end
 
   test 'escape closes the schedule dialog but keeps the selection' do
@@ -52,25 +51,27 @@ class BulletMenuPickerSystemTest < ApplicationSystemTestCase
     find_button('Later').click
     assert_selector 'dialog#postpone_dialog[open]'
 
-    find('dialog#postpone_dialog button[data-grid-navigation-target="item"]', match: :first).click
+    find('dialog#postpone_dialog button[name="pops_on"]', match: :first).click
 
     assert_no_selector 'dialog#postpone_dialog[open]'
     assert_no_selector '.bullet-menu', visible: true
   end
 
-  test 'confirm schedules the manually selected date' do
+  test 'enter schedules the date suggested by the text query' do
     target = Date.current + 3.days
 
     visit bullets_path
     select_bullet
     find_button('Later').click
-    assert_selector 'dialog#postpone_dialog[open] input[type=date]'
+    assert_selector 'dialog#postpone_dialog[open] input[name="postpone_query"]'
 
-    page.execute_script(
-      "document.querySelector('dialog#postpone_dialog input[type=date]').value = arguments[0]",
-      target.iso8601
-    )
-    find_button('Confirm').click
+    field = find('dialog#postpone_dialog input[name="postpone_query"]')
+    field.set(target.strftime('%b %-d %Y'))
+    assert_selector "#postpone_suggestions button[value='#{target.iso8601}']"
+    assert_selector '#postpone_suggestions > li > button.combobox--item > .icon-wrap > i.icon'
+    assert_selector '#postpone_suggestions > li > button.combobox--item > p[data-date-label]',
+                    text: target.strftime('%B %-d')
+    field.send_keys(:enter)
 
     assert_no_selector 'dialog#postpone_dialog[open]'
     assert_no_selector '.bullet-menu', visible: true
@@ -158,7 +159,4 @@ class BulletMenuPickerSystemTest < ApplicationSystemTestCase
     end
   end
 
-  def focused_option_label
-    page.evaluate_script('document.activeElement?.textContent?.trim().split("\\n")[0]')
-  end
 end

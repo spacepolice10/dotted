@@ -5,6 +5,7 @@
   </header>
 
   <main
+    class="picker"
     data-controller="combobox"
     data-combobox-path-value="<%= new_collect_path %>"
   >
@@ -19,8 +20,7 @@
       <%= search_field_tag :search_term, collects_search_term,
             placeholder: "Search collections",
             autofocus: !mobile_variant?,
-            class: "utilities--sticky",
-            style: "top: var(--space-v-5);",
+            class: "picker--request",
             data: {
               combobox_target: "textfield",
               action: "input->combobox#search search->combobox#commit keydown->combobox#navigate"

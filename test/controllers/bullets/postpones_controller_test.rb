@@ -17,18 +17,29 @@ module Bullets
       assert_response :success
       assert_select 'turbo-frame#postpone_picker'
       assert_select '[popover]', count: 0
-      assert_select 'turbo-frame#postpone_picker button[data-grid-navigation-target=?]', 'item', count: 5
-      assert_select 'turbo-frame#postpone_picker label[data-grid-navigation-target=?]', 'item', count: 0
+      assert_select 'main[data-controller="postpone-picker"]'
+      assert_select 'ul.combobox[data-postpone-picker-target="defaults"] > li > button.combobox--item', count: 9 do
+        assert_select 'span.icon-wrap > i.icon', count: 9
+        assert_select 'p', count: 9
+      end
+      assert_select 'ul#postpone_suggestions.combobox[hidden]'
+      assert_select 'template[data-postpone-picker-target="template"] > li > button.combobox--item' do
+        assert_select 'span.icon-wrap > i.icon'
+        assert_select 'p[data-date-label]'
+      end
       assert_select 'turbo-frame#postpone_picker input[name="bullet_ids"][data-bullet-menu-target="idList"]',
-                    count: 6
-      assert_select 'turbo-frame#postpone_picker input[type=date][name=pops_on][aria-label="Choose date"]'
-      assert_select 'turbo-frame#postpone_picker form.postpone-picker--manual-date button[type=submit]',
-                    text: 'Confirm'
+                    count: 1
+      assert_select 'input[type=search][name=postpone_query][aria-controls=postpone_suggestions]'
+      assert_select 'label[for=postpone_query]', text: 'Choose a date'
       assert_select 'turbo-frame#postpone_picker input[name=bucket_id]', count: 0
 
       assert_match 'Today', response.body
       assert_match 'Tomorrow', response.body
       assert_match 'Next week', response.body
+      assert_match 'Day after tomorrow', response.body
+      assert_match 'In two weeks', response.body
+      assert_match 'In a month', response.body
+      assert_match 'In three months', response.body
       assert_match Date.current.next_occurring(:monday).strftime('%a, %b %-d'), response.body
     end
 
@@ -41,7 +52,7 @@ module Bullets
 
       assert_response :success
       assert_select 'turbo-frame#postpone_picker h2', text: 'Schedule'
-      assert_select 'input[name="bullet_ids"][data-bullet-menu-target="idList"]', count: 6
+      assert_select 'input[name="bullet_ids"][data-bullet-menu-target="idList"]', count: 1
     end
 
     test 'new without bullet_ids returns not found' do

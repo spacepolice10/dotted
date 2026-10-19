@@ -31,6 +31,7 @@
     max-width: 800px;
     margin-inline: auto;
     border: 0;
+    border-radius: var(--radius-strong);
     background: transparent;
     --bullet-menu-exit-transform: translateY(calc(100% + var(--tabbar-bottom) + var(--space-v-5)));
     transform: translateY(0);
