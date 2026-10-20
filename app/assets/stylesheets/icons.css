@@ -27,6 +27,7 @@
   }
 
   :root {
+    --icon-book-2: url("icon-book-2.svg");
     --icon-paperclip: url("icon-paperclip.svg");
     --icon-arrows-diagonal: url("icon-arrows-diagonal.svg");
     --icon-arrow-forward-up: url("icon-arrow-forward-up.svg");

@@ -2,7 +2,7 @@
 
 <%= render "shared/back_tabbar" %>
 
-<main data-size="md">
+<main data-size="md" class="attachment--detail">
   <header>
     <div>
       <h1>Attachment</h1>
@@ -10,16 +10,19 @@
     </div>
   </header>
 
-  <main>
+  <div class="attachment--content">
     <% if @blob.representable? %>
       <%= image_tag @blob.representation(resize_to_limit: [1600, 1600]), alt: @blob.filename %>
     <% else %>
-      <p>
-        <%= link_to @blob.filename,
-              rails_blob_path(@blob, disposition: "attachment"),
-              data: { turbo: false } %>
-        · <%= number_to_human_size @blob.byte_size %>
-      </p>
+      <span class="attachment--preview-icon"><%= icon(attachment_icon(@blob)) %></span>
     <% end %>
-  </main>
+    <p><%= number_to_human_size @blob.byte_size %></p>
+    <p>
+      <%= link_to "Open file", rails_blob_path(@blob, disposition: "inline"),
+            target: "_blank", rel: "noopener noreferrer", data: { turbo: false } %>
+      ·
+      <%= link_to "Download", rails_blob_path(@blob, disposition: "attachment"),
+            download: @blob.filename.to_s, data: { turbo: false } %>
+    </p>
+  </div>
 </main>

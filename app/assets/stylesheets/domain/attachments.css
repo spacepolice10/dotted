@@ -15,10 +15,6 @@
     width: fit-content;
   }
 
-  a.attachment--preview-picture {
-    cursor: zoom-in;
-  }
-
   .attachment--preview-media::after {
     content: "";
     position: absolute;
@@ -140,6 +136,30 @@
     border-radius: var(--radius-base);
     background: var(--color-1);
     color: var(--color-invert-2);
+  }
+
+  .attachment--detail > header {
+    max-inline-size: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .attachment--content {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-v);
+    min-inline-size: 0;
+    text-align: center;
+  }
+
+  .attachment--content > p {
+    margin-block: 0;
+  }
+
+  .attachment--content > img {
+    display: block;
+    max-inline-size: 100%;
+    block-size: auto;
+    border-radius: var(--radius-base);
   }
 }
 

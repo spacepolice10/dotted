@@ -23,7 +23,7 @@
               <%= image_tag file.variant(:display), alt: file.filename.to_s, loading: "lazy" %>
             <% else %>
               <span class="attachment--tile-file">
-                <%= icon("paperclip") %>
+                <%= icon(attachment_icon(file)) %>
                 <span><%= number_to_human_size(file.byte_size) %></span>
               </span>
             <% end %>
