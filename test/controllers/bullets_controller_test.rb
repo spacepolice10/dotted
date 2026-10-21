@@ -106,7 +106,29 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
     assert_select '[data-bullet-menu-target="collectsDropdown"]', count: 0
   end
 
-  test 'update turbo stream replaces bullet only' do
+  test 'editing an older bullet brings it to today' do
+    @bullet.update!(pops_on: Date.current - 5)
+
+    patch bullet_path(@bullet), params: { bullet: { body: 'Revisited' } }, as: :turbo_stream
+
+    assert_response :success
+    assert_equal Date.current, @bullet.reload.pops_on
+    assert_select 'turbo-stream[action=refresh]', count: 0
+    assert_select "turbo-stream[action=remove][targets='.timeline--section #bullet_#{@bullet.id}']"
+    assert_select "turbo-stream[action=append][target=timeline_section_current_date] #bullet_#{@bullet.id}"
+  end
+
+  test 'failed editing preserves the bullet date' do
+    date = Date.current - 5
+    @bullet.update!(pops_on: date)
+
+    patch bullet_path(@bullet), params: { bullet: { body: '' } }, as: :turbo_stream
+
+    assert_response :unprocessable_entity
+    assert_equal date, @bullet.reload.pops_on
+  end
+
+  test 'updating a todays bullet replaces it without moving it' do
     assert_no_difference -> { Activity.count } do
       patch bullet_path(@bullet),
             params: { bullet: { body: 'Updated' } },
@@ -114,7 +136,10 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :success
-    assert_match(/turbo-stream action="replace"/, response.body)
+    assert_select 'turbo-stream[action=replace]'
+    assert_select 'turbo-stream[action=refresh]', count: 0
+    assert_select 'turbo-stream[action=remove]', count: 0
+    assert_select 'turbo-stream[action=append]', count: 0
     assert_no_match(/turbo-stream action="after"/, response.body)
     assert_equal 'Updated', @bullet.reload.body_as_text
   end

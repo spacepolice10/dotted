@@ -1,0 +1,52 @@
+<% content_for(:title, "Review") %>
+<main class="review" data-size="lg">
+  <header class="review--header">
+    <h1>Review</h1>
+    <%= link_to "Close", bullets_path, data: { intent: "secondary", turbo_frame: "_top" } %>
+  </header>
+
+  <% if @bullet %>
+    <p class="review--progress" role="status"><%= pluralize(@remaining_ids.size, "bullet") %> left to review</p>
+    <article class="review--card" aria-label="Bullet to review">
+      <div class="review--content">
+        <% if @bullet.file.attached? %>
+          <%= render "bullets/attachment", file: @bullet.file %>
+        <% else %>
+          <%= @bullet.body %>
+        <% end %>
+        <% if @bullet.collection %>
+          <p class="review--metadata">In <%= @bullet.collection.name %></p>
+        <% end %>
+        <% if @bullet.with_note? %>
+          <div class="review--note"><%= @bullet.note.content %></div>
+        <% end %>
+      </div>
+    </article>
+    <% if @error %><p role="alert"><%= @error %></p><% end %>
+    <div class="review--actions">
+      <%= form_with url: review_path, method: :patch do |form| %>
+        <%= hidden_field_tag :bullet_ids, @remaining_ids.join(',') %>
+        <%= hidden_field_tag :decision, "postpone" %>
+        <%= form.label :pops_on, "Review again on" %>
+        <%= form.date_field :pops_on, value: Date.tomorrow, required: true %>
+        <%= form.button "Postpone", data: { intent: "secondary" } %>
+      <% end %>
+      <%= form_with url: review_path, method: :patch do |form| %>
+        <%= hidden_field_tag :bullet_ids, @remaining_ids.join(',') %>
+        <%= hidden_field_tag :decision, "collect" %>
+        <%= form.label :collection_id, "Collection" %>
+        <%= form.collection_select :collection_id, @collections, :id, :name, { prompt: "Choose a collection" }, required: true %>
+        <%= form.button "Save to collection", disabled: @collections.empty?, data: { intent: "secondary" } %>
+        <% if @collections.empty? %><%= link_to "Create a collection", new_collection_path %><% end %>
+      <% end %>
+      <%= form_with url: review_path, method: :patch do |form| %>
+        <%= hidden_field_tag :bullet_ids, @remaining_ids.join(',') %>
+        <%= hidden_field_tag :decision, "complete" %>
+        <%= form.button "Complete", data: { intent: "primary" } %>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render "shared/empty_state", icon_name: "check", name: "All reviewed", description: "You're through this set of bullets." %>
+    <%= link_to "Back to bullets", bullets_path, data: { intent: "secondary" } %>
+  <% end %>
+</main>

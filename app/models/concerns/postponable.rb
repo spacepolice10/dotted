@@ -3,6 +3,10 @@
 module Postponable
   extend ActiveSupport::Concern
 
+  def resurface!
+    update!(pops_on: Date.current) unless pops_on == Date.current
+  end
+
   def postpone!(pops_on:)
     raise ArgumentError, 'pops_on is required' if pops_on.blank?
 

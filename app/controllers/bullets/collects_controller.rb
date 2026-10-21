@@ -24,9 +24,12 @@ module Bullets
     def create
       collection_id = params.require(:collection_id)
       Bullet.transaction do
-        @bullets.lock.find_each { |bullet| bullet.collect!(collection_id: collection_id) }
+        @bullets = @bullets.lock
+        @bullets.each do |bullet|
+          bullet.collect!(collection_id: collection_id)
+          bullet.resurface!
+        end
       end
-      @bullets.each(&:reload)
       @collection = Current.user.collections.find(collection_id)
       @bullet_ids = params[:bullet_ids].to_s
       @collected_collection_ids = collected_collection_ids

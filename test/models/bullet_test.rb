@@ -13,6 +13,26 @@ class BulletTest < ActiveSupport::TestCase
     assert_equal Date.current, bullet.pops_on
   end
 
+  test 'resurfacing moves past and future bullets to today' do
+    [Date.current - 5, Date.current + 5].each do |date|
+      bullet = create_bullet!(@user, body: 'Revisited', pops_on: date)
+
+      bullet.resurface!
+
+      assert_equal Date.current, bullet.reload.pops_on
+    end
+  end
+
+  test 'resurfacing a bullet already dated today does nothing' do
+    bullet = create_bullet!(@user, body: 'Current')
+
+    assert_no_changes -> { bullet.reload.updated_at } do
+      assert_no_difference 'Activity.count' do
+        bullet.resurface!
+      end
+    end
+  end
+
   test 'text is the default marker and done swaps it for a check' do
     bullet = create_bullet!(@user, body: 'Do it')
 

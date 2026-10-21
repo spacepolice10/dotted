@@ -28,6 +28,10 @@
       <%= render "bullets/timeline_sections", bullets: @bullets, timeline: @timeline,
           ensure_current_date: @filter.includes_date?(Date.current) %>
 
+      <% unless @filter.completed? %>
+        <%= link_to "Review bullets", review_path(@filter.to_params), class: "review--entry", data: { intent: "secondary", turbo_frame: "_top" } %>
+      <% end %>
+
       <% if @bullets.empty? && !@more_bullets %>
         <% if @filter.completed? %>
           <%= render "shared/empty_state", icon_name: "check", name: "A clear page", description: "Completed bullets will appear here." %>

@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   end
 
   # --- Bullets ---
+  resource :review, only: %i[show update]
   scope 'bullets', module: :bullets do
     resource :postpone, only: %i[new create]
     resource :collect, only: %i[new create]

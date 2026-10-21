@@ -19,6 +19,25 @@ module Bullets
       assert_equal collection, card.reload.collection
     end
 
+    test 'collecting resurfaces selected bullets' do
+      collection = create_collection!(@user, name: 'Ideas')
+      bullets = [Date.current - 5, Date.current, Date.current + 5].map do |date|
+        create_bullet!(@user, body: 'Revisited', pops_on: date)
+      end
+
+      post collect_path, params: { bullet_ids: bullets.map(&:id).join(','), collection_id: collection.id },
+                         as: :turbo_stream
+
+      assert_response :success
+      assert_select 'turbo-stream[action=refresh]', count: 0
+      assert_select 'turbo-stream[action=append][target=timeline_section_current_date]', count: 2
+      assert_select 'turbo-stream[action=append] #bullet_' + bullets[1].id.to_s, count: 0
+      bullets.each do |bullet|
+        assert_equal Date.current, bullet.reload.pops_on
+        assert_equal collection, bullet.collection
+      end
+    end
+
     test 'new renders collection picker for selected bullets' do
       collection = create_collection!(@user, name: 'Ideas')
       card = create_bullet!(@user, body: 'Move me')

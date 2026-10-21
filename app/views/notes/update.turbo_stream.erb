@@ -1,9 +1,4 @@
-<%= turbo_stream.replace_all @notable do %>
-  <%= render "bullets/bullet", bullet: @notable %>
-<% end %>
-<% if @resurface %>
-  <%= render "bullets/postpones/scheduled", bullets: [@notable], timeline_only: true %>
-<% end %>
+<%= render "bullets/updated", bullet: @notable %>
 <%= turbo_stream.replace dom_id(@notable, :note) do %>
   <%= render "bullets/note", bullet: @notable %>
 <% end %>

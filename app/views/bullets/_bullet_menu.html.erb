@@ -9,6 +9,10 @@
   <span class="bullet-menu--count" data-bullet-menu-target="amount" role="status">0 selected</span>
   <div class="bullet-menu--card">
     <div class="bullet-menu--actions">
+      <%= form_with url: review_path, method: :get, class: "utilities--contents", data: { turbo_frame: "_top" } do %>
+        <%= hidden_field_tag :bullet_ids, "", data: { bullet_menu_target: "idList" } %>
+        <%= button_tag "Review", type: :submit, class: "bullet-menu--action-button", data: { intent: "secondary", radius: "base", size: "sm" } %>
+      <% end %>
       <%= form_with url: completion_path, method: :post,
             class: "utilities--contents",
             data: { turbo_stream: true, bullet_menu_target: "complete" },

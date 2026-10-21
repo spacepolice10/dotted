@@ -84,4 +84,60 @@ class ComposerAttachmentSystemTest < ApplicationSystemTestCase
     assert bullet.client_id.present?
   end
 
+  test 'pasting files uploads each file and preserves the draft' do
+    find('#bullet_composer lexxy-editor .lexxy-editor__content').send_keys('Unfinished note')
+
+    paste_files([
+      { name: 'pasted.png', type: 'image/png', bytes: PIXEL_PNG.bytes },
+      { name: 'notes.txt', type: 'text/plain', bytes: 'File contents'.bytes }
+    ])
+
+    assert_selector '#timeline_section_current_date .attachment--preview-name', text: 'pasted.png', wait: 10
+    assert_selector '#timeline_section_current_date .attachment--preview-name', text: 'notes.txt', wait: 10
+    assert_selector '#bullet_composer lexxy-editor', text: 'Unfinished note'
+    assert_no_selector '#bullet_composer action-text-attachment'
+
+    bullets = @user.bullets.reload.select { |bullet| bullet.file.attached? }
+    assert_equal ['notes.txt', 'pasted.png'], bullets.map { |bullet| bullet.file.filename.to_s }.sort
+    assert bullets.all? { |bullet| bullet.body_as_text.blank? }
+  end
+
+  test 'pasting an oversized file shows the upload size error' do
+    paste_files([{ name: 'large.txt', type: 'text/plain', size: 5 * 1024 * 1024 + 1 }])
+
+    assert_text 'File is too large (maximum is 5 MB)'
+    assert_no_selector '.bullet--pending'
+    assert_not @user.bullets.reload.any? { |bullet| bullet.file.attached? }
+  end
+
+  test 'pasting plain text keeps the normal paste behavior' do
+    prevented = page.evaluate_script(<<~JS)
+      (() => {
+        const clipboardData = new DataTransfer()
+        clipboardData.setData('text/plain', 'Pasted note')
+        const event = new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true })
+        document.querySelector('#bullet_composer').dispatchEvent(event)
+        return event.defaultPrevented
+      })()
+    JS
+
+    assert_equal false, prevented
+    assert_no_selector '.bullet--pending'
+  end
+
+  private
+
+  def paste_files(files)
+    page.execute_script(<<~JS, files)
+      const clipboardData = new DataTransfer()
+      arguments[0].forEach(({ name, type, bytes, size }) => {
+        const content = new Uint8Array(bytes || size)
+        clipboardData.items.add(new File([content], name, { type }))
+      })
+      document.querySelector('#bullet_composer lexxy-editor .lexxy-editor__content').dispatchEvent(
+        new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true, composed: true })
+      )
+    JS
+  end
+
 end

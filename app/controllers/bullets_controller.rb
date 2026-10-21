@@ -42,6 +42,7 @@ class BulletsController < ApplicationController
 
   def update
     if @bullet.update(bullet_params)
+      @bullet.resurface!
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to bullet_path(@bullet) }

@@ -16,8 +16,22 @@ export default class extends Controller {
 
   async attach() {
     const file = this.fileTarget.files[0]
+    this.fileTarget.value = ""
     if (!file) return
 
+    await this.#attachFile(file)
+  }
+
+  attachPastedFile(event) {
+    const files = Array.from(event.clipboardData?.files || [])
+    if (!files.length) return
+
+    event.preventDefault()
+    event.stopPropagation()
+    files.forEach((file) => this.#attachFile(file))
+  }
+
+  async #attachFile(file) {
     const container = document.getElementById(APPEND_TO)
     if (!container) return
 
@@ -28,7 +42,6 @@ export default class extends Controller {
       "/rails/active_storage/direct_uploads"
     const body = new FormData(form)
     body.delete("bullet[body]")
-    this.fileTarget.value = ""
 
     if (file.size > MAXIMUM_SIZE) {
       notify("File is too large (maximum is 5 MB)")

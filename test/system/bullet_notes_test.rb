@@ -29,7 +29,7 @@ class BulletNotesSystemTest < ApplicationSystemTestCase
     assert_selector '.note-preview', text: 'Second paragraph'
     assert_no_selector '.note-preview a'
     assert_no_selector '.note-preview button'
-    assert_equal original_date, @bullet.reload.pops_on
+    assert_equal Date.current, @bullet.reload.pops_on
 
     find("label[for='select_checkbox_bullet_#{@bullet.id}']", match: :first).click
     click_button 'Note', exact: true
@@ -37,14 +37,13 @@ class BulletNotesSystemTest < ApplicationSystemTestCase
     editor = find('#note_editor .lexxy-editor__content[contenteditable=true]')
     editor.click
     editor.send_keys(:end, ' Updated')
-    click_button 'Save and resurface'
+    click_button 'Save', exact: true
 
     assert_no_selector 'dialog#note_dialog[open]'
     assert_current_path bullets_path
     assert_selector '.note-preview', text: 'Updated'
     assert_selector '#timeline_section_current_date .note-preview', text: 'Updated'
     assert_no_selector ".timeline--section:not(#timeline_section_current_date) #bullet_#{@bullet.id}"
-    assert_selector '#toasts', text: 'Bullet scheduled for'
     assert_equal Date.current, @bullet.reload.pops_on
   end
 end

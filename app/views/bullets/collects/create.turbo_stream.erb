@@ -14,8 +14,6 @@
           collected_ids: @collected_collection_ids %>
   <% end %>
   <% @bullets.each do |bullet| %>
-    <%= turbo_stream.replace_all bullet do %>
-      <%= render "bullets/bullet", bullet: bullet %>
-    <% end %>
+    <%= render "bullets/updated", bullet: bullet %>
   <% end %>
 <% end %>

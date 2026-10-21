@@ -6,8 +6,7 @@
     <%= form.label :content, "Note", class: "utilities--sr-only" %>
     <%= form.rich_text_area :content, preset: "note", autofocus: true, placeholder: "Elaborate on this bullet…" %>
     <div class="bullet-note--actions">
-      <%= form.button "Save", name: "intent", value: "save", data: { intent: "secondary", radius: "base", size: "sm" } %>
-      <%= form.button "Save and resurface", name: "intent", value: "resurface", data: { intent: "primary", radius: "base", size: "sm" } %>
+      <%= form.button "Save", data: { intent: "primary", radius: "base", size: "sm" } %>
     </div>
   <% end %>
 </turbo-frame>

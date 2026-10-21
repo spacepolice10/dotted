@@ -4,6 +4,7 @@
 id="bullet_composer"
   class="composer"
   data-controller="composer composer-attachment"
+  data-action="paste->composer-attachment#attachPastedFile:capture"
 >
   <%= form_with model: bullet,
         multipart: true,

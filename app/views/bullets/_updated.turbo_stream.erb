@@ -1,0 +1,10 @@
+<%# locals: (bullet:) %>
+<%= turbo_stream.replace_all bullet do %>
+  <%= render "bullets/bullet", bullet: bullet %>
+<% end %>
+<% if bullet.saved_change_to_pops_on? %>
+  <%= turbo_stream.remove_all ".timeline--section ##{dom_id(bullet)}" %>
+  <%= turbo_stream.append "timeline_section_current_date" do %>
+    <%= render "bullets/bullet", bullet: bullet %>
+  <% end %>
+<% end %>

@@ -1,0 +1,76 @@
+@layer components {
+  .review {
+    --lexxy-color-ink: var(--color-invert-1);
+    --lexxy-color-ink-medium: var(--color-invert-3);
+    --lexxy-color-ink-lightest: var(--color-2);
+    --lexxy-color-link: var(--color-focus);
+    inline-size: min(100%, 56rem);
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-v-2);
+    min-block-size: 90dvh;
+    padding-block: clamp(1rem, 4dvh, 3rem);
+    padding-inline: var(--space-h);
+  }
+
+  .review--header {
+    inline-size: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-h);
+  }
+
+  .review--progress, .review--metadata {
+    color: var(--color-invert-3);
+    font-size: var(--font-size-xs);
+  }
+
+  .review--header > a { flex: none; inline-size: auto; }
+
+  .review--card {
+    flex: 1;
+    display: grid;
+    align-items: center;
+    min-block-size: 30dvh;
+    overflow-wrap: anywhere;
+  }
+
+  .review--content {
+    padding: clamp(1rem, 4vi, 3rem);
+    min-inline-size: 0;
+  }
+
+  .review--note {
+    margin-block-start: var(--space-v-3);
+    padding-block-start: var(--space-v-2);
+    border-block-start: var(--border-subtle);
+  }
+
+  .review--actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--space-h);
+    padding-block-end: env(safe-area-inset-bottom, 0px);
+  }
+
+  .review--actions form {
+    flex: 1 1 12rem;
+    display: grid;
+    gap: var(--space-v);
+    min-inline-size: 0;
+  }
+
+  .review--actions :is(button, input, select) { min-block-size: 2.75rem; }
+  .review--actions label { padding-block-end: 0; }
+  .review--actions :is(button, a):active { opacity: 0.75; }
+  .review :is(button, a, input, select):focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  .review--entry { align-self: center; }
+  .timeline--scroller:not(:has(.bullet)) > .review--entry { display: none; }
+}

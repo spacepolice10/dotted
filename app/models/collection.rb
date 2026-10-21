@@ -16,7 +16,10 @@ class Collection < ApplicationRecord
   def save_and_collect!(bullets: Bullet.none)
     transaction do
       save!
-      bullets.lock.find_each { |bullet| bullet.collect!(collection_id: id) }
+      bullets.lock.find_each do |bullet|
+        bullet.collect!(collection_id: id)
+        bullet.resurface!
+      end
     end
     self
   end

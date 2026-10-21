@@ -11,11 +11,11 @@ module Bullet::WithNote
 
   def with_note? = note&.content.present?
 
-  def update_note(attributes, resurface: false)
+  def update_note(attributes)
     transaction do
       next false unless (note || build_note).update(attributes)
 
-      postpone!(pops_on: Date.current) if resurface
+      resurface!
       true
     end
   end

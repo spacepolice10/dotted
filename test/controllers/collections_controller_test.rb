@@ -61,8 +61,8 @@ class CollectionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'create with bullet_ids collects bullets and redirects' do
-    first = create_bullet!(@user, body: 'One')
-    second = create_bullet!(@user, body: 'Two')
+    first = create_bullet!(@user, body: 'One', pops_on: Date.current - 5)
+    second = create_bullet!(@user, body: 'Two', pops_on: Date.current + 5)
 
     assert_difference -> { Collection.count }, 1 do
       post collections_path,
@@ -76,6 +76,8 @@ class CollectionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to collection_path(collection)
     assert_equal collection, first.reload.collection
     assert_equal collection, second.reload.collection
+    assert_equal Date.current, first.pops_on
+    assert_equal Date.current, second.pops_on
   end
 
   test 'create rolls back the collection and earlier moves if any bullet cannot be collected' do

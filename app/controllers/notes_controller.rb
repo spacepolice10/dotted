@@ -10,8 +10,7 @@ class NotesController < ApplicationController
 
   def update
     @note = @notable.note || @notable.build_note
-    @resurface = params[:intent] == 'resurface'
-    if @notable.update_note(params.require(:note).permit(:content), resurface: @resurface)
+    if @notable.update_note(params.require(:note).permit(:content))
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to bullet_path(@notable), status: :see_other }
