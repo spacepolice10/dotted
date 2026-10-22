@@ -21,13 +21,15 @@ module Timelines
       assert_equal old.id, @user.bullets.find_by!(pops_on: Date.current - 20).id
     end
 
-    test 'before skips the rest of the current date' do
+    test 'before includes earlier bullets on the same date' do
       earlier = create_bullet!(@user, body: 'Earlier today', created_at: 2.hours.ago)
       cursor = create_bullet!(@user, body: 'Later today', created_at: 1.hour.ago)
 
       get bullets_path(before: cursor.id)
 
-      assert_response :no_content
+      assert_response :success
+      assert_select '.bullet', text: /Earlier today/
+      assert_no_match 'Later today', response.body
     end
 
     test 'before omits an empty today section so pagination cannot duplicate the append target' do

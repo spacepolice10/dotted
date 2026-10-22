@@ -38,7 +38,7 @@ class BulletTest < ActiveSupport::TestCase
 
     assert_equal :circle, bullet.marker_icon
     bullet.complete!
-    assert_equal :check, bullet.marker_icon
+    assert_equal 'check', bullet.marker_icon
   end
 
   test 'completion takes precedence over postponement for the marker' do
@@ -47,7 +47,7 @@ class BulletTest < ActiveSupport::TestCase
 
     assert_equal 'arrow-forward-up', bullet.marker_icon
     bullet.complete!
-    assert_equal :check, bullet.marker_icon
+    assert_equal 'check', bullet.marker_icon
   end
 
   test 'complete and uncomplete toggle done' do

@@ -87,14 +87,15 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select 'nav.tabbar--navigation span.tabbar--item-active[aria-current=page]', count: 1
   end
 
-  test 'show renders count badges when destinations have records' do
+  test 'show keeps shortcut labels without count badges when destinations have records' do
     done = create_bullet!(@user, body: 'Old note')
     done.complete!
 
     get search_path
 
     assert_response :success
-    assert_select 'a[href=?] small', completed_index_path, text: '1'
+    assert_select 'a[href=?]', completed_index_path, text: 'Completed'
+    assert_select 'a[href=?] small', completed_index_path, count: 0
     assert_select 'a[href=?] small', attachments_path, count: 0
   end
 

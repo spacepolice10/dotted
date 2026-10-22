@@ -36,7 +36,7 @@ class ApplicationHelperTest < ActionView::TestCase
   test 'search_results_count marks a full page as a lower bound' do
     assert_equal '1 result', search_results_count(1)
     assert_equal '2 results', search_results_count(2)
-    assert_equal "#{Search::GlobalRequest::LIMIT}+ results", search_results_count(Search::GlobalRequest::LIMIT)
+    assert_equal "#{Search::GlobalRequest::LIMITS}+ results", search_results_count(Search::GlobalRequest::LIMITS)
   end
 
   test 'back_link_to renders fallback href and navigation data' do

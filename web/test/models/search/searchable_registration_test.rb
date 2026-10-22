@@ -20,7 +20,7 @@ class Search::SearchableRegistrationTest < ActiveSupport::TestCase
   end
 
   test 'bullet declares its own preload' do
-    assert_equal %i[collection rich_text_body published_entity], Bullet.search_preload
+    assert_equal [:collection, :rich_text_body, :published_entity, { note: :rich_text_content }], Bullet.search_preload
   end
 
   test 'collection declares its own preload' do

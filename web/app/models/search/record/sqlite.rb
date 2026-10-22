@@ -8,6 +8,7 @@ class Search::Record::Sqlite
 
   class << self
     def matching(expression)
+      ensure_fts5_triggers!
       table_name = Search::Record.table_name
       Search::Record.joins("INNER JOIN #{FTS5_TABLES_NAME} ON #{FTS5_TABLES_NAME}.rowid = #{table_name}.id")
                     .where("#{FTS5_TABLES_NAME} MATCH ?", expression)

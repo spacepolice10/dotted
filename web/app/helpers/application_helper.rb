@@ -37,7 +37,7 @@ module ApplicationHelper
   end
 
   def search_results_count(size)
-    label = size == Search::GlobalRequest::LIMIT ? "#{size}+" : size
+    label = size == Search::GlobalRequest::LIMITS ? "#{size}+" : size
     "#{label} #{'result'.pluralize(size)}"
   end
 

@@ -145,7 +145,7 @@ class CollectionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame##{dom_id(collection, :timeline)}"
     assert_select "turbo-frame##{dom_id(bullet)}" do
       assert_select '.bullet--marker', count: 0
-      assert_select 'label.bullet--select-checkbox[aria-label=?]', 'Select bullet', count: 1
+      assert_select 'label.bullet--select-square[aria-label=?]', 'Select bullet', count: 1
       assert_select '[popover]', count: 0
     end
     assert_no_match 'Moved into inbox.', response.body

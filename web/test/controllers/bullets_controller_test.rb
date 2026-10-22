@@ -47,12 +47,9 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal 'Completed', @controller.instance_variable_get(:@filter).name
     assert_select '#timeline_section_current_date .bullet', text: /Fresh done/
-    assert_no_match 'Old done', response.body
+    assert_select "#timeline_section_#{old_done.pops_on.iso8601} .bullet", text: /Old done/
     assert_no_match 'Not done', response.body
     assert_select '[data-timeline-scroll-path-value=?]', bullets_path(completed: true)
-
-    get bullets_path(before: fresh_done.id, completed: true)
-    assert_select "#timeline_section_#{old_done.pops_on.iso8601} .bullet", text: /Old done/
   end
 
   test 'timeline shows status marks for postponed, published, and completed bullets' do
@@ -207,7 +204,7 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
     assert_match 'Expanded content', response.body
   end
 
-  test 'show renders uncomplete for completed bullet' do
+  test 'show renders undo for completed bullet' do
     bullet = create_bullet!(@user, body: 'Completed text')
     bullet.complete!
 
@@ -216,7 +213,7 @@ class BulletsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select '.bullet-menu form[action=?][method=post]', completion_path do
       assert_select 'input[name=_method][value=delete]'
-      assert_select 'button', text: /Uncomplete/
+      assert_select 'button', text: /Undo/
     end
   end
 
