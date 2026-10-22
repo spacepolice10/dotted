@@ -1,0 +1,24 @@
+<%# locals: (bullet:) %>
+<% if bullet.collection.present? || bullet.status.in?(%w[postponed published]) %>
+  <div class="bullet--metadata">
+    <% if (collection = bullet.collection) %>
+      <span class="collection-chip bullet--collection"
+            style="--chip-colour: <%= colour(collection.colour) || 'var(--color-invert-3)' %>;">
+        <%= icon("hash") %>
+        <span><%= collection.name %></span>
+      </span>
+    <% end %>
+    <% if bullet.status.in?(%w[postponed published]) %>
+      <span class="collection-chip bullet--status bullet--status--<%= bullet.status %>">
+        <%= icon(bullet.marker_icon) %>
+        <span>
+          <% if bullet.status == "postponed" %>
+            Postponed <%= pluralize(bullet.postponements_number, "time") %>
+          <% elsif bullet.status == "published" %>
+            It is published
+          <% end %>
+        </span>
+      </span>
+    <% end %>
+  </div>
+<% end %>

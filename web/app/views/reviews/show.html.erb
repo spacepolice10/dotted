@@ -1,0 +1,45 @@
+<% content_for(:title, "Review") %>
+
+<%= render "shared/back_tabbar", url: bullets_path, aria_label: "Back to Daylog" %>
+
+<main class="review" data-size="lg" data-controller="review" data-review-next-url-value="<%= review_path(bullet_ids: @remaining_ids.drop(1).join(',')) %>" data-action="turbo:submit-end@document->review#advance">
+  <header>
+    <h1>Review</h1>
+  </header>
+
+  <% if @bullet %>
+    <p class="review--progress" role="status"><%= pluralize(@remaining_ids.size, "bullet") %> left to review</p>
+    <article class="review--card" aria-label="Bullet to review">
+      <div class="review--content">
+        <% if @bullet.file.attached? %>
+          <%= render "bullets/attachment", file: @bullet.file %>
+        <% else %>
+          <%= @bullet.body %>
+        <% end %>
+        <%= render "bullets/metadata", bullet: @bullet %>
+        <% if @bullet.with_note? %>
+          <div class="review--note"><%= @bullet.note.content %></div>
+        <% end %>
+      </div>
+    </article>
+    <% if @error %><p role="alert"><%= @error %></p><% end %>
+    <div class="review--actions">
+      <button type="button" data-intent="secondary" data-action="review#openPicker" data-review-dialog-param="postpone_dialog" data-review-frame-param="postpone_picker" data-review-url-param="<%= new_postpone_path(bullet_ids: @bullet.id) %>">
+        <%= icon("arrow-forward-up", style: "color: var(--model-color-3)") %><span>Postpone</span>
+      </button>
+      <button type="button" data-intent="secondary" data-action="review#openPicker" data-review-dialog-param="collects_dialog" data-review-frame-param="collects_picker" data-review-url-param="<%= new_collect_path(bullet_ids: @bullet.id) %>">
+        <%= icon("hash", style: "color: var(--model-color-5)") %><span>Tag</span>
+      </button>
+      <%= form_with url: review_path, method: :patch, data: { turbo_action: "replace" } do |form| %>
+        <%= hidden_field_tag :bullet_ids, @remaining_ids.join(',') %>
+        <%= hidden_field_tag :decision, "complete" %>
+        <%= form.button data: { intent: "primary" } do %>
+          <%= icon("check") %><span>Complete</span>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render "shared/empty_state", icon_name: "check", name: "All reviewed", description: "You're through this set of bullets." %>
+    <%= link_to "Back to bullets", bullets_path, data: { intent: "secondary" } %>
+  <% end %>
+</main>

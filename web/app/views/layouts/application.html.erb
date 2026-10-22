@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+
+<html data-controller="hotkey-hint">
+  <head>
+    <title><%= content_for(:title) || "Dotted" %></title>
+
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"
+    >
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Dotted">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="turbo-refresh-method" content="morph">
+    <meta name="turbo-refresh-scroll" content="preserve">
+    <meta name="view-transition" content="same-origin">
+
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= tag.meta name: "timezone", content: Time.zone.name %>
+    <%= yield :head %>
+    <%= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+    <%= tag.meta name: "theme-color", content: "#f5f5f5", media: "(prefers-color-scheme: light)" %>
+    <%= tag.meta name: "theme-color", content: "#2a2a2a", media: "(prefers-color-scheme: dark)" %>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap"
+      rel="stylesheet"
+    >
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap"
+      rel="stylesheet"
+    >
+
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "lexxy" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body
+    data-controller="dialog timezone-cookie bullet-menu"
+    <% if native_tabs? %>data-native-tabs<% end %>
+    <% if Current.user %>data-appearance="<%= Current.user.settings!.appearance %>"<% end %>
+  >
+    <%= render "shared/toasts_host" %>
+
+    <svg class="bullet-menu--selection-lines" data-bullet-menu-target="selectionLines" aria-hidden="true" focusable="false" hidden></svg>
+
+    <%= yield %>
+
+    <%= render "bullets/bullet_menu" if Current.user %>
+    <%= render "searches/dialog" if Current.user %>
+  </body>
+</html>

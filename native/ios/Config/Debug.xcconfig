@@ -1,0 +1,3 @@
+// The slash variable prevents xcconfig from interpreting // as a comment.
+SLASH = /
+DOTTED_SERVER_URL = http:$(SLASH)$(SLASH)localhost:3001

@@ -1,0 +1,81 @@
+@layer components {
+  .review {
+    --lexxy-color-ink: var(--color-invert-1);
+    --lexxy-color-ink-medium: var(--color-invert-3);
+    --lexxy-color-ink-lightest: var(--color-2);
+    --lexxy-color-link: var(--color-focus);
+    inline-size: min(100%, 50rem);
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-v-2);
+    min-block-size: 100dvh;
+    padding-block: clamp(1.5rem, 5dvh, 3.5rem);
+    padding-inline: var(--space-h);
+  }
+
+  .review--progress {
+    align-self: center;
+    margin: 0;
+    padding: var(--space-v-half) var(--space-h);
+    border: var(--border-subtle);
+    border-radius: var(--radius-full);
+    background: var(--background-canvas-colour);
+    color: var(--color-invert-3);
+    font-size: var(--font-size-xs);
+  }
+
+  .review--card {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    margin-block: auto;
+    padding: clamp(1rem, 3vi, 2rem);
+    border: var(--border-subtle);
+    border-radius: var(--radius-strong);
+    background: var(--color-1);
+    box-shadow: var(--shadow-medium);
+    overflow-wrap: anywhere;
+  }
+
+  .review--content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-v-2);
+    min-inline-size: 0;
+    font-size: clamp(1rem, 1.5vi + 0.8rem, 1.25rem);
+  }
+
+  .review--content > * { max-inline-size: 100%; }
+  .review--content > .bullet--metadata { margin-block-start: 0; }
+
+  .review--note {
+    padding-block-start: var(--space-v-2);
+    border-block-start: var(--border-subtle);
+    font-size: var(--font-size-base-read);
+  }
+
+  .review--actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+    gap: var(--space-h-half);
+    padding-block-end: env(safe-area-inset-bottom, 0px);
+  }
+
+  .review--actions form { min-inline-size: 0; }
+  .review--actions :is(button, form) { inline-size: 100%; }
+  .review--actions button { min-block-size: 3rem; }
+  .review--actions button:active { transform: scale(0.97); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .review--actions button { transition: transform 160ms ease-out; }
+  }
+
+  .review :is(button, a):focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  .review--entry { align-self: center; }
+  .timeline--scroller:not(:has(.bullet)) > .review--entry { display: none; }
+}

@@ -1,0 +1,3 @@
+SLASH = /
+// Replace with your deployment URL before distributing a release build.
+DOTTED_SERVER_URL = https:$(SLASH)$(SLASH)dotted.example.com

@@ -1,0 +1,162 @@
+@layer components {
+  body:has(.timeline--scroller) {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .timeline--section {
+    display: flex;
+    height: auto;
+    flex-direction: column;
+    gap: calc(var(--space-v) * 1.5);
+    position: relative;
+    padding-block-end: var(--space-v);
+  }
+
+  .timeline--section::before {
+    content: "";
+    position: absolute;
+    inset-block: var(--space-v-2) -10px;
+    inset-inline-start: calc(50% - 0.5px);
+    border-inline-start: 2px dashed
+      color-mix(in oklch, var(--model-color-2) 28%, transparent);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .timeline--section:not(:has(.bullet)) {
+    display: none;
+  }
+
+  .timeline--section-header {
+    position: sticky;
+    top: 0px;
+    align-self: center;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-v-half);
+  }
+
+  body[data-native-tabs] .timeline--section-header {
+    top: 32px;
+  }
+
+  .timeline--section-header > h2.pill {
+    border: 1px solid color-mix(in oklch, var(--model-color-2) 12%, transparent);
+    background: light-dark(oklch(0.975 0.008 241), oklch(0.27 0.015 241));
+    color: light-dark(oklch(0.51 0.04 241), oklch(0.72 0.04 241));
+    font-family: var(--font-family-sans);
+    font-size: 0.875rem;
+    font-weight: var(--font-weight-medium);
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+
+  .timeline--scroller:has(.bullet)
+    > .empty-state {
+    display: none;
+  }
+
+  /* Complete timeline window: full-viewport scroller with an overlaid composer.
+     Assembled from timeline--* window classes so any page can build the shell. */
+  .timeline--window {
+    --timeline-header-clearance: var(--space-v);
+    /* Room under the last bullet so it rests above the floating dock;
+       content still scrolls behind the composer. */
+    --timeline-dock-clearance: calc(
+      max(var(--space-h-2), var(--space-v-3)) + var(--space-v-2) +
+        var(--space-v) + 1px + var(--tabbar-clearance)
+    );
+
+    position: relative;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 100%;
+    /* Fill the body flex column */
+    flex: 1 1 0;
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    gap: 0;
+    /* Visible so the dock veil can spill to full viewport width; the scroller
+       owns vertical overflow, and body is locked while a timeline is open. */
+    overflow: visible;
+    /* Page shell padding from body > main does not apply to timeline windows */
+    padding: 0;
+
+    &::after {
+      content: "";
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      z-index: 1;
+      pointer-events: none;
+      width: 100%;
+      height: calc(var(--tabbar-clearance) + var(--space-v-10));
+      background: linear-gradient(
+        to top,
+        var(--background-canvas-colour) 0%,
+        transparent 100%
+      );
+    }
+  }
+
+  /* Levitating header slot — frosted chips float over the scroller. */
+  .timeline--header {
+    position: sticky;
+    top: 0;
+  }
+
+  /* Full-height scrollport: short lists pin against the dock clearance via
+     auto margins (same Campfire packing as before). Overflowing rows scroll
+     through the clearance and pass under the absolute composer. */
+  .timeline--scroller {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    align-items: stretch;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-anchor: none;
+    overscroll-behavior-y: none;
+    overscroll-behavior-x: auto;
+    gap: var(--space-v);
+    padding-top: var(--timeline-header-clearance, 0px);
+    background: transparent;
+    scroll-padding-bottom: var(--timeline-dock-clearance);
+    /* A real flex item keeps the space after the newest bullet in scrollHeight
+       on Safari, where trailing padding on a flex scrollport can be skipped. */
+    &::after {
+      content: "";
+      flex: 0 0 calc(var(--timeline-dock-clearance) - var(--space-v));
+      pointer-events: none;
+    }
+    > * {
+      margin-block: 0;
+      /* Children never shrink: flex-shrink would crush rows (their min-height
+         auto protection is off whenever the row has non-visible overflow,
+         e.g. the monthly log's line-clamped wrappers) and swallow the
+         overflow that the scroller is supposed to scroll. */
+      flex-shrink: 0;
+    }
+
+    > *:first-child:not(.timeline--load-more-trigger) {
+      margin-block-start: auto;
+    }
+  }
+
+  .timeline--load-more-trigger {
+    display: flex;
+    justify-content: center;
+    margin-block-end: auto;
+    padding-block: var(--space-v);
+    color: var(--color-invert-4);
+  }
+}

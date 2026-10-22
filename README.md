@@ -2,6 +2,17 @@
 
 A digital Bullet Journal — keyboard-driven rapid logging into one infinite timeline, collections, and an Upcoming screen for what is scheduled ahead. Built with **Rails 8**, **Hotwire** (Turbo + Stimulus), **Lexxy** (Action Text), and **SQLite** (Solid Queue/Cache/Cable). No React, no Node build step.
 
+## Repository layout
+
+- `web/` — Rails web app, including deployment files and tests.
+- `cli/` — Rust command-line client.
+- `tui/` — reserved for the terminal UI.
+- `site/` — reserved for the website.
+- `native/` — Hotwire Native apps; see [iOS setup](native/ios/README.md).
+- `docs/` — shared documentation.
+
+Run Rails commands from `web/` and CLI commands as described in [cli/README.md](cli/README.md).
+
 ## License
 
 Source-available under the **[O'Saasy License](LICENSE)** ([osaasy.dev](https://osaasy.dev)).
@@ -43,7 +54,7 @@ docker run --name dotted --publish 3000:80 --restart unless-stopped \
 
 ### Kamal
 
-Copy `config/deploy.yml.example` to `config/deploy.yml` and `.kamal/secrets.example` to `.kamal/secrets` (both ignored by git), then run `bin/kamal setup`.
+From `web/`, copy `config/deploy.yml.example` to `config/deploy.yml` and `.kamal/secrets.example` to `.kamal/secrets` (both ignored by git), then run `bin/kamal setup`.
 
 ### Releasing
 
@@ -57,9 +68,10 @@ Set the package visibility to **Public** once so ONCE can pull without credentia
 
 ## Setup
 
-Prerequisites: Ruby (see `.ruby-version`), SQLite, [mise](https://mise.jdx.dev) recommended.
+Prerequisites: Ruby (see `web/.ruby-version`), SQLite, [mise](https://mise.jdx.dev) recommended.
 
 ```bash
+cd web
 bin/setup
 bin/dev
 ```
@@ -67,6 +79,7 @@ bin/dev
 ## Tests and CI
 
 ```bash
+cd web
 bin/rails test
 bin/ci
 ```
@@ -76,7 +89,6 @@ CI runs Minitest, RuboCop, Brakeman, and dependency audits.
 ## Documentation
 
 - **Framework reference (Rails, Turbo, Stimulus, Lexxy):** [docs/](docs/)
-- **Agent/coding workflow (for AI assistants):** [AGENTS.md](AGENTS.md)
 
 ## Stack
 
