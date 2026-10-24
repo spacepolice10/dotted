@@ -41,8 +41,8 @@ class ReviewsTest < ApplicationSystemTestCase
     assert_current_path review_path(bullet_ids: second.id.to_s)
     click_button 'Complete', exact: true
     assert_text 'All reviewed'
-    assert first.reload.done?
-    assert second.reload.done?
+    assert first.reload.completed?
+    assert second.reload.completed?
     page.go_back
     assert_current_path bullets_path
   end
@@ -59,7 +59,7 @@ class ReviewsTest < ApplicationSystemTestCase
     click_button 'Postpone'
     assert_selector '#postpone_dialog[open]'
     within '#postpone_dialog' do
-      find("button[name='pops_on'][value='#{Date.tomorrow.iso8601}']").click
+      find("button[name='pops_on'][value='#{Date.tomorrow.iso8601}']", match: :first).click
     end
     assert_selector '.review--card', text: 'Tag this'
     assert_current_path review_path(bullet_ids: second.id.to_s)

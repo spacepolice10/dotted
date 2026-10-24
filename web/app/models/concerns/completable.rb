@@ -6,25 +6,25 @@ module Completable
   RETENTION_DAYS = 30
 
   included do
-    scope :done, -> { where.not(done_at: nil) }
-    scope :not_done, -> { where(done_at: nil) }
-    scope :expired_done, -> { done.where(done_at: ...RETENTION_DAYS.days.ago) }
+    scope :completed, -> { where.not(completed_at: nil) }
+    scope :uncompleted, -> { where(completed_at: nil) }
+    scope :expired_completed, -> { completed.where(completed_at: ...RETENTION_DAYS.days.ago) }
   end
 
-  def done?
-    done_at.present?
+  def completed?
+    completed_at.present?
   end
 
   def complete!
-    return if done?
+    return if completed?
 
-    update!(done_at: Time.current)
+    update!(completed_at: Time.current)
     forget_search_selections!
   end
 
   def uncomplete!
-    return unless done?
+    return unless completed?
 
-    update!(done_at: nil)
+    update!(completed_at: nil)
   end
 end

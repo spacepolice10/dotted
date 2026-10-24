@@ -23,14 +23,17 @@ module Bullets
 
     def create
       collection_id = params.require(:collection_id)
+      @collection = Current.user.collections.find(collection_id)
+      lane = params[:lane].presence || 'unsorted'
+      raise ArgumentError, 'Unknown lane' unless lane.in?(%w[unsorted parked])
+
       Bullet.transaction do
         @bullets = @bullets.lock
         @bullets.each do |bullet|
           bullet.collect!(collection_id: collection_id)
-          bullet.resurface!
+          @collection.move_bullet!(bullet_id: bullet.id, lane: lane)
         end
       end
-      @collection = Current.user.collections.find(collection_id)
       @bullet_ids = params[:bullet_ids].to_s
       @collected_collection_ids = collected_collection_ids
 
@@ -41,6 +44,8 @@ module Bullets
       end
     rescue ActiveRecord::RecordInvalid => e
       respond_with_failed_bullet(e)
+    rescue ArgumentError
+      head :unprocessable_entity
     end
 
     private

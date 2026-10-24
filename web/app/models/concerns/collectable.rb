@@ -7,6 +7,9 @@ module Collectable
     destination = user.collections.find(collection_id)
     return if self.collection_id == destination.id
 
-    update!(collection: destination)
+    transaction do
+      collection_item&.destroy!
+      update!(collection: destination)
+    end
   end
 end

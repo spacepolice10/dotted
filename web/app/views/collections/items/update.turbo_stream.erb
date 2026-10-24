@@ -1,0 +1,3 @@
+<%= turbo_stream.replace dom_id(@collection, :board) do %>
+  <%= render "collections/board", collection: @collection, bullets: @bullets, parked_items: @parked_items %>
+<% end %>

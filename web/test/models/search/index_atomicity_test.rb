@@ -40,7 +40,7 @@ module Search
         assert_raises(ActiveRecord::StatementInvalid) { bullet.complete! }
       end
 
-      assert_not bullet.reload.done?
+      assert_not bullet.reload.completed?
       assert Search::Record.exists?(searchable: bullet)
       assert Search::Selection.exists?(searchable: bullet)
     end

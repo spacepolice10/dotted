@@ -10,7 +10,7 @@ module Bullet::Searchable
   end
 
   def searchable?
-    !done?
+    !completed?
   end
 
   def search_name

@@ -14,6 +14,8 @@ module RequestForgeryProtection
   end
 
   def allowed_browserless_request?
-    request.format.json? && request.headers['Sec-Fetch-Site'].blank?
+    request.format.json? &&
+      request.headers['Sec-Fetch-Site'].blank? &&
+      request.cookies['session_id'].blank?
   end
 end

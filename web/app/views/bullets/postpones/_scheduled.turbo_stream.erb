@@ -1,11 +1,14 @@
-<%# locals: (bullets:, timeline_only: false) %>
+<%# locals: (bullets:) %>
 <%= turbo_stream.update "toasts" do %>
   <% scheduled_on = bullets.first.pops_on.strftime("%B %-d") %>
   <% message = bullets.size == 1 ? "Bullet scheduled for #{scheduled_on}" : "#{bullets.size} bullets scheduled for #{scheduled_on}" %>
   <%= render "shared/toasts", type: "notify", messages: [message] %>
 <% end %>
 <% bullets.each do |bullet| %>
-  <%= turbo_stream.remove_all(timeline_only ? ".timeline--section ##{dom_id(bullet)}" : bullet) %>
+  <%= turbo_stream.remove_all ".timeline--section ##{dom_id(bullet)}, .bullet-page ##{dom_id(bullet)}" %>
+  <%= turbo_stream.replace_all ".collection-board ##{dom_id(bullet)}" do %>
+    <%= render partial: bullet.to_partial_path, locals: { bullet: bullet } %>
+  <% end %>
   <% if bullet.pops_on == Date.current %>
     <%= turbo_stream.append "timeline_section_current_date" do %>
       <%= render partial: bullet.to_partial_path, locals: { bullet: bullet } %>

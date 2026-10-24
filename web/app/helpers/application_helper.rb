@@ -6,7 +6,7 @@ module ApplicationHelper
   end
 
   def bullet_marker_colour(bullet)
-    return if bullet.done?
+    return if bullet.completed?
 
     marker_colour = Colourable.colour_variable_of(bullet.collection&.colour)
     "color: #{marker_colour};" if marker_colour.present?

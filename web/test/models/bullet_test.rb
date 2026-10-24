@@ -53,13 +53,13 @@ class BulletTest < ActiveSupport::TestCase
   test 'complete and uncomplete toggle done' do
     bullet = create_bullet!(@user, body: 'Do it')
 
-    assert_not bullet.done?
+    assert_not bullet.completed?
     bullet.complete!
-    assert bullet.reload.done?
-    assert_not_nil bullet.done_at
+    assert bullet.reload.completed?
+    assert_not_nil bullet.completed_at
     bullet.uncomplete!
-    assert_not bullet.reload.done?
-    assert_nil bullet.done_at
+    assert_not bullet.reload.completed?
+    assert_nil bullet.completed_at
   end
 
   test 'completed scope includes only completed bullets' do
@@ -87,7 +87,7 @@ class BulletTest < ActiveSupport::TestCase
 
     assert_equal ['https://example.com/article'], bullet.bookmarks.pluck(:link)
     bullet.complete!
-    assert bullet.reload.done?
+    assert bullet.reload.completed?
   end
 
   test 'blank client_id normalizes to nil' do
@@ -209,6 +209,6 @@ class BulletTest < ActiveSupport::TestCase
     bullet.postpone!(pops_on: Date.current + 2)
 
     assert_not_includes Timeline.new(@user).filtered, bullet
-    assert_includes @user.bullets.not_done.upcoming, bullet
+    assert_includes @user.bullets.uncompleted.upcoming, bullet
   end
 end

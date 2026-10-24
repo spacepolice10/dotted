@@ -1,0 +1,22 @@
+<%# locals: (collection:, bullets:, parked_items:) %>
+<div id="<%= dom_id(collection, :board) %>" class="collection-board" data-controller="collection-board" data-action="collection-board:move->collection-board#moveSelected" data-bullet-menu-target="list" data-collection-id="<%= collection.id %>" data-bulk-move-url="<%= collection_move_items_path(collection) %>">
+  <section class="collection--lane" data-collection-board-target="lane" data-lane="unsorted" data-action="dragover->collection-board#over drop->collection-board#drop dragleave->collection-board#leave">
+    <h2>Unsorted</h2>
+    <div class="collection--bullets">
+      <% bullets.each do |bullet| %>
+        <%= render "collections/item", collection: collection, bullet: bullet, lane: "unsorted" %>
+      <% end %>
+      <% if bullets.empty? %><p class="collection--empty">No unsorted bullets</p><% end %>
+    </div>
+  </section>
+
+  <section class="collection--lane" data-collection-board-target="lane" data-lane="parked" data-action="dragover->collection-board#over drop->collection-board#drop dragleave->collection-board#leave">
+    <h2>Parked</h2>
+    <div class="collection--bullets">
+      <% parked_items.each do |item| %>
+        <%= render "collections/item", collection: collection, bullet: item.bullet, lane: "parked" %>
+      <% end %>
+      <% if parked_items.empty? %><p class="collection--empty">Drop bullets here</p><% end %>
+    </div>
+  </section>
+</div>

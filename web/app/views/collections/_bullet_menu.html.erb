@@ -1,0 +1,14 @@
+<div class="collection-item-menu-wrapper"
+     data-controller="collection-item-menu"
+     data-action="change@document->collection-item-menu#sync turbo:before-stream-render@document->collection-item-menu#afterStream">
+  <div class="collection-item-menu-actions" data-collection-item-menu-target="actions" hidden>
+    <button type="button" class="collection-item-menu-button" data-intent="secondary" data-radius="base" data-size="sm" data-collection-item-menu-target="next" data-action="collection-item-menu#move" data-lane="parked" hidden>
+      <%= icon("arrow-right") %> Next
+    </button>
+    <button type="button" class="collection-item-menu-button" data-intent="secondary" data-radius="base" data-size="sm" data-collection-item-menu-target="prev" data-action="collection-item-menu#move" data-lane="unsorted" hidden>
+      <%= icon("arrow-left") %> Prev
+    </button>
+  </div>
+
+  <%= render "bullets/bullet_menu" %>
+</div>

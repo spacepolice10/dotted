@@ -24,7 +24,7 @@ class CleanSoftDeletedRecordsJobTest < ActiveJob::TestCase
       CleanSoftDeletedRecordsJob.perform_now
     end
 
-    assert bullet.reload.done?
+    assert bullet.reload.completed?
   end
 
   test "purges old unattached blobs" do
@@ -48,6 +48,6 @@ class CleanSoftDeletedRecordsJobTest < ActiveJob::TestCase
 
   def expire!(record)
     record.complete!
-    record.update!(done_at: (Completable::RETENTION_DAYS + 1).days.ago)
+    record.update!(completed_at: (Completable::RETENTION_DAYS + 1).days.ago)
   end
 end

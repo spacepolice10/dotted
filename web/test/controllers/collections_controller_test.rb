@@ -76,8 +76,8 @@ class CollectionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to collection_path(collection)
     assert_equal collection, first.reload.collection
     assert_equal collection, second.reload.collection
-    assert_equal Date.current, first.pops_on
-    assert_equal Date.current, second.pops_on
+    assert_equal Date.current - 5, first.pops_on
+    assert_equal Date.current + 5, second.pops_on
   end
 
   test 'create rolls back the collection and earlier moves if any bullet cannot be collected' do
@@ -185,8 +185,12 @@ class CollectionsControllerTest < ActionDispatch::IntegrationTest
     assert_select 'h1', count: 0
   end
 
-  test 'show renders the management panel and lazy timeline frame' do
+  test 'show renders the management panel and collection bullets' do
     collection = create_collection!(@user, name: 'Inbox', colour: 'teal', icon: 'folder')
+    past = create_bullet!(@user, collection: collection, body: 'Past bullet', pops_on: Date.current - 3)
+    future = create_bullet!(@user, collection: collection, body: 'Future bullet', pops_on: Date.current + 3)
+    completed = create_bullet!(@user, collection: collection, body: 'Completed bullet', pops_on: Date.current)
+    completed.complete!
 
     get collection_path(collection)
 
@@ -196,8 +200,17 @@ class CollectionsControllerTest < ActionDispatch::IntegrationTest
     assert_select 'div#collection_actions[role=menu][data-controller=grid-navigation]'
     assert_select 'a.dropdown-item[href=?]', edit_collection_path(collection)
     assert_select 'a.dropdown-item[href=?]', export_bullets_path(collection: collection.name)
-    assert_select "turbo-frame##{dom_id(collection, :timeline)}.utilities--contents[src=?]",
-                  bullets_path(collection: collection.name)
+    assert_select '.collection--lane[data-lane=unsorted] .collection--bullets' do
+      assert_select "turbo-frame##{dom_id(past)}", count: 1
+      assert_select "turbo-frame##{dom_id(future)}", count: 1
+      assert_select "turbo-frame##{dom_id(completed)}", count: 0
+    end
+    assert_select '.collection--lane[data-lane=parked]', count: 1
+    assert_select '.collection-item-menu-wrapper[data-controller=collection-item-menu]', count: 1
+    assert_select '.timeline--section', count: 0
+
+    get bullets_path
+    assert_select '.collection-item-menu-wrapper', count: 0
   end
 
   test 'filtered feed groups tagged bullets into timeline sections' do

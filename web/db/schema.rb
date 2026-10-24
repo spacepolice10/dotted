@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_23_141000) do
   create_table "access_codes", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "code_digest", null: false
@@ -98,7 +98,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_000000) do
   create_table "bullets", force: :cascade do |t|
     t.integer "user_id", null: false
     t.date "pops_on", null: false
-    t.datetime "done_at"
+    t.datetime "completed_at"
     t.string "author_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -112,6 +112,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_000000) do
     t.index ["user_id", "client_id"], name: "index_bullets_on_user_id_and_client_id", unique: true
     t.index ["user_id", "collection_id", "pops_on"], name: "index_bullets_on_user_collection_pops_on"
     t.index ["user_id"], name: "index_bullets_on_user_id"
+  end
+
+  create_table "collection_items", force: :cascade do |t|
+    t.integer "collection_id", null: false
+    t.integer "bullet_id", null: false
+    t.integer "position", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bullet_id"], name: "index_collection_items_on_bullet_id", unique: true
+    t.index ["collection_id", "position"], name: "index_collection_items_on_collection_id_and_position"
+    t.index ["collection_id"], name: "index_collection_items_on_collection_id"
   end
 
   create_table "collections", force: :cascade do |t|
@@ -218,6 +229,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_000000) do
   add_foreign_key "bookmarks", "bullets"
   add_foreign_key "bullets", "collections"
   add_foreign_key "bullets", "users"
+  add_foreign_key "collection_items", "bullets"
+  add_foreign_key "collection_items", "collections"
   add_foreign_key "collections", "users"
   add_foreign_key "published_entities", "users"
   add_foreign_key "search_records", "users"

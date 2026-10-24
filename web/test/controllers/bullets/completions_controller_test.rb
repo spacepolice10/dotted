@@ -18,8 +18,9 @@ module Bullets
            headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
 
       assert_response :success
-      assert @bullet.reload.done?
-      assert second.reload.done?
+      assert @bullet.reload.completed?
+      assert_match %(turbo-stream action="remove" targets=".collection-board #collection_item_bullet_#{@bullet.id}"), response.body
+      assert second.reload.completed?
       assert_match %(turbo-stream action="replace" targets="#bullet_#{@bullet.id}"), response.body
       assert_match %(turbo-stream action="replace" targets="#bullet_#{second.id}"), response.body
       assert_match '2 bullets completed', response.body
@@ -33,7 +34,7 @@ module Bullets
              headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
 
       assert_response :success
-      assert_not @bullet.reload.done?
+      assert_not @bullet.reload.completed?
       assert_match %(turbo-stream action="replace" targets="#bullet_#{@bullet.id}"), response.body
       assert_match 'Bullet uncompleted', response.body
     end
@@ -55,7 +56,7 @@ module Bullets
            headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
 
       assert_response :success
-      assert @bullet.reload.done?
+      assert @bullet.reload.completed?
     end
 
     test 'create returns unprocessable entity when complete! is invalid' do
@@ -75,7 +76,7 @@ module Bullets
       assert_equal 'text/vnd.turbo-stream.html', response.media_type
       assert_match %(turbo-stream action="update" target="toasts"), response.body
       assert_match 'cannot complete', response.body
-      assert_not @bullet.reload.done?
+      assert_not @bullet.reload.completed?
     ensure
       Bullet.class_eval do
         alias_method :complete!, :__orig_complete!

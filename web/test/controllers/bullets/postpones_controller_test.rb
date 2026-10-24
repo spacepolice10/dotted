@@ -102,6 +102,20 @@ module Bullets
       assert_equal target, card.pops_on
     end
 
+    test 'postponing keeps a collected bullet on the collection page' do
+      collection = create_collection!(@user, name: 'Ideas')
+      card = create_bullet!(@user, body: 'Filed', collection: collection)
+
+      post postpone_path,
+           params: { bullet_ids: card.id.to_s, pops_on: (Date.current + 2).iso8601 },
+           headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
+
+      assert_response :success
+      assert_match %(turbo-stream action="replace" targets=".collection-board #bullet_#{card.id}"), response.body
+      get collection_path(collection)
+      assert_select ".collection--bullets ##{dom_id(card)}", count: 1
+    end
+
     test 'create postpones multiple bullets to same day' do
       target = 4.days.from_now.to_date
       first = create_bullet!(@user, body: 'A')
@@ -126,7 +140,7 @@ module Bullets
       assert_equal target, card.reload.pops_on
       assert_match %(turbo-stream action="update" target="toasts"), response.body
       assert_match "Bullet scheduled for #{target.strftime('%B %-d')}", response.body
-      assert_match %(turbo-stream action="remove" targets="#bullet_#{card.id}"), response.body
+      assert_match %(turbo-stream action="remove" targets=".timeline--section #bullet_#{card.id}, .bullet-page #bullet_#{card.id}"), response.body
       assert_no_match 'timeline_section_current_date', response.body
     end
 

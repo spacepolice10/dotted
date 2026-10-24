@@ -33,8 +33,8 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
 
   test 'complete advances to the next bullet' do
     patch review_path, params: { bullet_ids: @ids, decision: 'complete' }
-    assert @first.reload.done?
-    assert_not @second.reload.done?
+    assert @first.reload.completed?
+    assert_not @second.reload.completed?
     follow_redirect!
     assert_select '.review--card', text: /Second review bullet/
   end
@@ -67,7 +67,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     patch review_path, params: { bullet_ids: foreign.id, decision: 'complete' }
     assert_response :not_found
-    assert_not foreign.reload.done?
+    assert_not foreign.reload.completed?
   end
 
   test 'foreign collections cannot be used' do

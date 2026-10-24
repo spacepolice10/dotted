@@ -19,7 +19,7 @@ module Bullets
       assert_equal collection, card.reload.collection
     end
 
-    test 'collecting resurfaces selected bullets' do
+    test 'collecting keeps selected bullets on their original dates' do
       collection = create_collection!(@user, name: 'Ideas')
       bullets = [Date.current - 5, Date.current, Date.current + 5].map do |date|
         create_bullet!(@user, body: 'Revisited', pops_on: date)
@@ -30,10 +30,9 @@ module Bullets
 
       assert_response :success
       assert_select 'turbo-stream[action=refresh]', count: 0
-      assert_select 'turbo-stream[action=append][target=timeline_section_current_date]', count: 2
-      assert_select 'turbo-stream[action=append] #bullet_' + bullets[1].id.to_s, count: 0
-      bullets.each do |bullet|
-        assert_equal Date.current, bullet.reload.pops_on
+      assert_select 'turbo-stream[action=append][target=timeline_section_current_date]', count: 0
+      bullets.zip([Date.current - 5, Date.current, Date.current + 5]).each do |bullet, date|
+        assert_equal date, bullet.reload.pops_on
         assert_equal collection, bullet.collection
       end
     end
@@ -128,7 +127,8 @@ module Bullets
       get new_collect_path, params: { bullet_ids: card.id.to_s }
 
       assert_response :success
-      assert_select '#collects-collections-list button.combobox--item', count: 10
+      assert_select '#collects-collections-list .collect-picker--collection', count: 10
+      assert_select '#collects-collections-list button.collect-picker--parked', count: 10
     end
 
     test 'new collection rows omit bullet count and date' do
@@ -179,16 +179,61 @@ module Bullets
       assert_equal collection, card.reload.collection
     end
 
+    test 'create can place a bullet directly in Parked' do
+      card = create_bullet!(@user, body: 'Solo', pops_on: Date.current + 4)
+      collection = create_collection!(@user, name: 'scratchpad')
+
+      post collect_path, params: { bullet_ids: card.id.to_s, collection_id: collection.id, lane: 'parked' }
+
+      assert_redirected_to bullets_path
+      assert_equal collection, card.reload.collection
+      assert_equal Date.current + 4, card.pops_on
+      assert_equal [card.id], collection.parked_items.map(&:bullet_id)
+      assert_not_includes collection.unsorted_bullets, card
+    end
+
+    test 'create can move a parked bullet back to Unsorted in the same collection' do
+      collection = create_collection!(@user, name: 'scratchpad')
+      card = create_bullet!(@user, body: 'Solo', collection: collection)
+      collection.move_bullet!(bullet_id: card.id, lane: 'parked')
+
+      post collect_path, params: { bullet_ids: card.id.to_s, collection_id: collection.id, lane: 'unsorted' }, as: :turbo_stream
+
+      assert_response :success
+      assert_empty collection.collection_items.reload
+      assert_includes collection.unsorted_bullets, card
+      assert_select "turbo-stream[action=replace][target=#{dom_id(collection, :board)}]"
+    end
+
     test 'create moves bullet out of its previous collection' do
       previous = create_collection!(@user, name: 'Previous')
       destination = create_collection!(@user, name: 'Destination')
       card = create_bullet!(@user, body: 'Move me', collection: previous)
+      previous.move_bullet!(bullet_id: card.id, lane: 'parked')
 
       post collect_path, params: { bullet_ids: card.id.to_s, collection_id: destination.id }
 
       assert_redirected_to bullets_path
       assert_equal destination, card.reload.collection
       assert_empty previous.bullets
+      assert_empty previous.collection_items.reload
+    end
+
+    test 'moving a bullet removes it from the previous collection page' do
+      previous = create_collection!(@user, name: 'Previous')
+      destination = create_collection!(@user, name: 'Destination')
+      card = create_bullet!(@user, body: 'Move me', collection: previous)
+
+      post collect_path,
+           params: { bullet_ids: card.id.to_s, collection_id: destination.id },
+           headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
+
+      assert_response :success
+      assert_match %(turbo-stream action="remove" targets=".collection-board[data-collection-id=#{previous.id}] #collection_item_bullet_#{card.id}"), response.body
+      get collection_path(previous)
+      assert_select ".collection--bullets ##{dom_id(card)}", count: 0
+      get collection_path(destination)
+      assert_select ".collection--bullets ##{dom_id(card)}", count: 1
     end
 
     test 'create collects multiple bullets into one collection' do

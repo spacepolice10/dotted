@@ -1,0 +1,4 @@
+<%# locals: (collection:, bullet:, lane:) %>
+<div id="collection_item_<%= dom_id(bullet) %>" class="collection--item" draggable="true" data-collection-board-target="item" data-lane="<%= lane %>" data-bullet-id="<%= bullet.id %>" data-move-url="<%= collection_item_path(collection, bullet_id: bullet.id) %>" data-action="dragstart->collection-board#start dragend->collection-board#end">
+  <%= render "bullets/bullet", bullet: bullet %>
+</div>

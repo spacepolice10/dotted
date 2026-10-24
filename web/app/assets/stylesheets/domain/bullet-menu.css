@@ -1,27 +1,4 @@
 @layer components {
-  [data-bullet-menu-target~="list"] {
-    position: relative;
-  }
-
-  .bullet-menu--selection-lines {
-    position: absolute;
-    inset-block-start: 0;
-    inset-inline-start: 0;
-    z-index: 2;
-    overflow: visible;
-    color: var(--color-accent-1);
-    pointer-events: none;
-
-    path {
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2px;
-      stroke-dasharray: 1 5;
-      stroke-linecap: round;
-      opacity: 0.75;
-    }
-  }
-
   .bullet-menu {
     position: absolute;
     inset-block-end: var(--tabbar-bottom);

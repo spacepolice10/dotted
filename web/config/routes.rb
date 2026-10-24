@@ -32,7 +32,10 @@ Rails.application.routes.draw do
   end
 
   # --- Collections ---
-  resources :collections
+  resources :collections do
+    patch 'items/move', to: 'collections/items#move', as: :move_items
+    patch 'items/:bullet_id', to: 'collections/items#update', as: :item
+  end
 
   # --- Search & navigation ---
   get 'search/results', to: 'searches#results', as: :search_results

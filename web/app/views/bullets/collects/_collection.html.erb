@@ -1,25 +1,36 @@
 <%# locals: (collection:, bullet_ids: "", collected_ids: []) %>
 <% selected = collected_ids.map(&:to_i).include?(collection.id) %>
 
+<li class="collect-picker--collection" role="group" aria-label="<%= collection.name %>">
   <%= form_with url: collect_path,
         method: :post,
         class: "utilities--contents",
         data: { turbo_stream: true } do %>
     <%= hidden_field_tag :bullet_ids, bullet_ids, data: { bullet_menu_target: "idList" } %>
     <%= hidden_field_tag :collection_id, collection.id %>
+    <%= hidden_field_tag :lane, "unsorted" %>
 
     <button
-      class="combobox--item"
+      class="combobox--item collect-picker--name"
       type="submit"
       data-combobox-target="item"
-      aria-pressed="<%= selected %>"
     >
       <%= icon(collection.icon, style: "color: #{colour(collection.colour)};") %>
       <p><%= collection.name %></p>
+      <span class="collect-picker--lane-name">Unsorted</span>
 
       <% if selected %>
         <%= icon("check") %>
       <% end %>
     </button>
   <% end %>
-
+  <%= form_with url: collect_path,
+        method: :post,
+        class: "utilities--contents",
+        data: { turbo_stream: true } do %>
+    <%= hidden_field_tag :bullet_ids, bullet_ids, data: { bullet_menu_target: "idList" } %>
+    <%= hidden_field_tag :collection_id, collection.id %>
+    <%= hidden_field_tag :lane, "parked" %>
+    <button class="combobox--item collect-picker--parked" type="submit" data-combobox-target="item">Parked</button>
+  <% end %>
+</li>

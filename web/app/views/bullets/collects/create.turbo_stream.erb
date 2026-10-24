@@ -15,5 +15,12 @@
   <% end %>
   <% @bullets.each do |bullet| %>
     <%= render "bullets/updated", bullet: bullet %>
+    <% if (previous_collection_id = bullet.collection_id_before_last_save).present? && bullet.saved_change_to_collection_id? %>
+      <%= turbo_stream.remove_all ".collection-board[data-collection-id=#{previous_collection_id}] #collection_item_#{dom_id(bullet)}" %>
+    <% end %>
+  <% end %>
+  <%= turbo_stream.replace dom_id(@collection, :board) do %>
+    <%= render "collections/board", collection: @collection,
+          bullets: @collection.unsorted_bullets, parked_items: @collection.parked_items %>
   <% end %>
 <% end %>

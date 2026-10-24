@@ -2,14 +2,13 @@
 <turbo-frame
   id="<%= dom_id(bullet) %>"
   class="bullet"
-  data-bullet-menu-target="bulletRow"
-  data-bullet-done="<%= bullet.done? ? "true" : "false" %>"
+  data-bullet-done="<%= bullet.completed? ? "true" : "false" %>"
 >
   <input
     type="checkbox"
     id="<%= dom_id(bullet, :select_checkbox) %>"
     value="<%= bullet.id %>"
-    data-bulk-done="<%= bullet.done? %>"
+    data-bulk-done="<%= bullet.completed? %>"
     data-bulk-published="<%= bullet.published? %>"
     data-public-url="<%= published_url(bullet.public_code) if bullet.published? %>"
     data-note-url="<%= edit_bullet_note_path(bullet) %>"

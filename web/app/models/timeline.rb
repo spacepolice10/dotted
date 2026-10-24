@@ -11,7 +11,7 @@ class Timeline
   attr_reader :user, :filter
 
   def filtered
-    bullets = filter.completed? ? user.bullets.completed : user.bullets.not_done
+    bullets = filter.completed? ? user.bullets.completed : user.bullets.uncompleted
     filter.filtered(bullets)
   end
 

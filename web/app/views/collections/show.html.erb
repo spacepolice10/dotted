@@ -2,7 +2,7 @@
 
 <%= render "shared/back_tabbar" %>
 
-<main class="collection-page" data-size="sm">
+<main class="collection-page" data-size="xl">
   <header class="collection-header">
     <nav>
       <h1><%= @collection.name %></h1>
@@ -56,12 +56,5 @@
     </nav>
   </header>
 
-  <%= turbo_frame_tag dom_id(@collection, :timeline),
-        class: "utilities--contents",
-        src: bullets_path(collection: @collection.name) do %>
-    <div class="timeline--load-more-trigger" aria-busy="true">
-      <%= icon("spinner", class: "icon icon--spin") %>
-      <span class="utilities--sr-only">Loading collection</span>
-    </div>
-  <% end %>
+  <%= render "collections/board", collection: @collection, bullets: @bullets, parked_items: @parked_items %>
 </main>

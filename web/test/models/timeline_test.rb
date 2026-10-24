@@ -103,7 +103,7 @@ class TimelineTest < ActiveSupport::TestCase
     user = users(:one)
     old_done = create_bullet!(user, body: 'Old done', pops_on: Date.current - 3).tap(&:complete!)
     fresh_done = create_bullet!(user, body: 'Fresh done').tap(&:complete!)
-    fresh_done.update!(done_at: 10.days.ago)
+    fresh_done.update!(completed_at: 10.days.ago)
     create_bullet!(user, body: 'Not done')
     timeline = Timeline.new(user, filter: Bullet::Filter.from_params({ completed: 'true' }, user: user))
     assert_equal [old_done.id, fresh_done.id], timeline.filtered.last_page.map(&:id)

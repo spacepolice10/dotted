@@ -17,7 +17,7 @@ class HorizontalOverflowSystemTest < ApplicationSystemTestCase
     [[bullets_path(completed: true), done], [bullet_path(postponed), postponed], [bullet_path(published), published]].each do |path, bullet|
       visit path
       assert_selector "#bullet_#{bullet.id}"
-      if bullet.done?
+      if bullet.completed?
         assert_selector "#bullet_#{bullet.id}[data-bullet-done=true]"
       else
         assert_selector "#bullet_#{bullet.id} .bullet--status--#{bullet.status}"

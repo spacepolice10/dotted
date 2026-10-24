@@ -12,7 +12,7 @@
 
 <div class="export--list">
   <% @bullets.each do |bullet| %>
-    <% task_completed = bullet.done? %>
+    <% task_completed = bullet.completed? %>
     <article class="export--bullet">
       <header class="export--bullet-header">
         <time datetime="<%= bullet.created_at.iso8601 %>"><%= bullet.created_at.strftime("%-d %b %Y") %></time>

@@ -42,7 +42,10 @@ class CollectionsController < ApplicationController
     end
   end
 
-  def show; end
+  def show
+    @bullets = @collection.unsorted_bullets
+    @parked_items = @collection.parked_items
+  end
 
   def edit; end
 

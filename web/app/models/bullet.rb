@@ -6,6 +6,7 @@ class Bullet < ApplicationRecord
 
   belongs_to :user
   belongs_to :collection, optional: true
+  has_one :collection_item, dependent: :destroy
 
   has_rich_text :body
 
@@ -29,7 +30,6 @@ class Bullet < ApplicationRecord
 
   scope :current, -> { where(pops_on: ..Date.current) }
   scope :upcoming, -> { where(pops_on: (Date.current + 1.day)..) }
-  scope :completed, -> { done }
   scope :with_attachment, -> { joins(:file_attachment) }
   scope :tagged_with, lambda { |collection|
     where(collection_id: collection.id)
@@ -39,7 +39,7 @@ class Bullet < ApplicationRecord
   def name = body_as_text.lines.first&.strip.presence || filename.presence || 'Untitled'
 
   def status
-    return 'done' if done?
+    return 'completed' if completed?
     return 'postponed' if last_postponed_at.present?
     return 'published' if published?
 
@@ -49,7 +49,7 @@ class Bullet < ApplicationRecord
   def marker_icon
     return 'arrow-forward-up' if status == 'postponed'
     return 'link' if status == 'published'
-    return 'check' if status == 'done'
+    return 'check' if status == 'completed'
 
     :circle
   end

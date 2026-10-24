@@ -43,7 +43,7 @@ class ReviewsController < ApplicationController
   def review_ids
     return prepare_bullet_list_from(params[:bullet_ids]) if params.key?(:bullet_ids)
 
-    @timeline.filtered.not_done.reorder(pops_on: :asc, id: :asc).pluck(:id)
+    @timeline.filtered.uncompleted.reorder(pops_on: :asc, id: :asc).pluck(:id)
   end
 
   def set_review
@@ -52,7 +52,7 @@ class ReviewsController < ApplicationController
     bullets = Current.user.bullets.where(id: ids).index_by(&:id)
     raise ActiveRecord::RecordNotFound if bullets.size != ids.size
 
-    @remaining_ids = ids.reject { |id| bullets.fetch(id).done? }
+    @remaining_ids = ids.reject { |id| bullets.fetch(id).completed? }
     @bullet = bullets[@remaining_ids.first]
   end
 
