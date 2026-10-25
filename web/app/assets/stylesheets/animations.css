@@ -100,7 +100,7 @@
     .animations--side-in:not([popover]),
     .animations--side-back:not([popover]),
     label:has(input:checked)::after,
-    .bullet:has(input:checked) .bullet--body {
+    .bullet:has(> input:checked) .bullet--body {
       animation: none;
     }
 

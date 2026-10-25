@@ -1,0 +1,10 @@
+<%# locals: (item_form:) %>
+<div class="checklist-editor--item" data-checklist-editor-target="row" data-persisted="<%= item_form.object.persisted? %>">
+  <%= item_form.label :text, "Checklist item", class: "utilities--sr-only" %>
+  <%= item_form.text_field :text, required: true, maxlength: 500, placeholder: "Add a step…", data: { checklist_editor_target: "text" } %>
+  <%= item_form.hidden_field :position, data: { checklist_editor_target: "position" } %>
+  <%= item_form.hidden_field :_destroy, value: "0", data: { checklist_editor_target: "destroy" } %>
+  <button type="button" data-intent="secondary" data-radius="base" data-size="sm" data-content="icon" data-action="checklist-editor#remove" aria-label="Remove item">
+    <%= icon("x") %>
+  </button>
+</div>

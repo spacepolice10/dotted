@@ -18,13 +18,14 @@ module Completable
   def complete!
     return if completed?
 
-    update!(completed_at: Time.current)
+    now = Time.current
+    update!(completed_at: now, reviewed_at: now)
     forget_search_selections!
   end
 
   def uncomplete!
     return unless completed?
 
-    update!(completed_at: nil)
+    update!(completed_at: nil, reviewed_at: nil)
   end
 end

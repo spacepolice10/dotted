@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_23_141000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
   create_table "access_codes", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "code_digest", null: false
@@ -107,11 +107,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_141000) do
     t.integer "collection_id"
     t.datetime "last_postponed_at"
     t.integer "postponements_number", default: 0, null: false
+    t.datetime "reviewed_at"
     t.index ["collection_id"], name: "index_bullets_on_collection_id"
     t.index ["last_postponed_at"], name: "index_bullets_on_last_postponed_at"
+    t.index ["reviewed_at"], name: "index_bullets_on_reviewed_at"
     t.index ["user_id", "client_id"], name: "index_bullets_on_user_id_and_client_id", unique: true
     t.index ["user_id", "collection_id", "pops_on"], name: "index_bullets_on_user_collection_pops_on"
     t.index ["user_id"], name: "index_bullets_on_user_id"
+  end
+
+  create_table "checklist_items", force: :cascade do |t|
+    t.integer "checklist_id", null: false
+    t.string "text", null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["checklist_id", "position"], name: "index_checklist_items_on_checklist_id_and_position"
+    t.index ["checklist_id"], name: "index_checklist_items_on_checklist_id"
+  end
+
+  create_table "checklists", force: :cascade do |t|
+    t.integer "bullet_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bullet_id"], name: "index_checklists_on_bullet_id", unique: true
   end
 
   create_table "collection_items", force: :cascade do |t|
@@ -229,6 +249,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_141000) do
   add_foreign_key "bookmarks", "bullets"
   add_foreign_key "bullets", "collections"
   add_foreign_key "bullets", "users"
+  add_foreign_key "checklist_items", "checklists"
+  add_foreign_key "checklists", "bullets"
   add_foreign_key "collection_items", "bullets"
   add_foreign_key "collection_items", "collections"
   add_foreign_key "collections", "users"

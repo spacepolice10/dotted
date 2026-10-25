@@ -34,6 +34,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
   test 'complete advances to the next bullet' do
     patch review_path, params: { bullet_ids: @ids, decision: 'complete' }
     assert @first.reload.completed?
+    assert_not_nil @first.reviewed_at
     assert_not @second.reload.completed?
     follow_redirect!
     assert_select '.review--card', text: /Second review bullet/
@@ -42,6 +43,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
   test 'postpone persists date and advances' do
     patch review_path, params: { bullet_ids: @ids, decision: 'postpone', pops_on: Date.tomorrow.iso8601 }
     assert_equal Date.tomorrow, @first.reload.pops_on
+    assert_not_nil @first.reviewed_at
     follow_redirect!
     assert_select '.review--card', text: /Second review bullet/
   end
@@ -50,6 +52,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     collection = create_collection!(@user, name: 'review destination')
     patch review_path, params: { bullet_ids: @ids, decision: 'collect', collection_id: collection.id }
     assert_equal collection, @first.reload.collection
+    assert_not_nil @first.reviewed_at
     follow_redirect!
     assert_select '.review--card', text: /Second review bullet/
   end
@@ -59,6 +62,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_select '[role=alert]'
     assert_select '.review--card', text: /First review bullet/
+    assert_nil @first.reload.reviewed_at
   end
 
   test 'foreign bullets cannot be viewed or changed' do
@@ -94,5 +98,32 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_includes ids, @second.id
     assert_not_includes ids, @first.id
     assert_not_includes ids, future.id
+  end
+
+  test 'default review excludes reviewed bullets until reset' do
+    @first.postpone!(pops_on: Date.current)
+
+    get review_path
+    assert_select '.review--card', text: /Second review bullet/
+
+    @first.reset_review!
+    get review_path
+    assert_select '.review--card', text: /First review bullet/
+  end
+
+  test 'explicit selection can revisit a reviewed bullet' do
+    @first.postpone!(pops_on: Date.current)
+
+    get review_path, params: { bullet_ids: @first.id }
+    assert_select '.review--card', text: /First review bullet/
+  end
+
+  test 'review ends once all due bullets have been handled' do
+    @first.postpone!(pops_on: Date.current)
+    @second.collect!(collection_id: create_collection!(@user, name: 'Handled').id)
+
+    get review_path
+    assert_select '.review--card', count: 0
+    assert_match 'All reviewed', response.body
   end
 end

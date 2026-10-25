@@ -11,10 +11,10 @@ module Postponable
     raise ArgumentError, 'pops_on is required' if pops_on.blank?
 
     target = pops_on.to_date
-    return if self.pops_on == target
+    return update!(reviewed_at: Time.current) if self.pops_on == target
 
     from = self.pops_on
-    attributes = { pops_on: target }
+    attributes = { pops_on: target, reviewed_at: Time.current }
     if from.present? && target > from
       attributes[:last_postponed_at] = Time.current
       attributes[:postponements_number] = postponements_number + 1

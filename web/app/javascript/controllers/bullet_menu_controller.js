@@ -14,6 +14,7 @@ export default class extends Controller {
     "publishingLink",
     "publishingTemplate",
     "note",
+    "checklist",
     "pickerElement",
   ];
 
@@ -114,6 +115,14 @@ export default class extends Controller {
     if (!checkbox) return;
     this.#closePickers();
     this.openPicker({ params: { dialog: "note_dialog", url: checkbox.dataset.noteUrl } });
+  }
+
+  openChecklist() {
+    if (this.idListValue.length != 1) return;
+    const checkbox = this.checkboxTargets.find((checkbox) => checkbox.checked);
+    if (!checkbox) return;
+    this.#closePickers();
+    this.openPicker({ params: { dialog: "checklist_dialog", url: checkbox.dataset.checklistUrl } });
   }
 
   openPicker(event) {
@@ -225,6 +234,9 @@ export default class extends Controller {
   #syncStatusActions() {
     const checked = this.checkboxTargets.filter((checkbox) => checkbox.checked);
     this.noteTargets.forEach((target) => {
+      target.hidden = checked.length != 1;
+    });
+    this.checklistTargets.forEach((target) => {
       target.hidden = checked.length != 1;
     });
     const completed = this.#sharedDataset(checked, "bulkDone");

@@ -5,11 +5,11 @@ module Collectable
 
   def collect!(collection_id:)
     destination = user.collections.find(collection_id)
-    return if self.collection_id == destination.id
+    return update!(reviewed_at: Time.current) if self.collection_id == destination.id
 
     transaction do
       collection_item&.destroy!
-      update!(collection: destination)
+      update!(collection: destination, reviewed_at: Time.current)
     end
   end
 end

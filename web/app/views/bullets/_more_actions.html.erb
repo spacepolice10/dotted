@@ -2,6 +2,9 @@
   <button type="button" class="bullet-menu--action-button" data-bullet-menu-target="note" data-action="bullet-menu#openNote" data-intent="secondary" data-radius="base" data-size="sm" hidden>
     <%= icon("memo", style: "color: var(--model-color-4)") %> Note
   </button>
+  <button type="button" class="bullet-menu--action-button" data-bullet-menu-target="checklist" data-action="bullet-menu#openChecklist" data-intent="secondary" data-radius="base" data-size="sm" hidden>
+    <%= icon("check", style: "color: var(--model-color-2)") %> Checklist
+  </button>
   <div class="bullet-menu--publishing" data-bullet-menu-target="publishing">
     <%= render "bullets/publishes/link" %>
   </div>

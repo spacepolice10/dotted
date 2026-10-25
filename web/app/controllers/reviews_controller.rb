@@ -43,7 +43,7 @@ class ReviewsController < ApplicationController
   def review_ids
     return prepare_bullet_list_from(params[:bullet_ids]) if params.key?(:bullet_ids)
 
-    @timeline.filtered.uncompleted.reorder(pops_on: :asc, id: :asc).pluck(:id)
+    @timeline.filtered.uncompleted.unreviewed.reorder(pops_on: :asc, id: :asc).pluck(:id)
   end
 
   def set_review

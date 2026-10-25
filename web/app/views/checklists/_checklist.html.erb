@@ -1,0 +1,27 @@
+<%# locals: (bullet:, checklist:) %>
+<section id="<%= dom_id(bullet, :checklist) %>" class="bullet-checklist" aria-label="Checklist">
+  <ul class="bullet-checklist--items">
+    <% checklist.items.each do |item| %>
+      <li>
+        <% if Current.user&.id == bullet.user_id %>
+          <%= form_with url: bullet_checklist_item_path(bullet, item), method: :patch,
+                class: "bullet-checklist--item",
+                data: { controller: "checklist-item", action: "change->checklist-item#submit", turbo_stream: true } do %>
+            <%= hidden_field_tag "checklist_item[completed]", "0", id: nil %>
+            <%= check_box_tag "checklist_item[completed]", "1", item.completed?, id: dom_id(item, :completed), class: "utilities--sr-only", aria: { label: item.text } %>
+            <%= label_tag dom_id(item, :completed) do %>
+              <span class="bullet-checklist--text"><%= item.text %></span>
+            <% end %>
+          <% end %>
+        <% else %>
+          <div class="bullet-checklist--item">
+            <%= check_box_tag nil, "1", item.completed?, disabled: true, id: dom_id(item, :completed), class: "utilities--sr-only", aria: { label: item.text } %>
+            <%= label_tag dom_id(item, :completed) do %>
+              <span class="bullet-checklist--text"><%= item.text %></span>
+            <% end %>
+          </div>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</section>

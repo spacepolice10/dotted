@@ -26,6 +26,9 @@ Rails.application.routes.draw do
 
   resources :bullets, except: %i[new edit] do
     resource :note, only: %i[edit update]
+    resource :checklist, only: %i[new create edit update] do
+      resources :items, only: :update, controller: 'checklist_items'
+    end
     collection do
       get :export, to: 'bullets/exports#show'
     end

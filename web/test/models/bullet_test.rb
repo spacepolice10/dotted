@@ -57,9 +57,22 @@ class BulletTest < ActiveSupport::TestCase
     bullet.complete!
     assert bullet.reload.completed?
     assert_not_nil bullet.completed_at
+    assert_not_nil bullet.reviewed_at
     bullet.uncomplete!
     assert_not bullet.reload.completed?
     assert_nil bullet.completed_at
+    assert_nil bullet.reviewed_at
+  end
+
+  test 'review can be reset independently of completion' do
+    bullet = create_bullet!(@user, body: 'Review again')
+    bullet.postpone!(pops_on: Date.tomorrow)
+
+    assert_not_nil bullet.reload.reviewed_at
+    bullet.reset_review!
+
+    assert_nil bullet.reload.reviewed_at
+    assert_equal Date.tomorrow, bullet.pops_on
   end
 
   test 'completed scope includes only completed bullets' do
@@ -177,6 +190,7 @@ class BulletTest < ActiveSupport::TestCase
     bullet.collect!(collection_id: collection.id)
 
     assert_equal collection, bullet.reload.collection
+    assert_not_nil bullet.reviewed_at
     assert_includes timeline.filtered, bullet
   end
 
@@ -208,7 +222,22 @@ class BulletTest < ActiveSupport::TestCase
 
     bullet.postpone!(pops_on: Date.current + 2)
 
+    assert_not_nil bullet.reload.reviewed_at
     assert_not_includes Timeline.new(@user).filtered, bullet
     assert_includes @user.bullets.uncompleted.upcoming, bullet
+  end
+
+  test 'choosing the current date or collection still reviews a bullet' do
+    bullet = create_bullet!(@user, body: 'Keep as is')
+    collection = create_collection!(@user, name: 'Keep')
+
+    bullet.postpone!(pops_on: bullet.pops_on)
+    assert_not_nil bullet.reload.reviewed_at
+
+    bullet.reset_review!
+    bullet.collect!(collection_id: collection.id)
+    bullet.reset_review!
+    bullet.collect!(collection_id: collection.id)
+    assert_not_nil bullet.reload.reviewed_at
   end
 end

@@ -10,7 +10,7 @@ class BulletsController < ApplicationController
     if params[:before].present?
       load_prev_page
     else
-      relation = @timeline.filtered.preload(:collection, note: :rich_text_content)
+      relation = @timeline.filtered.preload(:collection, { note: :rich_text_content }, checklist: :items)
       @bullets = @filter.single_date? ? relation.by_date.to_a : relation.last_page
       @more_bullets = !@filter.single_date? && @timeline.filtered.previous_page?(@bullets.first)
     end
@@ -72,7 +72,7 @@ class BulletsController < ApplicationController
     cursor = @timeline.filtered.find_by(id: params[:before])
     return head :no_content unless cursor
 
-    @bullets = @timeline.filtered.preload(:collection, note: :rich_text_content).prev_page(cursor)
+    @bullets = @timeline.filtered.preload(:collection, { note: :rich_text_content }, checklist: :items).prev_page(cursor)
     return head :no_content if @bullets.empty?
 
     respond_to do |format|

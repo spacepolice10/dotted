@@ -145,7 +145,7 @@
         color: var(--color-invert-3);
       }
 
-      .bullet:has(input:checked) & {
+      .bullet:has(> input:checked) & {
         background: var(--model-color-2-bg);
       }
     }
@@ -225,7 +225,7 @@
     }
   }
 
-  .bullet:has(input:checked) {
+  .bullet:has(> input:checked) {
     .bullet--body {
       border-color: var(--model-color-2);
       box-shadow: 0 0 0 1px var(--model-color-2), var(--shadow-subtle);

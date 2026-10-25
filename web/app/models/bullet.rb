@@ -2,7 +2,8 @@
 
 class Bullet < ApplicationRecord
   include Completable, Collectable, Postponable, Publishable, Bullet::Pageable,
-          Bullet::Searchable, Bullet::Bookmarkable, Bullet::WithNote, ActivityTrackable
+          Bullet::Searchable, Bullet::Bookmarkable, Bullet::WithNote, Bullet::WithChecklist,
+          ActivityTrackable
 
   belongs_to :user
   belongs_to :collection, optional: true
@@ -30,6 +31,7 @@ class Bullet < ApplicationRecord
 
   scope :current, -> { where(pops_on: ..Date.current) }
   scope :upcoming, -> { where(pops_on: (Date.current + 1.day)..) }
+  scope :unreviewed, -> { where(reviewed_at: nil) }
   scope :with_attachment, -> { joins(:file_attachment) }
   scope :tagged_with, lambda { |collection|
     where(collection_id: collection.id)
@@ -37,6 +39,10 @@ class Bullet < ApplicationRecord
 
   def body_as_text = body.to_plain_text.to_s
   def name = body_as_text.lines.first&.strip.presence || filename.presence || 'Untitled'
+
+  def reset_review!
+    update!(reviewed_at: nil)
+  end
 
   def status
     return 'completed' if completed?

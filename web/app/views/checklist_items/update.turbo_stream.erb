@@ -1,0 +1,3 @@
+<%= turbo_stream.replace_all "##{dom_id(@bullet, :checklist)}" do %>
+  <%= render "checklists/checklist", bullet: @bullet, checklist: @checklist %>
+<% end %>

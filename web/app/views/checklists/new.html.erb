@@ -1,0 +1,31 @@
+<turbo-frame id="checklist_editor">
+  <%= form_with model: @checklist,
+        url: bullet_checklist_path(@bullet),
+        method: @checklist.persisted? ? :patch : :post,
+        class: "checklist-editor",
+        data: { controller: "checklist-editor", action: "submit->checklist-editor#reindex keydown.enter->checklist-editor#addOnEnter", turbo_stream: true } do |form| %>
+    <% if @checklist.errors.any? %>
+      <p role="alert"><%= @checklist.errors.full_messages.to_sentence %></p>
+    <% end %>
+
+    <div class="checklist-editor--items" data-checklist-editor-target="items">
+      <%= form.fields_for :items do |item_form| %>
+        <%= render "checklists/item_field", item_form: item_form %>
+      <% end %>
+      <button type="button" class="checklist-editor--add" data-intent="secondary" data-radius="base" data-size="sm" data-checklist-editor-target="addButton" data-action="checklist-editor#add">
+        <%= icon("plus") %> Add item
+      </button>
+    </div>
+
+    <template data-checklist-editor-target="template">
+      <%= form.fields_for :items, ChecklistItem.new, child_index: "NEW_ITEM" do |item_form| %>
+        <%= render "checklists/item_field", item_form: item_form %>
+      <% end %>
+    </template>
+
+    <div class="checklist-editor--actions">
+      <%= form.button "Save", data: { intent: "secondary", radius: "base", size: "sm" } %>
+      <%= form.button "Save & Resurface", name: "resurface", value: "1", data: { intent: "primary", radius: "base", size: "sm" } %>
+    </div>
+  <% end %>
+</turbo-frame>

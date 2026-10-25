@@ -1,0 +1,130 @@
+@layer components {
+  .bullet-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-v-half);
+    min-inline-size: 0;
+    margin-block-start: var(--space-v-half);
+    padding: var(--space-v) var(--space-h);
+    border: var(--border-subtle);
+    border-radius: var(--radius-base);
+    background: color-mix(in srgb, var(--model-color-2) 18%, var(--color-1));
+  }
+
+  .bullet-checklist--items {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--space-v-half) / 2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .bullet-checklist--item {
+    display: flex;
+    flex-direction: row;
+    min-inline-size: 0;
+    margin: 0;
+  }
+
+  .bullet-checklist--item > label {
+    display: flex;
+    align-items: flex-start;
+    min-inline-size: 0;
+    padding-block: 0;
+    padding-inline: 0;
+    line-height: 1.5;
+    cursor: pointer;
+  }
+
+  .bullet-checklist--item label::before {
+    content: "";
+    flex: none;
+    inline-size: 1rem;
+    block-size: 1rem;
+    box-sizing: border-box;
+    margin-block-start: calc((1lh - 1rem) / 2);
+    margin-inline-end: var(--space-h-half);
+    border: var(--border-strong);
+    border-radius: 50%;
+    background: var(--color-1);
+  }
+
+  .bullet-checklist--item input:checked + label::before {
+    border-color: var(--color-accent-1);
+    background: var(--color-accent-1);
+    box-shadow: inset 0 0 0 3px var(--color-1);
+  }
+
+  .bullet-checklist--item input:focus-visible + label::before {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  .bullet-checklist--item label:active::before { transform: scale(0.96); }
+
+  .bullet-checklist--item input:disabled + label { cursor: default; }
+
+  .bullet-checklist--text {
+    min-inline-size: 0;
+    overflow-wrap: break-word;
+  }
+
+  .bullet-checklist--item input:checked + label .bullet-checklist--text {
+    color: var(--color-invert-3);
+    text-decoration: line-through;
+  }
+
+  #checklist_dialog[open] {
+    display: flex;
+    flex-direction: column;
+    block-size: fit-content;
+    max-block-size: min(75dvh, calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)));
+    overflow: clip;
+  }
+
+  #checklist_dialog > main,
+  #checklist_editor,
+  .checklist-editor {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-block-size: 0;
+  }
+
+  .checklist-editor { gap: var(--space-v); }
+
+  .checklist-editor--items {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    gap: var(--space-v-half);
+    min-block-size: 0;
+    padding: var(--space-v) var(--space-h-half);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .checklist-editor--item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-h-half);
+
+    &[hidden] { display: none; }
+
+    input[type="text"] { min-inline-size: 0; }
+  }
+
+  .checklist-editor--add { align-self: flex-start; }
+
+  .checklist-editor--actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-v-half);
+    flex: none;
+  }
+
+  .checklist-editor--actions > button { margin: 0; }
+}

@@ -28,13 +28,13 @@ class Collection < ApplicationRecord
 
   def unsorted_bullets
     bullets.uncompleted.where.not(id: collection_items.select(:bullet_id))
-           .preload(:collection, note: :rich_text_content)
+           .preload(:collection, { note: :rich_text_content }, checklist: :items)
            .order(created_at: :desc, id: :desc)
   end
 
   def parked_items
     collection_items.joins(:bullet).merge(Bullet.uncompleted)
-                    .includes(bullet: [:collection, { note: :rich_text_content }])
+                    .includes(bullet: [:collection, { note: :rich_text_content }, { checklist: :items }])
                     .order(:position, :id)
   end
 

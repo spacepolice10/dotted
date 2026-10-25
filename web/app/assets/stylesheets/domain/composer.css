@@ -210,7 +210,7 @@
     }
 
     .composer lexxy-editor:focus-within,
-    .bullet:has(input:checked) .bullet--body {
+    .bullet:has(> input:checked) .bullet--body {
         animation: none;
     }
 }

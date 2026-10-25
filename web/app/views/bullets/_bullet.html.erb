@@ -13,6 +13,7 @@
     data-public-url="<%= published_url(bullet.public_code) if bullet.published? %>"
     data-note-url="<%= edit_bullet_note_path(bullet) %>"
     data-with-note="<%= bullet.with_note? %>"
+    data-checklist-url="<%= bullet.with_checklist? ? edit_bullet_checklist_path(bullet) : new_bullet_checklist_path(bullet) %>"
     data-bullet-menu-target="checkbox"
     data-action="bullet-menu#toggle"
     class="utilities--sr-only"
@@ -43,6 +44,9 @@
     </div>
     <% if bullet.with_note? %>
       <%= render "notes/preview", note: bullet.note %>
+    <% end %>
+    <% if bullet.with_checklist? %>
+      <%= render "checklists/checklist", bullet: bullet, checklist: bullet.checklist %>
     <% end %>
   </div>
 
